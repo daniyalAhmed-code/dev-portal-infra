@@ -93,7 +93,6 @@ module "register" {
   INTEGRATION_RESPONSE_PARAMETERS = "${local.integration_response_parameters}"
   METHOD_RESPONSE_PARAMETERS = "${local.method_response_parameters}"
   AUTHORIZATION = "${var.AUTHORIZATION}"
-#   AUTHORIZER_ID = "${var.AUTHORIZATION == "CUSTOM" ? "${aws_api_gateway_authorizer.entity_authorizer[0].id}" : ""}"
   HTTP_METHOD = "POST"
   LAMBDA_INVOKE_ARN = "${var.BACKEND_LAMBDA_INVOKE_ARN}"
   FUNCTION_NAME = "${var.BACKEND_LAMBDA_NAME}"
@@ -138,7 +137,6 @@ module "catalog" {
   INTEGRATION_RESPONSE_PARAMETERS = "${local.integration_response_parameters}"
   METHOD_RESPONSE_PARAMETERS = "${local.method_response_parameters}"
   AUTHORIZATION = "${var.AUTHORIZATION}"
-#   AUTHORIZER_ID = "${var.AUTHORIZATION == "CUSTOM" ? "${aws_api_gateway_authorizer.entity_authorizer[0].id}" : ""}"
   HTTP_METHOD = "GET"
   LAMBDA_INVOKE_ARN = "${var.BACKEND_LAMBDA_INVOKE_ARN}"
   FUNCTION_NAME = "${var.BACKEND_LAMBDA_NAME}"
@@ -182,7 +180,6 @@ module "feedback_get" {
   INTEGRATION_RESPONSE_PARAMETERS = "${local.integration_response_parameters}"
   METHOD_RESPONSE_PARAMETERS = "${local.method_response_parameters}"
   AUTHORIZATION = "${var.AUTHORIZATION}"
-#   AUTHORIZER_ID = "${var.AUTHORIZATION == "CUSTOM" ? "${aws_api_gateway_authorizer.entity_authorizer[0].id}" : ""}"
   HTTP_METHOD = "GET"
   LAMBDA_INVOKE_ARN = "${var.BACKEND_LAMBDA_INVOKE_ARN}"
   FUNCTION_NAME = "${var.BACKEND_LAMBDA_NAME}"
@@ -202,7 +199,6 @@ module "feedback_post" {
   INTEGRATION_RESPONSE_PARAMETERS = "${local.integration_response_parameters}"
   METHOD_RESPONSE_PARAMETERS = "${local.method_response_parameters}"
   AUTHORIZATION = "${var.AUTHORIZATION}"
-#   AUTHORIZER_ID = "${var.AUTHORIZATION == "CUSTOM" ? "${aws_api_gateway_authorizer.entity_authorizer[0].id}" : ""}"
   HTTP_METHOD = "POST"
   LAMBDA_INVOKE_ARN = "${var.BACKEND_LAMBDA_INVOKE_ARN}"
   FUNCTION_NAME = "${var.BACKEND_LAMBDA_NAME}"
@@ -224,7 +220,6 @@ module "feedback_delete" {
   AUTHORIZATION = "${var.AUTHORIZATION}"
     CURRENT_ACCOUNT_ID = var.CURRENT_ACCOUNT_ID
   AWS_REGION = var.AWS_REGION
-#   AUTHORIZER_ID = "${var.AUTHORIZATION == "CUSTOM" ? "${aws_api_gateway_authorizer.entity_authorizer[0].id}" : ""}"
   HTTP_METHOD = "DELETE"
   LAMBDA_INVOKE_ARN = "${var.BACKEND_LAMBDA_INVOKE_ARN}"
   FUNCTION_NAME = "${var.BACKEND_LAMBDA_NAME}"
@@ -280,7 +275,6 @@ module "visibility_get" {
   INTEGRATION_RESPONSE_PARAMETERS = "${local.integration_response_parameters}"
   METHOD_RESPONSE_PARAMETERS = "${local.method_response_parameters}"
   AUTHORIZATION = "${var.AUTHORIZATION}"
-#   AUTHORIZER_ID = "${var.AUTHORIZATION == "CUSTOM" ? "${aws_api_gateway_authorizer.entity_authorizer[0].id}" : ""}"
   HTTP_METHOD = "GET"
   LAMBDA_INVOKE_ARN = "${var.BACKEND_LAMBDA_INVOKE_ARN}"
   FUNCTION_NAME = "${var.BACKEND_LAMBDA_NAME}"
@@ -302,7 +296,6 @@ module "visibility_post" {
   AUTHORIZATION = "${var.AUTHORIZATION}"
     CURRENT_ACCOUNT_ID = var.CURRENT_ACCOUNT_ID
   AWS_REGION = var.AWS_REGION
-#   AUTHORIZER_ID = "${var.AUTHORIZATION == "CUSTOM" ? "${aws_api_gateway_authorizer.entity_authorizer[0].id}" : ""}"
   HTTP_METHOD = "POST"
   LAMBDA_INVOKE_ARN = "${var.BACKEND_LAMBDA_INVOKE_ARN}"
   FUNCTION_NAME = "${var.BACKEND_LAMBDA_NAME}"
@@ -312,6 +305,28 @@ module "visibility_post" {
     EOF
     }
 }
+module "visibility_ANY" {
+  source = "./methods"
+  METHOD_VALUE = ""
+  API_GATEWAY_ID = "${aws_api_gateway_rest_api.api-gateway.id}"
+  RESOURCE_ID = "${aws_api_gateway_resource.admin_catalog_visibility_resource.id}"
+  INTEGRATION_RESPONSE_PARAMETERS = "${local.integration_response_parameters}"
+  METHOD_RESPONSE_PARAMETERS = "${local.method_response_parameters}"
+  AUTHORIZATION = "${var.AUTHORIZATION}"
+  CURRENT_ACCOUNT_ID = var.CURRENT_ACCOUNT_ID
+  AWS_REGION = var.AWS_REGION
+  HTTP_METHOD = "ANY"
+  LAMBDA_INVOKE_ARN = "${var.BACKEND_LAMBDA_INVOKE_ARN}"
+  FUNCTION_NAME = "${var.BACKEND_LAMBDA_NAME}"
+  
+  REQUEST_TEMPLATES = {
+  "application/json" = <<EOF
+    EOF
+    }
+}
+
+
+
 
 //catalog visibility api ends
 
@@ -333,12 +348,12 @@ module "proxy_post" {
   AUTHORIZATION = "${var.AUTHORIZATION}"
     CURRENT_ACCOUNT_ID = var.CURRENT_ACCOUNT_ID
   AWS_REGION = var.AWS_REGION
-#   AUTHORIZER_ID = "${var.AUTHORIZATION == "CUSTOM" ? "${aws_api_gateway_authorizer.entity_authorizer[0].id}" : ""}"
   HTTP_METHOD = "ANY"
   LAMBDA_INVOKE_ARN = "${var.BACKEND_LAMBDA_INVOKE_ARN}"
-  FUNCTION_NAME = "${var.BACKEND_LAMBDA_NAME}"
-  
+  FUNCTION_NAME = "${var.BACKEND_LAMBDA_NAME}" 
 }
+  
+
 
   module "proxy_resource_OPTION" {
   source = "./methods"
@@ -399,7 +414,7 @@ resource "aws_api_gateway_deployment" "api-gateway-deployment" {
     "module.proxy_post.API_GATEWAY_RESPONSE_200",
   ]
   rest_api_id       = "${aws_api_gateway_rest_api.api-gateway.id}"
-  stage_name        = "${var.ENV}"
+  stage_name        = "prod"
   stage_description = "1.0"
   description       = "1.0"
   

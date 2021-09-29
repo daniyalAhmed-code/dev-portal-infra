@@ -1,6 +1,4 @@
-output "CloudFrontDomainName"{
-    value = aws_cloudfront_distribution.s3_distribution.*.domain_name
-}
+
 output "id"{
     value = aws_cloudfront_origin_access_identity.cloudfront_origin_access_identity.id
 }
