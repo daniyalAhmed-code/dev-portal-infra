@@ -427,7 +427,7 @@ resource "aws_api_gateway_deployment" "api-gateway-deployment" {
   }
 }
 
-resource "aws_lambda_permission" "lambda_permission1" {
+resource "aws_lambda_permission" "resource_permission" {
   function_name = "${var.BACKEND_LAMBDA_NAME}"
   statement_id  = "lambda-permission1"
   action        = "lambda:InvokeFunction"
@@ -435,7 +435,7 @@ resource "aws_lambda_permission" "lambda_permission1" {
   source_arn    = "${aws_api_gateway_rest_api.api-gateway.execution_arn}/*/*/*"
 }
 
-resource "aws_lambda_permission" "lambda_permission2" {
+resource "aws_lambda_permission" "proxy_permission" {
   function_name = "${var.BACKEND_LAMBDA_NAME}"
   statement_id  = "lambda-permission2"
   action        = "lambda:InvokeFunction"
