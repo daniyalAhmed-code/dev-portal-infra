@@ -1,5 +1,4 @@
 resource "aws_cloudfront_origin_access_identity" "cloudfront_origin_access_identity" {
-  #  count = var.DEVELOPMENT_MODE ? 1 : 0
   comment = "${var.RESOURCE_PREFIX}"
 }
 

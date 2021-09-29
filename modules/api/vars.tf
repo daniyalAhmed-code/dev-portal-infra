@@ -1,84 +1,8 @@
-# variable "allow_headers" {
-#   description = "Allow headers"
-#   type        = list(string)
 
-#   default = [
-#     "*"
-#   ]
-# }
-
-# # var.allow_methods
-# variable "allow_methods" {
-#   description = "Allow methods"
-#   type        = list(string)
-
-#   default = [
-#     "OPTIONS",
-#     "HEAD",
-#     "GET",
-#     "POST",
-#     "PUT",
-#     "PATCH",
-#     "DELETE",
-#   ]
-# }
-
-# # var.allow_max_age
-# variable "allow_max_age" {
-#   description = "Allow response caching time"
-#   type        = string
-#   default     = "7200"
-# }
-
-# # var.allowed_credentials
-# variable "allow_credentials" {
-#   description = "Allow credentials"
-#   default     = true
-# }
-
-# # ##################
-
-# variable "Strict_Transport_Security" {
-#   default = "max-age=31536000; includeSubDomains; preload"
-# }
-
-# variable "Referrer_Policy" {
-#   default = "same-origin"
-# }
-
-# variable "X_XSS_Protection" {
-#   default = "1; mode=block"
-# }
-
-# variable "X_Frame_Options" {
-#   default = "DENY"
-# }
-
-# variable "X_Content_Type_Options" {
-#   default = "nosniff"
-# }
-
-# variable "Content_Security_Policy" {
-#   default = "default-src 'self';"
-# }
 variable "CORS_ALLOW_ORIGIN" {
   type = string
   default = "*"
 }
-
-# variable "AUTHORIZATION" {
-#   default = "AWS_IAM" // CUSTOM
-# }
-
-# variable "Base_Path" {
-#   default = "prod" //notification
-# }
-# variable "ENV" {}
-# variable "RESOURCE_PREFIX" {}
-# variable "BACKEND_LAMBDA_NAME" {}
-# variable "BACKEND_LAMBDA_INVOKE_ARN" {}
-# variable "USE_CUSTOM_DOMAIN_NAME"{}
-# variable "DOMAIN_NAME" {}
 
 
 variable "allow_headers" {
@@ -86,25 +10,13 @@ variable "allow_headers" {
   type        = list(string)
 
   default = [
-    "Authorization",
+   "Authorization",
     "authorization",
     "Content-Type",
     "X-Amz-Date",
     "X-Amz-Security-Token",
     "X-Api-Key",
-    "X-Amz-User-Agent",
-    "Strict-Transport-Security",
-    "strict-transport-security",
-    "Referrer-Policy",
-    "referrer-policy",
-    "X-XSS-Protection",
-    "x-xss-protection",
-    "X-Content-Type-Options",
-    "x-content-type-options",
-    "X-Frame-Options",
-    "x-frame-options",
-    "Content-Security-Policy",
-    "content-security-policy"
+    
   ]
 }
 

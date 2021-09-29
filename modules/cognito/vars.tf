@@ -1,6 +1,5 @@
 
 
-variable "SCHEMA_ATTRIBUTES"{}
 variable "COGNITO_USER_POOL_CLIENT"{}
 variable "AWS_ACCOUNT_ID"{}
 variable "ALLOW_ADMIN_CREATE_USER_ONLY"{}

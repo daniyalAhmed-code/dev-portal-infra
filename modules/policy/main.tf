@@ -125,6 +125,15 @@ resource "aws_iam_policy" "lambda_backend_policy" {
       "Resource": [
         "*"
       ]
+    },
+{
+      "Effect": "Allow",
+      "Action": [
+        "cognito-idp:AdminListGroupsForUser"
+      ],
+      "Resource": [
+        "*"
+      ]
     }
   ]
 }
