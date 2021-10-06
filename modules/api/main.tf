@@ -16,50 +16,50 @@ resource "aws_api_gateway_resource" "version_number_resource" {
 }
 
 module "version_resource_OPTION" {
-  source = "./methods"
-  METHOD_VALUE = ""
-  API_GATEWAY_ID = "${aws_api_gateway_rest_api.api-gateway.id}"
-  RESOURCE_ID = "${aws_api_gateway_resource.version_number_resource.id}"
+  source                          = "./methods"
+  METHOD_VALUE                    = ""
+  API_GATEWAY_ID                  = "${aws_api_gateway_rest_api.api-gateway.id}"
+  RESOURCE_ID                     = "${aws_api_gateway_resource.version_number_resource.id}"
   INTEGRATION_RESPONSE_PARAMETERS = "${local.integration_response_parameters}"
-  METHOD_RESPONSE_PARAMETERS = "${local.method_response_parameters}"
-  HTTP_METHOD = "OPTIONS"
-  AUTHORIZATION = "NONE"
-  CURRENT_ACCOUNT_ID = var.CURRENT_ACCOUNT_ID
-  AWS_REGION = var.AWS_REGION
+  METHOD_RESPONSE_PARAMETERS      = "${local.method_response_parameters}"
+  HTTP_METHOD                     = "OPTIONS"
+  AUTHORIZATION                   = "NONE"
+  CURRENT_ACCOUNT_ID              = var.CURRENT_ACCOUNT_ID
+  AWS_REGION                      = var.AWS_REGION
 }
 
 //ROOT resources
 module "root_resource_OPTION" {
-  source = "./methods"
-  METHOD_VALUE = ""
-  API_GATEWAY_ID = "${aws_api_gateway_rest_api.api-gateway.id}"
-  RESOURCE_ID = "${aws_api_gateway_rest_api.api-gateway.root_resource_id}"
+  source                          = "./methods"
+  METHOD_VALUE                    = ""
+  API_GATEWAY_ID                  = "${aws_api_gateway_rest_api.api-gateway.id}"
+  RESOURCE_ID                     = "${aws_api_gateway_rest_api.api-gateway.root_resource_id}"
   INTEGRATION_RESPONSE_PARAMETERS = "${local.integration_response_parameters}"
-  METHOD_RESPONSE_PARAMETERS = "${local.method_response_parameters}"
-  HTTP_METHOD = "OPTIONS"
-  AUTHORIZATION = "NONE"
-    CURRENT_ACCOUNT_ID = var.CURRENT_ACCOUNT_ID
-  AWS_REGION = var.AWS_REGION
+  METHOD_RESPONSE_PARAMETERS      = "${local.method_response_parameters}"
+  HTTP_METHOD                     = "OPTIONS"
+  AUTHORIZATION                   = "NONE"
+  CURRENT_ACCOUNT_ID              = var.CURRENT_ACCOUNT_ID
+  AWS_REGION                      = var.AWS_REGION
 }
 
 
 module "root_resource" {
-  source = "./methods"
-  METHOD_VALUE = ""
-  API_GATEWAY_ID = "${aws_api_gateway_rest_api.api-gateway.id}"
-  RESOURCE_ID = "${aws_api_gateway_rest_api.api-gateway.root_resource_id}"
+  source                          = "./methods"
+  METHOD_VALUE                    = ""
+  API_GATEWAY_ID                  = "${aws_api_gateway_rest_api.api-gateway.id}"
+  RESOURCE_ID                     = "${aws_api_gateway_rest_api.api-gateway.root_resource_id}"
   INTEGRATION_RESPONSE_PARAMETERS = "${local.integration_response_parameters}"
-  METHOD_RESPONSE_PARAMETERS = "${local.method_response_parameters}"
-  AUTHORIZATION = "${var.AUTHORIZATION}"
-  HTTP_METHOD = "ANY"
-    CURRENT_ACCOUNT_ID = var.CURRENT_ACCOUNT_ID
-  AWS_REGION = var.AWS_REGION
-  LAMBDA_INVOKE_ARN = "${var.BACKEND_LAMBDA_INVOKE_ARN}"
-  FUNCTION_NAME = "${var.BACKEND_LAMBDA_NAME}"
+  METHOD_RESPONSE_PARAMETERS      = "${local.method_response_parameters}"
+  AUTHORIZATION                   = "${var.AUTHORIZATION}"
+  HTTP_METHOD                     = "ANY"
+  CURRENT_ACCOUNT_ID              = var.CURRENT_ACCOUNT_ID
+  AWS_REGION                      = var.AWS_REGION
+  LAMBDA_INVOKE_ARN               = "${var.BACKEND_LAMBDA_INVOKE_ARN}"
+  FUNCTION_NAME                   = "${var.BACKEND_LAMBDA_NAME}"
   REQUEST_TEMPLATES = {
-  "application/json" = <<EOF
+    "application/json" = <<EOF
     EOF
-    }
+  }
 }
 
 
@@ -73,35 +73,35 @@ resource "aws_api_gateway_resource" "register_resource" {
 }
 
 module "register_resource_OPTION" {
-  source = "./methods"
-  METHOD_VALUE = ""
-  API_GATEWAY_ID = "${aws_api_gateway_rest_api.api-gateway.id}"
-  RESOURCE_ID = "${aws_api_gateway_resource.register_resource.id}"
+  source                          = "./methods"
+  METHOD_VALUE                    = ""
+  API_GATEWAY_ID                  = "${aws_api_gateway_rest_api.api-gateway.id}"
+  RESOURCE_ID                     = "${aws_api_gateway_resource.register_resource.id}"
   INTEGRATION_RESPONSE_PARAMETERS = "${local.integration_response_parameters}"
-  METHOD_RESPONSE_PARAMETERS = "${local.method_response_parameters}"
-  HTTP_METHOD = "OPTIONS"
-  AUTHORIZATION = "NONE"
-    CURRENT_ACCOUNT_ID = var.CURRENT_ACCOUNT_ID
-  AWS_REGION = var.AWS_REGION
+  METHOD_RESPONSE_PARAMETERS      = "${local.method_response_parameters}"
+  HTTP_METHOD                     = "OPTIONS"
+  AUTHORIZATION                   = "NONE"
+  CURRENT_ACCOUNT_ID              = var.CURRENT_ACCOUNT_ID
+  AWS_REGION                      = var.AWS_REGION
 }
 
 module "register" {
-  source = "./methods"
-  METHOD_VALUE = ""
-  API_GATEWAY_ID = "${aws_api_gateway_rest_api.api-gateway.id}"
-  RESOURCE_ID = "${aws_api_gateway_resource.register_resource.id}"
+  source                          = "./methods"
+  METHOD_VALUE                    = ""
+  API_GATEWAY_ID                  = "${aws_api_gateway_rest_api.api-gateway.id}"
+  RESOURCE_ID                     = "${aws_api_gateway_resource.register_resource.id}"
   INTEGRATION_RESPONSE_PARAMETERS = "${local.integration_response_parameters}"
-  METHOD_RESPONSE_PARAMETERS = "${local.method_response_parameters}"
-  AUTHORIZATION = "${var.AUTHORIZATION}"
-  HTTP_METHOD = "POST"
-  LAMBDA_INVOKE_ARN = "${var.BACKEND_LAMBDA_INVOKE_ARN}"
-  FUNCTION_NAME = "${var.BACKEND_LAMBDA_NAME}"
-    CURRENT_ACCOUNT_ID = var.CURRENT_ACCOUNT_ID
-  AWS_REGION = var.AWS_REGION
+  METHOD_RESPONSE_PARAMETERS      = "${local.method_response_parameters}"
+  AUTHORIZATION                   = "${var.AUTHORIZATION}"
+  HTTP_METHOD                     = "POST"
+  LAMBDA_INVOKE_ARN               = "${var.BACKEND_LAMBDA_INVOKE_ARN}"
+  FUNCTION_NAME                   = "${var.BACKEND_LAMBDA_NAME}"
+  CURRENT_ACCOUNT_ID              = var.CURRENT_ACCOUNT_ID
+  AWS_REGION                      = var.AWS_REGION
   REQUEST_TEMPLATES = {
-  "application/json" = <<EOF
+    "application/json" = <<EOF
     EOF
-    }
+  }
 }
 
 // REGISTER POST API END
@@ -116,37 +116,37 @@ resource "aws_api_gateway_resource" "catalog_resource" {
 }
 
 module "catalog_resource_OPTION" {
-  source = "./methods"
-  METHOD_VALUE = ""
-  API_GATEWAY_ID = "${aws_api_gateway_rest_api.api-gateway.id}"
-  RESOURCE_ID = "${aws_api_gateway_resource.catalog_resource.id}"
+  source                          = "./methods"
+  METHOD_VALUE                    = ""
+  API_GATEWAY_ID                  = "${aws_api_gateway_rest_api.api-gateway.id}"
+  RESOURCE_ID                     = "${aws_api_gateway_resource.catalog_resource.id}"
   INTEGRATION_RESPONSE_PARAMETERS = "${local.integration_response_parameters}"
-  METHOD_RESPONSE_PARAMETERS = "${local.method_response_parameters}"
-  HTTP_METHOD = "OPTIONS"
-  AUTHORIZATION = "NONE"
-    CURRENT_ACCOUNT_ID = var.CURRENT_ACCOUNT_ID
-  AWS_REGION = var.AWS_REGION
-  
+  METHOD_RESPONSE_PARAMETERS      = "${local.method_response_parameters}"
+  HTTP_METHOD                     = "OPTIONS"
+  AUTHORIZATION                   = "NONE"
+  CURRENT_ACCOUNT_ID              = var.CURRENT_ACCOUNT_ID
+  AWS_REGION                      = var.AWS_REGION
+
 }
 
 module "catalog" {
-  source = "./methods"
-  METHOD_VALUE = ""
-  API_GATEWAY_ID = "${aws_api_gateway_rest_api.api-gateway.id}"
-  RESOURCE_ID = "${aws_api_gateway_resource.catalog_resource.id}"
+  source                          = "./methods"
+  METHOD_VALUE                    = ""
+  API_GATEWAY_ID                  = "${aws_api_gateway_rest_api.api-gateway.id}"
+  RESOURCE_ID                     = "${aws_api_gateway_resource.catalog_resource.id}"
   INTEGRATION_RESPONSE_PARAMETERS = "${local.integration_response_parameters}"
-  METHOD_RESPONSE_PARAMETERS = "${local.method_response_parameters}"
-  AUTHORIZATION = "${var.AUTHORIZATION}"
-  HTTP_METHOD = "GET"
-  LAMBDA_INVOKE_ARN = "${var.BACKEND_LAMBDA_INVOKE_ARN}"
-  FUNCTION_NAME = "${var.BACKEND_LAMBDA_NAME}"
-    CURRENT_ACCOUNT_ID = var.CURRENT_ACCOUNT_ID
-  AWS_REGION = var.AWS_REGION
-  
+  METHOD_RESPONSE_PARAMETERS      = "${local.method_response_parameters}"
+  AUTHORIZATION                   = "${var.AUTHORIZATION}"
+  HTTP_METHOD                     = "GET"
+  LAMBDA_INVOKE_ARN               = "${var.BACKEND_LAMBDA_INVOKE_ARN}"
+  FUNCTION_NAME                   = "${var.BACKEND_LAMBDA_NAME}"
+  CURRENT_ACCOUNT_ID              = var.CURRENT_ACCOUNT_ID
+  AWS_REGION                      = var.AWS_REGION
+
   REQUEST_TEMPLATES = {
-  "application/json" = <<EOF
+    "application/json" = <<EOF
     EOF
-    }
+  }
 }
 //CATALOG POST API ENDS
 
@@ -160,74 +160,74 @@ resource "aws_api_gateway_resource" "feedback_resource" {
 
 
 module "feedback_resource_OPTION" {
-  source = "./methods"
-  METHOD_VALUE = ""
-  API_GATEWAY_ID = "${aws_api_gateway_rest_api.api-gateway.id}"
-  RESOURCE_ID = "${aws_api_gateway_resource.feedback_resource.id}"
+  source                          = "./methods"
+  METHOD_VALUE                    = ""
+  API_GATEWAY_ID                  = "${aws_api_gateway_rest_api.api-gateway.id}"
+  RESOURCE_ID                     = "${aws_api_gateway_resource.feedback_resource.id}"
   INTEGRATION_RESPONSE_PARAMETERS = "${local.integration_response_parameters}"
-  METHOD_RESPONSE_PARAMETERS = "${local.method_response_parameters}"
-  HTTP_METHOD = "OPTIONS"
-  AUTHORIZATION = "NONE"
-    CURRENT_ACCOUNT_ID = var.CURRENT_ACCOUNT_ID
-  AWS_REGION = var.AWS_REGION
+  METHOD_RESPONSE_PARAMETERS      = "${local.method_response_parameters}"
+  HTTP_METHOD                     = "OPTIONS"
+  AUTHORIZATION                   = "NONE"
+  CURRENT_ACCOUNT_ID              = var.CURRENT_ACCOUNT_ID
+  AWS_REGION                      = var.AWS_REGION
 }
 
 module "feedback_get" {
-  source = "./methods"
-  METHOD_VALUE = ""
-  API_GATEWAY_ID = "${aws_api_gateway_rest_api.api-gateway.id}"
-  RESOURCE_ID = "${aws_api_gateway_resource.feedback_resource.id}"
+  source                          = "./methods"
+  METHOD_VALUE                    = ""
+  API_GATEWAY_ID                  = "${aws_api_gateway_rest_api.api-gateway.id}"
+  RESOURCE_ID                     = "${aws_api_gateway_resource.feedback_resource.id}"
   INTEGRATION_RESPONSE_PARAMETERS = "${local.integration_response_parameters}"
-  METHOD_RESPONSE_PARAMETERS = "${local.method_response_parameters}"
-  AUTHORIZATION = "${var.AUTHORIZATION}"
-  HTTP_METHOD = "GET"
-  LAMBDA_INVOKE_ARN = "${var.BACKEND_LAMBDA_INVOKE_ARN}"
-  FUNCTION_NAME = "${var.BACKEND_LAMBDA_NAME}"
-    CURRENT_ACCOUNT_ID = var.CURRENT_ACCOUNT_ID
-  AWS_REGION = var.AWS_REGION
-  
+  METHOD_RESPONSE_PARAMETERS      = "${local.method_response_parameters}"
+  AUTHORIZATION                   = "${var.AUTHORIZATION}"
+  HTTP_METHOD                     = "GET"
+  LAMBDA_INVOKE_ARN               = "${var.BACKEND_LAMBDA_INVOKE_ARN}"
+  FUNCTION_NAME                   = "${var.BACKEND_LAMBDA_NAME}"
+  CURRENT_ACCOUNT_ID              = var.CURRENT_ACCOUNT_ID
+  AWS_REGION                      = var.AWS_REGION
+
   REQUEST_TEMPLATES = {
-  "application/json" = <<EOF
+    "application/json" = <<EOF
     EOF
-    }
+  }
 }
 module "feedback_post" {
-  source = "./methods"
-  METHOD_VALUE = ""
-  API_GATEWAY_ID = "${aws_api_gateway_rest_api.api-gateway.id}"
-  RESOURCE_ID = "${aws_api_gateway_resource.feedback_resource.id}"
+  source                          = "./methods"
+  METHOD_VALUE                    = ""
+  API_GATEWAY_ID                  = "${aws_api_gateway_rest_api.api-gateway.id}"
+  RESOURCE_ID                     = "${aws_api_gateway_resource.feedback_resource.id}"
   INTEGRATION_RESPONSE_PARAMETERS = "${local.integration_response_parameters}"
-  METHOD_RESPONSE_PARAMETERS = "${local.method_response_parameters}"
-  AUTHORIZATION = "${var.AUTHORIZATION}"
-  HTTP_METHOD = "POST"
-  LAMBDA_INVOKE_ARN = "${var.BACKEND_LAMBDA_INVOKE_ARN}"
-  FUNCTION_NAME = "${var.BACKEND_LAMBDA_NAME}"
-    CURRENT_ACCOUNT_ID = var.CURRENT_ACCOUNT_ID
-  AWS_REGION = var.AWS_REGION
-  
+  METHOD_RESPONSE_PARAMETERS      = "${local.method_response_parameters}"
+  AUTHORIZATION                   = "${var.AUTHORIZATION}"
+  HTTP_METHOD                     = "POST"
+  LAMBDA_INVOKE_ARN               = "${var.BACKEND_LAMBDA_INVOKE_ARN}"
+  FUNCTION_NAME                   = "${var.BACKEND_LAMBDA_NAME}"
+  CURRENT_ACCOUNT_ID              = var.CURRENT_ACCOUNT_ID
+  AWS_REGION                      = var.AWS_REGION
+
   REQUEST_TEMPLATES = {
-  "application/json" = <<EOF
+    "application/json" = <<EOF
     EOF
-    }
+  }
 }
 module "feedback_delete" {
-  source = "./methods"
-  METHOD_VALUE = ""
-  API_GATEWAY_ID = "${aws_api_gateway_rest_api.api-gateway.id}"
-  RESOURCE_ID = "${aws_api_gateway_resource.feedback_resource.id}"
+  source                          = "./methods"
+  METHOD_VALUE                    = ""
+  API_GATEWAY_ID                  = "${aws_api_gateway_rest_api.api-gateway.id}"
+  RESOURCE_ID                     = "${aws_api_gateway_resource.feedback_resource.id}"
   INTEGRATION_RESPONSE_PARAMETERS = "${local.integration_response_parameters}"
-  METHOD_RESPONSE_PARAMETERS = "${local.method_response_parameters}"
-  AUTHORIZATION = "${var.AUTHORIZATION}"
-    CURRENT_ACCOUNT_ID = var.CURRENT_ACCOUNT_ID
-  AWS_REGION = var.AWS_REGION
-  HTTP_METHOD = "DELETE"
-  LAMBDA_INVOKE_ARN = "${var.BACKEND_LAMBDA_INVOKE_ARN}"
-  FUNCTION_NAME = "${var.BACKEND_LAMBDA_NAME}"
-  
+  METHOD_RESPONSE_PARAMETERS      = "${local.method_response_parameters}"
+  AUTHORIZATION                   = "${var.AUTHORIZATION}"
+  CURRENT_ACCOUNT_ID              = var.CURRENT_ACCOUNT_ID
+  AWS_REGION                      = var.AWS_REGION
+  HTTP_METHOD                     = "DELETE"
+  LAMBDA_INVOKE_ARN               = "${var.BACKEND_LAMBDA_INVOKE_ARN}"
+  FUNCTION_NAME                   = "${var.BACKEND_LAMBDA_NAME}"
+
   REQUEST_TEMPLATES = {
-  "application/json" = <<EOF
+    "application/json" = <<EOF
     EOF
-    }
+  }
 }
 
 
@@ -255,74 +255,74 @@ resource "aws_api_gateway_resource" "admin_catalog_visibility_resource" {
 
 
 module "visibility_resource_OPTION" {
-  source = "./methods"
-  METHOD_VALUE = ""
-  API_GATEWAY_ID = "${aws_api_gateway_rest_api.api-gateway.id}"
-  RESOURCE_ID = "${aws_api_gateway_resource.admin_catalog_visibility_resource.id}"
+  source                          = "./methods"
+  METHOD_VALUE                    = ""
+  API_GATEWAY_ID                  = "${aws_api_gateway_rest_api.api-gateway.id}"
+  RESOURCE_ID                     = "${aws_api_gateway_resource.admin_catalog_visibility_resource.id}"
   INTEGRATION_RESPONSE_PARAMETERS = "${local.integration_response_parameters}"
-  METHOD_RESPONSE_PARAMETERS = "${local.method_response_parameters}"
-  HTTP_METHOD = "OPTIONS"
-  AUTHORIZATION = "NONE"
-    CURRENT_ACCOUNT_ID = var.CURRENT_ACCOUNT_ID
-  AWS_REGION = var.AWS_REGION
+  METHOD_RESPONSE_PARAMETERS      = "${local.method_response_parameters}"
+  HTTP_METHOD                     = "OPTIONS"
+  AUTHORIZATION                   = "NONE"
+  CURRENT_ACCOUNT_ID              = var.CURRENT_ACCOUNT_ID
+  AWS_REGION                      = var.AWS_REGION
 }
 
 module "visibility_get" {
-  source = "./methods"
-  METHOD_VALUE = ""
-  API_GATEWAY_ID = "${aws_api_gateway_rest_api.api-gateway.id}"
-  RESOURCE_ID = "${aws_api_gateway_resource.admin_catalog_visibility_resource.id}"
+  source                          = "./methods"
+  METHOD_VALUE                    = ""
+  API_GATEWAY_ID                  = "${aws_api_gateway_rest_api.api-gateway.id}"
+  RESOURCE_ID                     = "${aws_api_gateway_resource.admin_catalog_visibility_resource.id}"
   INTEGRATION_RESPONSE_PARAMETERS = "${local.integration_response_parameters}"
-  METHOD_RESPONSE_PARAMETERS = "${local.method_response_parameters}"
-  AUTHORIZATION = "${var.AUTHORIZATION}"
-  HTTP_METHOD = "GET"
-  LAMBDA_INVOKE_ARN = "${var.BACKEND_LAMBDA_INVOKE_ARN}"
-  FUNCTION_NAME = "${var.BACKEND_LAMBDA_NAME}"
-    CURRENT_ACCOUNT_ID = var.CURRENT_ACCOUNT_ID
-  AWS_REGION = var.AWS_REGION
-  
+  METHOD_RESPONSE_PARAMETERS      = "${local.method_response_parameters}"
+  AUTHORIZATION                   = "${var.AUTHORIZATION}"
+  HTTP_METHOD                     = "GET"
+  LAMBDA_INVOKE_ARN               = "${var.BACKEND_LAMBDA_INVOKE_ARN}"
+  FUNCTION_NAME                   = "${var.BACKEND_LAMBDA_NAME}"
+  CURRENT_ACCOUNT_ID              = var.CURRENT_ACCOUNT_ID
+  AWS_REGION                      = var.AWS_REGION
+
   REQUEST_TEMPLATES = {
-  "application/json" = <<EOF
+    "application/json" = <<EOF
     EOF
-    }
+  }
 }
 module "visibility_post" {
-  source = "./methods"
-  METHOD_VALUE = ""
-  API_GATEWAY_ID = "${aws_api_gateway_rest_api.api-gateway.id}"
-  RESOURCE_ID = "${aws_api_gateway_resource.admin_catalog_visibility_resource.id}"
+  source                          = "./methods"
+  METHOD_VALUE                    = ""
+  API_GATEWAY_ID                  = "${aws_api_gateway_rest_api.api-gateway.id}"
+  RESOURCE_ID                     = "${aws_api_gateway_resource.admin_catalog_visibility_resource.id}"
   INTEGRATION_RESPONSE_PARAMETERS = "${local.integration_response_parameters}"
-  METHOD_RESPONSE_PARAMETERS = "${local.method_response_parameters}"
-  AUTHORIZATION = "${var.AUTHORIZATION}"
-    CURRENT_ACCOUNT_ID = var.CURRENT_ACCOUNT_ID
-  AWS_REGION = var.AWS_REGION
-  HTTP_METHOD = "POST"
-  LAMBDA_INVOKE_ARN = "${var.BACKEND_LAMBDA_INVOKE_ARN}"
-  FUNCTION_NAME = "${var.BACKEND_LAMBDA_NAME}"
-  
+  METHOD_RESPONSE_PARAMETERS      = "${local.method_response_parameters}"
+  AUTHORIZATION                   = "${var.AUTHORIZATION}"
+  CURRENT_ACCOUNT_ID              = var.CURRENT_ACCOUNT_ID
+  AWS_REGION                      = var.AWS_REGION
+  HTTP_METHOD                     = "POST"
+  LAMBDA_INVOKE_ARN               = "${var.BACKEND_LAMBDA_INVOKE_ARN}"
+  FUNCTION_NAME                   = "${var.BACKEND_LAMBDA_NAME}"
+
   REQUEST_TEMPLATES = {
-  "application/json" = <<EOF
+    "application/json" = <<EOF
     EOF
-    }
+  }
 }
 module "visibility_ANY" {
-  source = "./methods"
-  METHOD_VALUE = ""
-  API_GATEWAY_ID = "${aws_api_gateway_rest_api.api-gateway.id}"
-  RESOURCE_ID = "${aws_api_gateway_resource.admin_catalog_visibility_resource.id}"
+  source                          = "./methods"
+  METHOD_VALUE                    = ""
+  API_GATEWAY_ID                  = "${aws_api_gateway_rest_api.api-gateway.id}"
+  RESOURCE_ID                     = "${aws_api_gateway_resource.admin_catalog_visibility_resource.id}"
   INTEGRATION_RESPONSE_PARAMETERS = "${local.integration_response_parameters}"
-  METHOD_RESPONSE_PARAMETERS = "${local.method_response_parameters}"
-  AUTHORIZATION = "${var.AUTHORIZATION}"
-  CURRENT_ACCOUNT_ID = var.CURRENT_ACCOUNT_ID
-  AWS_REGION = var.AWS_REGION
-  HTTP_METHOD = "ANY"
-  LAMBDA_INVOKE_ARN = "${var.BACKEND_LAMBDA_INVOKE_ARN}"
-  FUNCTION_NAME = "${var.BACKEND_LAMBDA_NAME}"
-  
+  METHOD_RESPONSE_PARAMETERS      = "${local.method_response_parameters}"
+  AUTHORIZATION                   = "${var.AUTHORIZATION}"
+  CURRENT_ACCOUNT_ID              = var.CURRENT_ACCOUNT_ID
+  AWS_REGION                      = var.AWS_REGION
+  HTTP_METHOD                     = "ANY"
+  LAMBDA_INVOKE_ARN               = "${var.BACKEND_LAMBDA_INVOKE_ARN}"
+  FUNCTION_NAME                   = "${var.BACKEND_LAMBDA_NAME}"
+
   REQUEST_TEMPLATES = {
-  "application/json" = <<EOF
+    "application/json" = <<EOF
     EOF
-    }
+  }
 }
 
 
@@ -339,33 +339,33 @@ resource "aws_api_gateway_resource" "proxy_resource" {
   path_part   = "{proxy+}"
 }
 module "proxy_post" {
-  source = "./methods"
-  METHOD_VALUE = ""
-  API_GATEWAY_ID = "${aws_api_gateway_rest_api.api-gateway.id}"
-  RESOURCE_ID = "${aws_api_gateway_resource.proxy_resource.id}"
+  source                          = "./methods"
+  METHOD_VALUE                    = ""
+  API_GATEWAY_ID                  = "${aws_api_gateway_rest_api.api-gateway.id}"
+  RESOURCE_ID                     = "${aws_api_gateway_resource.proxy_resource.id}"
   INTEGRATION_RESPONSE_PARAMETERS = {}
-  METHOD_RESPONSE_PARAMETERS = "${local.method_response_parameters}"
-  AUTHORIZATION = "${var.AUTHORIZATION}"
-    CURRENT_ACCOUNT_ID = var.CURRENT_ACCOUNT_ID
-  AWS_REGION = var.AWS_REGION
-  HTTP_METHOD = "ANY"
-  LAMBDA_INVOKE_ARN = "${var.BACKEND_LAMBDA_INVOKE_ARN}"
-  FUNCTION_NAME = "${var.BACKEND_LAMBDA_NAME}" 
+  METHOD_RESPONSE_PARAMETERS      = "${local.method_response_parameters}"
+  AUTHORIZATION                   = "${var.AUTHORIZATION}"
+  CURRENT_ACCOUNT_ID              = var.CURRENT_ACCOUNT_ID
+  AWS_REGION                      = var.AWS_REGION
+  HTTP_METHOD                     = "ANY"
+  LAMBDA_INVOKE_ARN               = "${var.BACKEND_LAMBDA_INVOKE_ARN}"
+  FUNCTION_NAME                   = "${var.BACKEND_LAMBDA_NAME}"
 }
-  
 
 
-  module "proxy_resource_OPTION" {
-  source = "./methods"
-  METHOD_VALUE = ""
-  API_GATEWAY_ID = "${aws_api_gateway_rest_api.api-gateway.id}"
-  RESOURCE_ID = "${aws_api_gateway_resource.proxy_resource.id}"
+
+module "proxy_resource_OPTION" {
+  source                          = "./methods"
+  METHOD_VALUE                    = ""
+  API_GATEWAY_ID                  = "${aws_api_gateway_rest_api.api-gateway.id}"
+  RESOURCE_ID                     = "${aws_api_gateway_resource.proxy_resource.id}"
   INTEGRATION_RESPONSE_PARAMETERS = "${local.integration_response_parameters}"
-  METHOD_RESPONSE_PARAMETERS = "${local.method_response_parameters}"
-    CURRENT_ACCOUNT_ID = var.CURRENT_ACCOUNT_ID
-  AWS_REGION = var.AWS_REGION
-  HTTP_METHOD = "OPTIONS"
-  AUTHORIZATION = "NONE"
+  METHOD_RESPONSE_PARAMETERS      = "${local.method_response_parameters}"
+  CURRENT_ACCOUNT_ID              = var.CURRENT_ACCOUNT_ID
+  AWS_REGION                      = var.AWS_REGION
+  HTTP_METHOD                     = "OPTIONS"
+  AUTHORIZATION                   = "NONE"
 }
 
 //proxy api ends
@@ -379,29 +379,29 @@ resource "aws_api_gateway_deployment" "api-gateway-deployment" {
     "module.feedback_resource_OPTION.API_GATEWAY_METHOD",
     "module.catalog_resource_OPTION.API_GATEWAY_METHOD",
     "module.visibility_resource_OPTION.API_GATEWAY_METHOD",
-    
+
     "module.proxy_resource_OPTION.API_GATEWAY_METHOD",
-    
+
     "module.register_resource_OPTION.API_GATEWAY_METHOD",
     "module.register.API_GATEWAY_INTEGRATION",
     "module.register.API_GATEWAY_RESPONSE_200",
-    
-    
+
+
     "module.catalog.API_GATEWAY_METHOD",
     "module.catalog.API_GATEWAY_INTEGRATION",
     "module.catalog.API_GATEWAY_RESPONSE_200",
-    
+
     "module.feedback_get.API_GATEWAY_METHOD",
     "module.feedback_get.API_GATEWAY_INTEGRATION",
     "module.feedback_get.API_GATEWAY_RESPONSE_200",
     "module.feedback_post.API_GATEWAY_METHOD",
     "module.feedback_post.API_GATEWAY_INTEGRATION",
     "module.feedback_post.API_GATEWAY_RESPONSE_200",
-    
+
     "module.feedback_delete.API_GATEWAY_METHOD",
     "module.feedback_delete.API_GATEWAY_INTEGRATION",
     "module.feedback_delete.API_GATEWAY_RESPONSE_200",
-    
+
     "module.visibility_get.API_GATEWAY_METHOD",
     "module.visibility_get.API_GATEWAY_INTEGRATION",
     "module.visibility_get.API_GATEWAY_RESPONSE_200",
@@ -417,7 +417,7 @@ resource "aws_api_gateway_deployment" "api-gateway-deployment" {
   stage_name        = "prod"
   stage_description = "1.0"
   description       = "1.0"
-  
+
   variables = {
     "DevPortalFunctionName" = "${var.RESOURCE_PREFIX}-backend"
   }

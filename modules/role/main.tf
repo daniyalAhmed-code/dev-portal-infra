@@ -115,7 +115,7 @@ EOF
 }
 
 resource "aws_iam_role" "lambda_cognito_userpool_client_settings_role" {
-  name = "lambda_cognito_userpool_client_settings_role"
+  name               = "lambda_cognito_userpool_client_settings_role"
   assume_role_policy = <<EOF
 {
   "Version": "2012-10-17",
@@ -133,7 +133,7 @@ EOF
 }
 
 resource "aws_iam_role" "lambda_cognito_userpool_domain_role" {
-  name = "lambda_cognito_userpool_domain_role"
+  name               = "lambda_cognito_userpool_domain_role"
   assume_role_policy = <<EOF
 {
   "Version": "2012-10-17",
@@ -168,7 +168,7 @@ resource "aws_iam_role" "lambda_dump_v3_account_role" {
 EOF
 }
 resource "aws_iam_role" "lambda_usergroup_importer_role" {
-  name = "lambda_usergroup_importer_role"
+  name               = "lambda_usergroup_importer_role"
   assume_role_policy = <<EOF
 {
   "Version": "2012-10-17",
@@ -187,7 +187,7 @@ EOF
 
 
 resource "aws_iam_role" "lambda_cloudfront_security_role" {
-  name = "lambda_cloudfront_security_role"
+  name               = "lambda_cloudfront_security_role"
   assume_role_policy = <<EOF
 {
   "Version": "2012-10-17",
@@ -207,7 +207,7 @@ EOF
 
 
 resource "aws_iam_role" "cognito_admin_group_role" {
- name = "${var.RESOURCE_PREFIX}-CognitoAdminRole-role"
+  name = "${var.RESOURCE_PREFIX}-CognitoAdminRole-role"
 
   assume_role_policy = <<EOF
 {

@@ -1,171 +1,170 @@
-locals{
-     RESOURCE_PREFIX = "${lower(var.ENV)}"
-    DEV_PORTAL_SITE_S3_BUCKET = "${data.terraform_remote_state.vap-platform-api.outputs.DEV_PORTAL_SITE_S3_BUCKET_NAME}"
-    ARTIFICATS_S3_BUCKET = "${data.terraform_remote_state.vap-platform-api.outputs.ARTIFACT_S3_BUCKET_NAME}"
-    DEV_PORTAL_CUSTOMERS_TABLE_NAME = "${data.terraform_remote_state.vap-platform-api.outputs.DEV_PORTAL_CUSTOMERS_TABLE_NAME}"
-    DEV_PORTAL_CUSTOMERS_TABLE_ARN = "${data.terraform_remote_state.vap-platform-api.outputs.DEV_PORTAL_CUSTOMERS_TABLE_ARN}"
-    
-    DEV_PORTAL_FEEDBACK_TABLE_NAME = "${data.terraform_remote_state.vap-platform-api.outputs.DEV_PORTAL_FEEDBACK_TABLE_NAME}"
-    DEV_PORTAL_FEEDBACK_TABLE_ARN = "${data.terraform_remote_state.vap-platform-api.outputs.DEV_PORTAL_FEEDBACK_TABLE_ARN}"
-    
-    DEV_PORTAL_PRE_LOGIN_ACCOUNTS_TABLE_NAME = "${data.terraform_remote_state.vap-platform-api.outputs.DEV_PORTAL_PRE_LOGIN_ACCOUNTS_TABLE_NAME}"
-    DEV_PORTAL_PRE_LOGIN_ACCOUNTS_TABLE_ARN = "${data.terraform_remote_state.vap-platform-api.outputs.DEV_PORTAL_PRE_LOGIN_ACCOUNTS_TABLE_ARN}"
-    BUCKET_REGIONAL_DOMAIN_NAME = "${data.terraform_remote_state.vap-platform-api.outputs.BUCKET_REGIONAL_DOMAIN_NAME}"
-    TOPIC_NAME = "${data.terraform_remote_state.vap-platform-api.outputs.TOPIC_NAME}"
-    COGNITO_USER_POOL = "${local.RESOURCE_PREFIX}-user-pool"
-    COGNITO_USER_POOL_CLIENT = "${local.RESOURCE_PREFIX}-user-pool-client"
-    
-    ENABLE_FEEDBACK_SUBMISSION = var.ENABLE_FEEDBACK_SUBMISSION =="admin@email.com" ? local.TOPIC_NAME : "" 
-    IS_ADMIN = var.ENABLE_FEEDBACK_SUBMISSION =="admin@email.com" ? true : false 
-   
-    USE_CUSTOM_DOMAIN_NAME= var.CUSTOM_DOMAIN_NAME !="" && var.ACM_CERTIFICATE_ARN !="" ?"https://${var.CUSTOM_DOMAIN_NAME}" : null  
-    CORS_ALLOW_ORIGIN =  "*"        
-    AWS_REGION = "${data.aws_region.current.name}"
-    CURRENT_ACCOUNT_ID = "${data.aws_caller_identity.current.account_id}"
+locals {
+  RESOURCE_PREFIX                 = "${lower(var.ENV)}"
+  DEV_PORTAL_SITE_S3_BUCKET       = "${data.terraform_remote_state.vap-platform-api.outputs.DEV_PORTAL_SITE_S3_BUCKET_NAME}"
+  ARTIFICATS_S3_BUCKET            = "${data.terraform_remote_state.vap-platform-api.outputs.ARTIFACT_S3_BUCKET_NAME}"
+  DEV_PORTAL_CUSTOMERS_TABLE_NAME = "${data.terraform_remote_state.vap-platform-api.outputs.DEV_PORTAL_CUSTOMERS_TABLE_NAME}"
+  DEV_PORTAL_CUSTOMERS_TABLE_ARN  = "${data.terraform_remote_state.vap-platform-api.outputs.DEV_PORTAL_CUSTOMERS_TABLE_ARN}"
 
-    REGISTERED_GROUP_NAME ="${local.RESOURCE_PREFIX}-registered-group"
-    ADMIN_GROUP_NAME ="${local.RESOURCE_PREFIX}-admin-group"
+  DEV_PORTAL_FEEDBACK_TABLE_NAME = "${data.terraform_remote_state.vap-platform-api.outputs.DEV_PORTAL_FEEDBACK_TABLE_NAME}"
+  DEV_PORTAL_FEEDBACK_TABLE_ARN  = "${data.terraform_remote_state.vap-platform-api.outputs.DEV_PORTAL_FEEDBACK_TABLE_ARN}"
+
+  DEV_PORTAL_PRE_LOGIN_ACCOUNTS_TABLE_NAME = "${data.terraform_remote_state.vap-platform-api.outputs.DEV_PORTAL_PRE_LOGIN_ACCOUNTS_TABLE_NAME}"
+  DEV_PORTAL_PRE_LOGIN_ACCOUNTS_TABLE_ARN  = "${data.terraform_remote_state.vap-platform-api.outputs.DEV_PORTAL_PRE_LOGIN_ACCOUNTS_TABLE_ARN}"
+  BUCKET_REGIONAL_DOMAIN_NAME              = "${data.terraform_remote_state.vap-platform-api.outputs.BUCKET_REGIONAL_DOMAIN_NAME}"
+  TOPIC_NAME                               = "${data.terraform_remote_state.vap-platform-api.outputs.TOPIC_NAME}"
+  COGNITO_USER_POOL                        = "${local.RESOURCE_PREFIX}-user-pool"
+  COGNITO_USER_POOL_CLIENT                 = "${local.RESOURCE_PREFIX}-user-pool-client"
+
+  ENABLE_FEEDBACK_SUBMISSION = var.ENABLE_FEEDBACK_SUBMISSION == "admin@email.com" ? local.TOPIC_NAME : ""
+  IS_ADMIN                   = var.ENABLE_FEEDBACK_SUBMISSION == "admin@email.com" ? true : false
+
+  USE_CUSTOM_DOMAIN_NAME = var.CUSTOM_DOMAIN_NAME != "" && var.ACM_CERTIFICATE_ARN != "" ? "https://${var.CUSTOM_DOMAIN_NAME}" : null
+  CORS_ALLOW_ORIGIN      = "*"
+  AWS_REGION             = "${data.aws_region.current.name}"
+  CURRENT_ACCOUNT_ID     = "${data.aws_caller_identity.current.account_id}"
+
+  REGISTERED_GROUP_NAME = "${local.RESOURCE_PREFIX}-registered-group"
+  ADMIN_GROUP_NAME      = "${local.RESOURCE_PREFIX}-admin-group"
+
+}
+
+
+
+
+module "role" {
+  source                = "./modules/role"
+  COGNITO_IDENTITY_POOL = module.cognito.COGNITO_IDENTITY_POOL
+  RESOURCE_PREFIX       = local.RESOURCE_PREFIX
+}
+
+module "policy" {
+  source                                               = "./modules/policy"
+  CLOUDFRONT_SECURITY_LAMBDA_QUALIFIED_ARN             = module.lambda.CLOUDFRONT_SECURITY_LAMBDA_QUALIFIED_ARN
+  COGNITO_USER_POOL                                    = module.cognito.COGNITO_USERPOOL_ARN
+  LAMBDA_CATALOG_UPDATER_ROLE_NAME                     = module.role.LAMBDA_CATALOG_UPDATER_ROLE_NAME
+  LAMBDA_BACKEND_ROLE_NAME                             = module.role.LAMBDA_BACKEND_ROLE_NAME
+  LAMBDA_ASSET_UPLOADER_ROLE_NAME                      = module.role.LAMBDA_ASSET_UPLOADER_ROLE_NAME
+  CUSTOMER_TABLE_ARN                                   = local.DEV_PORTAL_CUSTOMERS_TABLE_ARN
+  CUSTOMER_TABLE_NAME                                  = local.DEV_PORTAL_CUSTOMERS_TABLE_NAME
+  PRE_LOGIN_TABLE_ARN                                  = local.DEV_PORTAL_PRE_LOGIN_ACCOUNTS_TABLE_ARN
+  AWS_REGION                                           = local.AWS_REGION
+  CURRENT_ACCOUNT_ID                                   = local.CURRENT_ACCOUNT_ID
+  RESOURCE_PREFIX                                      = local.RESOURCE_PREFIX
+  WEBSITE_BUCKET_NAME                                  = local.DEV_PORTAL_SITE_S3_BUCKET
+  ARTIFACTS_S3_BUCKET_NAME                             = local.ARTIFICATS_S3_BUCKET
+  CATALOG_UPDATER_LAMBDA_NAME                          = module.lambda.CATALOG_UPDATER_LAMBDA_NAME
+  LAMBDA_COGNITO_PRESIGNUP_TRIGGER_ROLE_NAME           = module.role.LAMBDA_COGNITO_PRESIGNUP_TRIGGER_ROLE_NAME
+  LAMBDA_COGNITO_POST_AUTHENTICATION_TRIGGER_ROLE_NAME = module.role.LAMBDA_COGNITO_POST_AUTHENTICATION_TRIGGER_ROLE_NAME
+  LAMBDA_COGNITO_POST_CONFIRMATION_TRIGGER_ROLE_NAME   = module.role.LAMBDA_COGNITO_POST_CONFIRMATION_TRIGGER_ROLE_NAME
+  LAMBDA_COGNITO_USERPOOL_CLIENT_SETTING_ROLE_NAME     = module.role.LAMBDA_COGNITO_USERPOOL_CLIENT_SETTING_ROLE_NAME
+  LAMBDA_COGNITO_USERPOOL_DOMAIN_ROLE_NAME             = module.role.LAMBDA_COGNITO_USERPOOL_DOMAIN_ROLE_NAME
+  LAMBDA_USERGROUP_IMPORTER_ROLE_NAME                  = module.role.LAMBDA_USERGROUP_IMPORTER_ROLE_NAME
+  LAMBDA_DUMP_V3_ACCOUNT_ROLE_NAME                     = module.role.LAMBDA_DUMP_V3_ACCOUNT_ROLE_NAME
+  LAMBDA_COGNITO_PRE_SIGNUP_NAME                       = module.lambda.COGNITO_PRESIGNUP_TRIGGER_LAMBDA_NAME
+  LAMBDA_COGNITO_POST_CONFIRMATION_NAME                = module.lambda.COGNITO_POST_CONFIRMATION_TRIGGER_LAMBDA_NAME
+  LAMBDA_COGNITO_POST_AUTHENTICATION_NAME              = module.lambda.COGNITO_POST_AUTHENTICATION_TRIGGER_LAMBDA_NAME
+  LAMBDA_CLOUDFRONT_SECURITY                           = module.lambda.CLOUDFRONT_SECURITY_LAMBDA_NAME
+  LAMBDA_SECURITY_HEADER                               = module.lambda.CLOUDFRONT_SECURITY_HEADER_NAME
+  USERPOOL_ID                                          = module.cognito.COGNITO_USER_POOL
+  API_GATEWAY_API                                      = module.api.API_GATEWAY_API
+  COGNITO_ADMIN_GROUP_ROLE                             = module.role.COGNITO_ADMIN_GROUP_ROLE_NAME
+  COGNITO_REGISTERED_GROUP_ROLE                        = module.role.COGNITO_REGISTERED_GROUP_ROLE_NAME
+  LAMBDA_CLOUDFRONT_SECURITY_ROLE                      = module.role.CLOUDFRONT_SECURITY_ROLE_NAME
+  ORIGIN_ACCESS_IDENTITY                               = module.cloudfront.id
+
+}
+
+module "lambda" {
+  source                                              = "./modules/lambda"
+  ARTIFACTS_S3_BUCKET_NAME                            = local.ARTIFICATS_S3_BUCKET
+  LAMBDA_CATALOG_UPDATER_ROLE_ARN                     = module.role.LAMBDA_CATALOG_UPDATER_ROLE_ARN
+  LAMBDA_BACKEND_ROLE_ARN                             = module.role.LAMBDA_BACKEND_ROLE_ARN
+  LAMBDA_ASSET_UPLOADER_ROLE_ARN                      = module.role.LAMBDA_ASSET_UPLOADER_ROLE_ARN
+  LAMBDA_COGNITO_PRESIGNUP_TRIGGER_ROLE_ARN           = module.role.LAMBDA_COGNITO_PRESIGNUP_TRIGGER_ROLE_ARN
+  LAMBDA_COGNITO_POST_AUTHENTICATION_TRIGGER_ROLE_ARN = module.role.LAMBDA_COGNITO_POST_AUTHENTICATION_TRIGGER_ROLE_ARN
+  LAMBDA_COGNITO_POST_CONFIRMATION_TRIGGER_ROLE_ARN   = module.role.LAMBDA_COGNITO_POST_CONFIRMATION_TRIGGER_ROLE_ARN
+  LAMBDA_COGNITO_USERPOOL_CLIENT_SETTING_ROLE_ARN     = module.role.LAMBDA_COGNITO_USERPOOL_CLIENT_SETTING_ROLE_ARN
+  LAMBDA_COGNITO_USERPOOL_DOMAIN_ROLE_ARN             = module.role.LAMBDA_COGNITO_USERPOOL_DOMAIN_ROLE_ARN
+  LAMBDA_USERGROUP_IMPORTER_ROLE_ARN                  = module.role.LAMBDA_USERGROUP_IMPORTER_ROLE_ARN
+  LAMBDA_DUMP_V3_ACCOUNT_ROLE_ARN                     = module.role.LAMBDA_DUMP_V3_ACCOUNT_ROLE_ARN
+  LAMBDA_CLOUDFRONT_SECURITY_ROLE_ARN                 = module.role.CLOUDFRONT_SECURITY_ROLE_ARN
+  NODE_ENV                                            = var.NODE_ENV
+  WEBSITE_BUCKET_NAME                                 = local.DEV_PORTAL_SITE_S3_BUCKET
+  CUSTOMER_TABLE_NAME                                 = local.DEV_PORTAL_CUSTOMERS_TABLE_NAME
+  PRE_LOGIN_ACCOUNT_TABLE_NAME                        = local.DEV_PORTAL_PRE_LOGIN_ACCOUNTS_TABLE_NAME
+  FEEDBACK_TABLE_NAME                                 = local.DEV_PORTAL_FEEDBACK_TABLE_NAME
+  FEEDBACK_SNS_TOPIC_ARN                              = local.ENABLE_FEEDBACK_SUBMISSION
+  USERPOOL_ID                                         = module.cognito.COGNITO_USER_POOL
+  IS_ADMIN                                            = local.IS_ADMIN
+  ADMIN_GROUP_NAME                                    = local.ADMIN_GROUP_NAME
+  RESOURCE_PREFIX                                     = local.RESOURCE_PREFIX
+  ACCOUNT_REGISTRATION_MODE                           = var.ACCOUNT_REGISTRATION_MODE
+  REGISTERED_GROUP_NAME                               = local.REGISTERED_GROUP_NAME
+  DEVELOPMENT_MODE                                    = var.DEVELOPMENT_MODE ? true : false
+  AWS_REGION                                          = "${data.aws_region.current.name}"
+  API_GATEWAY_API                                     = module.api.API_GATEWAY_ID
+  FEEDBACK_ENABLED                                    = local.IS_ADMIN
+  USERPOOL_DOMAIN                                     = "https://${var.COGNITO_USER_POOL_DOMAIN}.auth.${data.aws_region.current.name}.amazoncognito.com"
+  USERPOOL_CLIENT_ID                                  = module.cognito.COGNITO_USERPOOL_CLIENT
+  IDENTITYPOOL_ID                                     = module.cognito.COGNITO_IDENTITY_POOL
 
 }
 
 
-
-
-module "role"{
-    source = "./modules/role"
-    COGNITO_IDENTITY_POOL = module.cognito.COGNITO_IDENTITY_POOL
-    RESOURCE_PREFIX = local.RESOURCE_PREFIX
-}
-
-module "policy"{
-    source = "./modules/policy"
-    CLOUDFRONT_SECURITY_LAMBDA_QUALIFIED_ARN = module.lambda.CLOUDFRONT_SECURITY_LAMBDA_QUALIFIED_ARN
-    COGNITO_USER_POOL = module.cognito.COGNITO_USERPOOL_ARN
-    LAMBDA_CATALOG_UPDATER_ROLE_NAME = module.role.LAMBDA_CATALOG_UPDATER_ROLE_NAME
-    LAMBDA_BACKEND_ROLE_NAME = module.role.LAMBDA_BACKEND_ROLE_NAME
-    LAMBDA_ASSET_UPLOADER_ROLE_NAME = module.role.LAMBDA_ASSET_UPLOADER_ROLE_NAME
-    CUSTOMER_TABLE_ARN = local.DEV_PORTAL_CUSTOMERS_TABLE_ARN
-    CUSTOMER_TABLE_NAME= local.DEV_PORTAL_CUSTOMERS_TABLE_NAME
-    PRE_LOGIN_TABLE_ARN = local.DEV_PORTAL_PRE_LOGIN_ACCOUNTS_TABLE_ARN
-    AWS_REGION = local.AWS_REGION
-    CURRENT_ACCOUNT_ID = local.CURRENT_ACCOUNT_ID
-    RESOURCE_PREFIX = local.RESOURCE_PREFIX
-    WEBSITE_BUCKET_NAME = local.DEV_PORTAL_SITE_S3_BUCKET
-    ARTIFACTS_S3_BUCKET_NAME = local.ARTIFICATS_S3_BUCKET
-    CATALOG_UPDATER_LAMBDA_NAME = module.lambda.CATALOG_UPDATER_LAMBDA_NAME
-    LAMBDA_COGNITO_PRESIGNUP_TRIGGER_ROLE_NAME = module.role.LAMBDA_COGNITO_PRESIGNUP_TRIGGER_ROLE_NAME
-    LAMBDA_COGNITO_POST_AUTHENTICATION_TRIGGER_ROLE_NAME = module.role.LAMBDA_COGNITO_POST_AUTHENTICATION_TRIGGER_ROLE_NAME
-    LAMBDA_COGNITO_POST_CONFIRMATION_TRIGGER_ROLE_NAME = module.role.LAMBDA_COGNITO_POST_CONFIRMATION_TRIGGER_ROLE_NAME
-    LAMBDA_COGNITO_USERPOOL_CLIENT_SETTING_ROLE_NAME = module.role.LAMBDA_COGNITO_USERPOOL_CLIENT_SETTING_ROLE_NAME
-    LAMBDA_COGNITO_USERPOOL_DOMAIN_ROLE_NAME = module.role.LAMBDA_COGNITO_USERPOOL_DOMAIN_ROLE_NAME
-    LAMBDA_USERGROUP_IMPORTER_ROLE_NAME = module.role.LAMBDA_USERGROUP_IMPORTER_ROLE_NAME
-    LAMBDA_DUMP_V3_ACCOUNT_ROLE_NAME = module.role.LAMBDA_DUMP_V3_ACCOUNT_ROLE_NAME
-    LAMBDA_COGNITO_PRE_SIGNUP_NAME = module.lambda.COGNITO_PRESIGNUP_TRIGGER_LAMBDA_NAME
-    LAMBDA_COGNITO_POST_CONFIRMATION_NAME = module.lambda.COGNITO_POST_CONFIRMATION_TRIGGER_LAMBDA_NAME
-    LAMBDA_COGNITO_POST_AUTHENTICATION_NAME = module.lambda.COGNITO_POST_AUTHENTICATION_TRIGGER_LAMBDA_NAME
-    LAMBDA_CLOUDFRONT_SECURITY = module.lambda.CLOUDFRONT_SECURITY_LAMBDA_NAME
-    LAMBDA_SECURITY_HEADER = module.lambda.CLOUDFRONT_SECURITY_HEADER_NAME
-    USERPOOL_ID = module.cognito.COGNITO_USER_POOL
-    API_GATEWAY_API = module.api.API_GATEWAY_API
-    COGNITO_ADMIN_GROUP_ROLE = module.role.COGNITO_ADMIN_GROUP_ROLE_NAME
-    COGNITO_REGISTERED_GROUP_ROLE = module.role.COGNITO_REGISTERED_GROUP_ROLE_NAME
-    LAMBDA_CLOUDFRONT_SECURITY_ROLE = module.role.CLOUDFRONT_SECURITY_ROLE_NAME
-    ORIGIN_ACCESS_IDENTITY = module.cloudfront.id
- 
-}
-
-module "lambda"{
-    source = "./modules/lambda"
-    ARTIFACTS_S3_BUCKET_NAME = local.ARTIFICATS_S3_BUCKET
-    LAMBDA_CATALOG_UPDATER_ROLE_ARN = module.role.LAMBDA_CATALOG_UPDATER_ROLE_ARN
-    LAMBDA_BACKEND_ROLE_ARN = module.role.LAMBDA_BACKEND_ROLE_ARN
-    LAMBDA_ASSET_UPLOADER_ROLE_ARN = module.role.LAMBDA_ASSET_UPLOADER_ROLE_ARN
-    LAMBDA_COGNITO_PRESIGNUP_TRIGGER_ROLE_ARN = module.role.LAMBDA_COGNITO_PRESIGNUP_TRIGGER_ROLE_ARN
-    LAMBDA_COGNITO_POST_AUTHENTICATION_TRIGGER_ROLE_ARN = module.role.LAMBDA_COGNITO_POST_AUTHENTICATION_TRIGGER_ROLE_ARN
-    LAMBDA_COGNITO_POST_CONFIRMATION_TRIGGER_ROLE_ARN = module.role.LAMBDA_COGNITO_POST_CONFIRMATION_TRIGGER_ROLE_ARN
-    LAMBDA_COGNITO_USERPOOL_CLIENT_SETTING_ROLE_ARN = module.role.LAMBDA_COGNITO_USERPOOL_CLIENT_SETTING_ROLE_ARN
-    LAMBDA_COGNITO_USERPOOL_DOMAIN_ROLE_ARN = module.role.LAMBDA_COGNITO_USERPOOL_DOMAIN_ROLE_ARN
-    LAMBDA_USERGROUP_IMPORTER_ROLE_ARN = module.role.LAMBDA_USERGROUP_IMPORTER_ROLE_ARN
-    LAMBDA_DUMP_V3_ACCOUNT_ROLE_ARN = module.role.LAMBDA_DUMP_V3_ACCOUNT_ROLE_ARN   
-    LAMBDA_CLOUDFRONT_SECURITY_ROLE_ARN = module.role.CLOUDFRONT_SECURITY_ROLE_ARN
-    NODE_ENV = var.NODE_ENV
-    WEBSITE_BUCKET_NAME = local.DEV_PORTAL_SITE_S3_BUCKET
-    CUSTOMER_TABLE_NAME = local.DEV_PORTAL_CUSTOMERS_TABLE_NAME
-    PRE_LOGIN_ACCOUNT_TABLE_NAME = local.DEV_PORTAL_PRE_LOGIN_ACCOUNTS_TABLE_NAME
-    FEEDBACK_TABLE_NAME = local.DEV_PORTAL_FEEDBACK_TABLE_NAME
-    FEEDBACK_SNS_TOPIC_ARN = local.ENABLE_FEEDBACK_SUBMISSION
-    USERPOOL_ID = module.cognito.COGNITO_USER_POOL
-    IS_ADMIN = local.IS_ADMIN
-    ADMIN_GROUP_NAME = local.ADMIN_GROUP_NAME
-    RESOURCE_PREFIX = local.RESOURCE_PREFIX
-    ACCOUNT_REGISTRATION_MODE = var.ACCOUNT_REGISTRATION_MODE
-    REGISTERED_GROUP_NAME = local.REGISTERED_GROUP_NAME
-    DEVELOPMENT_MODE = var.DEVELOPMENT_MODE ? true : false 
-    AWS_REGION = "${data.aws_region.current.name}"
-    API_GATEWAY_API = module.api.API_GATEWAY_ID
-    FEEDBACK_ENABLED = local.IS_ADMIN
-    USERPOOL_DOMAIN = "https://${var.COGNITO_USER_POOL_DOMAIN}.auth.${data.aws_region.current.name}.amazoncognito.com"
-    USERPOOL_CLIENT_ID= module.cognito.COGNITO_USERPOOL_CLIENT
-    IDENTITYPOOL_ID = module.cognito.COGNITO_IDENTITY_POOL
-    
-}
-
-
-module "api"{
-    source = "./modules/api"
-    RESOURCE_PREFIX = "${local.RESOURCE_PREFIX}"
-    ENV = "${var.ENV}"
-    CORS_ALLOW_ORIGIN = "${local.CORS_ALLOW_ORIGIN}"
-    BACKEND_LAMBDA_INVOKE_ARN = module.lambda.BACKEND_LAMBDA_INVOKE_ARN
-    BACKEND_LAMBDA_NAME = module.lambda.BACKEND_LAMBDA_NAME
-    USE_CUSTOM_DOMAIN_NAME = local.USE_CUSTOM_DOMAIN_NAME
-    DOMAIN_NAME = module.cloudfront.CLOUDFRONT_DOMAIN
-    CURRENT_ACCOUNT_ID = "${data.aws_caller_identity.current.account_id}"
-    AWS_REGION = "${data.aws_region.current.name}"
+module "api" {
+  source                    = "./modules/api"
+  RESOURCE_PREFIX           = "${local.RESOURCE_PREFIX}"
+  ENV                       = "${var.ENV}"
+  CORS_ALLOW_ORIGIN         = "${local.CORS_ALLOW_ORIGIN}"
+  BACKEND_LAMBDA_INVOKE_ARN = module.lambda.BACKEND_LAMBDA_INVOKE_ARN
+  BACKEND_LAMBDA_NAME       = module.lambda.BACKEND_LAMBDA_NAME
+  USE_CUSTOM_DOMAIN_NAME    = local.USE_CUSTOM_DOMAIN_NAME
+  DOMAIN_NAME               = module.cloudfront.CLOUDFRONT_DOMAIN
+  CURRENT_ACCOUNT_ID        = "${data.aws_caller_identity.current.account_id}"
+  AWS_REGION                = "${data.aws_region.current.name}"
 
 }
 
-module "cloudfront"{
-    source = "./modules/cloudfront"
-    DEVELOPMENT_MODE = var.DEVELOPMENT_MODE
-    RESOURCE_PREFIX = local.RESOURCE_PREFIX
-    CUSTOM_DOMAIN_NAME = var.CUSTOM_DOMAIN_NAME
-    DEV_PORTAL_SITE_S3_BUCKET = local.DEV_PORTAL_SITE_S3_BUCKET
-    ARTIFACTS_S3_BUCKET_NAME = local.ARTIFICATS_S3_BUCKET
-    CLOUDFRONT_SECURITY_HEADER_SETUP =  module.lambda.CLOUDFRONT_SECURITY_HEADER_QUALIFIED_ARN
-    ORIGIN_ID = var.ORIGIN_ID
-    AWS_REGION = "${data.aws_region.current.name}"
-    ACM_CERTIFICATE_ARN = var.ACM_CERTIFICATE_ARN
-    BUCKET_REGIONAL_DOMAIN_NAME = "${local.BUCKET_REGIONAL_DOMAIN_NAME}"
+module "cloudfront" {
+  source                           = "./modules/cloudfront"
+  DEVELOPMENT_MODE                 = var.DEVELOPMENT_MODE
+  RESOURCE_PREFIX                  = local.RESOURCE_PREFIX
+  CUSTOM_DOMAIN_NAME               = var.CUSTOM_DOMAIN_NAME
+  DEV_PORTAL_SITE_S3_BUCKET        = local.DEV_PORTAL_SITE_S3_BUCKET
+  ARTIFACTS_S3_BUCKET_NAME         = local.ARTIFICATS_S3_BUCKET
+  CLOUDFRONT_SECURITY_HEADER_SETUP = module.lambda.CLOUDFRONT_SECURITY_HEADER_QUALIFIED_ARN
+  ORIGIN_ID                        = var.ORIGIN_ID
+  AWS_REGION                       = "${data.aws_region.current.name}"
+  ACM_CERTIFICATE_ARN              = var.ACM_CERTIFICATE_ARN
+  BUCKET_REGIONAL_DOMAIN_NAME      = "${local.BUCKET_REGIONAL_DOMAIN_NAME}"
 
 }
 
-module "route53"{
-    source = "./modules/route53"
-    USE_ROUTE53 = var.USE_ROUTE53
-    CUSTOM_DOMAIN_NAME = "${var.CUSTOM_DOMAIN_NAME}"
-    HOSTED_ZONE_ID = var.HOSTED_ZONE_ID
-    DNS_NAME = module.cloudfront.CLOUDFRONT_DOMAIN
+module "route53" {
+  source             = "./modules/route53"
+  USE_ROUTE53        = var.USE_ROUTE53
+  CUSTOM_DOMAIN_NAME = "${var.CUSTOM_DOMAIN_NAME}"
+  HOSTED_ZONE_ID     = var.HOSTED_ZONE_ID
+  DNS_NAME           = module.cloudfront.CLOUDFRONT_DOMAIN
 }
 
 
-module "cognito"{
-    source ="./modules/cognito"
-    COGNITO_USER_POOL = local.COGNITO_USER_POOL
-    ALLOW_ADMIN_CREATE_USER_ONLY = var.ALLOW_ADMIN_CREATE_USER_ONLY
-    CUSTOM_DOMAIN_NAME = var.CUSTOM_DOMAIN_NAME
-    AWS_REGION = local.AWS_REGION
-    AWS_ACCOUNT_ID = local.CURRENT_ACCOUNT_ID
-    RESOURCE_PREFIX = local.RESOURCE_PREFIX
-    COGNITO_USER_POOL_CLIENT = local.COGNITO_USER_POOL_CLIENT
-    COGNITO_ADMIN_GROUP_DESCRIPTION = var.COGNITO_ADMIN_GROUP_DESCRIPTION
-    COGNITO_REGISTERED_GROUP_DESCRIPTION =var.COGNITO_REGISTERED_GROUP_DESCRIPTION
-    COGNITO_USER_POOL_DOMAIN = var.COGNITO_USER_POOL_DOMAIN
-    DNS_NAME = module.cloudfront.CLOUDFRONT_DOMAIN
-    REGISTERED_GROUP_NAME = local.REGISTERED_GROUP_NAME
-    ADMIN_GROUP_NAME = local.ADMIN_GROUP_NAME
-    # LOCAL_DEVELOPMENT_MODE = var.LOCAL_DEVELOPMENT_MODE
-    COGNITO_REGISTERED_GROUP_ROLE_ARN = module.role.COGNITO_REGISTERED_GROUP_ROLE_ARN
-    COGNITO_ADMIN_GROUP_ROLE_ARN = module.role.COGNITO_ADMIN_GROUP_ROLE_ARN
-    # BUCEKT_REGIONAL_DOMAIN_NAME = var.BUCKET_REGIONAL_NAME
+module "cognito" {
+  source                               = "./modules/cognito"
+  COGNITO_USER_POOL                    = local.COGNITO_USER_POOL
+  ALLOW_ADMIN_CREATE_USER_ONLY         = var.ALLOW_ADMIN_CREATE_USER_ONLY
+  CUSTOM_DOMAIN_NAME                   = var.CUSTOM_DOMAIN_NAME
+  AWS_REGION                           = local.AWS_REGION
+  AWS_ACCOUNT_ID                       = local.CURRENT_ACCOUNT_ID
+  RESOURCE_PREFIX                      = local.RESOURCE_PREFIX
+  COGNITO_USER_POOL_CLIENT             = local.COGNITO_USER_POOL_CLIENT
+  COGNITO_ADMIN_GROUP_DESCRIPTION      = var.COGNITO_ADMIN_GROUP_DESCRIPTION
+  COGNITO_REGISTERED_GROUP_DESCRIPTION = var.COGNITO_REGISTERED_GROUP_DESCRIPTION
+  COGNITO_USER_POOL_DOMAIN             = var.COGNITO_USER_POOL_DOMAIN
+  DNS_NAME                             = module.cloudfront.CLOUDFRONT_DOMAIN
+  REGISTERED_GROUP_NAME                = local.REGISTERED_GROUP_NAME
+  ADMIN_GROUP_NAME                     = local.ADMIN_GROUP_NAME
+  COGNITO_REGISTERED_GROUP_ROLE_ARN    = module.role.COGNITO_REGISTERED_GROUP_ROLE_ARN
+  COGNITO_ADMIN_GROUP_ROLE_ARN         = module.role.COGNITO_ADMIN_GROUP_ROLE_ARN
+  # BUCEKT_REGIONAL_DOMAIN_NAME = var.BUCKET_REGIONAL_NAME
 }

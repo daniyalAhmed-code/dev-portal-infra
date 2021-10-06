@@ -1,26 +1,26 @@
 variable "HTTP_METHOD" {}
 variable "AUTHORIZATION" {}
 variable "METHOD_RESPONSE_PARAMETERS" {}
-variable "INTEGRATION_RESPONSE_PARAMETERS" {}  
+variable "INTEGRATION_RESPONSE_PARAMETERS" {}
 variable "RESOURCE_ID" {}
-variable "API_GATEWAY_ID" {} 
+variable "API_GATEWAY_ID" {}
 variable "METHOD_VALUE" {}
 variable "LAMBDA_INVOKE_ARN" {
-    default = ""
+  default = ""
 }
 variable "REQUEST_TEMPLATES" {
-     type = map(string)
-    default = {}
+  type    = map(string)
+  default = {}
 }
 variable "SOURCE_ARN" {
-    default = ""
+  default = ""
 }
 variable "FUNCTION_NAME" {
-    default = ""
+  default = ""
 }
 variable "AUTHORIZER_ID" {
-    default = ""
+  default = ""
 }
-variable "REQUEST_PARAMETERS" {default = false}
-variable "CURRENT_ACCOUNT_ID"{}
+variable "REQUEST_PARAMETERS" { default = false }
+variable "CURRENT_ACCOUNT_ID" {}
 variable "AWS_REGION" {}

@@ -1,66 +1,68 @@
-locals{
-  NO_CUSTOM_DOMAIN_NAME = var.CUSTOM_DOMAIN_NAME =="" ? var.DNS_NAME : null
-  CUSTOM_DOMAIN_NAME = var.CUSTOM_DOMAIN_NAME !=null ? var.CUSTOM_DOMAIN_NAME : ""
-  CALLBACK_URL = local.NO_CUSTOM_DOMAIN_NAME == null ? local.CUSTOM_DOMAIN_NAME  :local.NO_CUSTOM_DOMAIN_NAME
-  LOGOUT_URL =local.NO_CUSTOM_DOMAIN_NAME == null ? local.CUSTOM_DOMAIN_NAME  :local.NO_CUSTOM_DOMAIN_NAME
-  
+locals {
+  NO_CUSTOM_DOMAIN_NAME = var.CUSTOM_DOMAIN_NAME == "" ? var.DNS_NAME : null
+  CUSTOM_DOMAIN_NAME    = var.CUSTOM_DOMAIN_NAME != null ? var.CUSTOM_DOMAIN_NAME : ""
+  CALLBACK_URL          = local.NO_CUSTOM_DOMAIN_NAME == null ? local.CUSTOM_DOMAIN_NAME : local.NO_CUSTOM_DOMAIN_NAME
+  LOGOUT_URL            = local.NO_CUSTOM_DOMAIN_NAME == null ? local.CUSTOM_DOMAIN_NAME : local.NO_CUSTOM_DOMAIN_NAME
+
 
 }
 resource "aws_cognito_user_pool" "cognito_user_pool" {
-    name = var.COGNITO_USER_POOL
-    admin_create_user_config {
-        allow_admin_create_user_only = var.ALLOW_ADMIN_CREATE_USER_ONLY
-        invite_message_template {
-        email_subject = "Developer Portal - Invitation"
-        email_message = "<h2>Developer Portal</h2><p>You have been invited to access the developer portal at <a href=${local.CUSTOM_DOMAIN_NAME}>${local.CUSTOM_DOMAIN_NAME}</a>.</p><p><b>Username:</b> {username} <br><b>Temporary Password</b> {####}</p>"
-        sms_message = "<p><b>Username:</b> {username} <br><b>Temporary Password</b> {####}</p>"
-        }
-    }
-
-    email_verification_subject = "Developer Portal - Invitation"
-    email_verification_message = "'<h2>Developer Portal</h2><p>Your verification code is <b>{####}</b></p>'"
-    auto_verified_attributes = ["email"]
-    username_attributes = ["email"]
-
-    lambda_config {
-        pre_sign_up            = "arn:aws:lambda:${var.AWS_REGION}:${var.AWS_ACCOUNT_ID}:function:${var.RESOURCE_PREFIX}-CognitoPreSignupTriggerFn"
-        post_confirmation      = "arn:aws:lambda:${var.AWS_REGION}:${var.AWS_ACCOUNT_ID}:function:${var.RESOURCE_PREFIX}-CognitoPostConfirmationTriggerFn"
-        post_authentication    = "arn:aws:lambda:${var.AWS_REGION}:${var.AWS_ACCOUNT_ID}:function:${var.RESOURCE_PREFIX}-CognitoPostAuthenticationTriggerFn"
-    }
-    password_policy {
-    minimum_length                   = 12
-    require_lowercase                = true
-    require_numbers                  = true
-    }
-    schema {
-    name                     = "email"
-    attribute_data_type      = "String"
-    mutable                  = false  # false for "sub"
-    required                 = true # true for "sub"
-    string_attribute_constraints {   # if it is a string
-      min_length = 1                 # 10 for "birthdate"
-      max_length = 2048              # 10 for "birthdate"
+  name = var.COGNITO_USER_POOL
+  admin_create_user_config {
+    allow_admin_create_user_only = var.ALLOW_ADMIN_CREATE_USER_ONLY
+    invite_message_template {
+      email_subject = "Developer Portal - Invitation"
+      email_message = "<h2>Developer Portal</h2><p>You have been invited to access the developer portal at <a href=${local.CUSTOM_DOMAIN_NAME}>${local.CUSTOM_DOMAIN_NAME}</a>.</p><p><b>Username:</b> {username} <br><b>Temporary Password</b> {####}</p>"
+      sms_message   = "<p><b>Username:</b> {username} <br><b>Temporary Password</b> {####}</p>"
     }
   }
-   account_recovery_setting {
+
+  email_verification_subject = "Developer Portal - Invitation"
+  email_verification_message = "'<h2>Developer Portal</h2><p>Your verification code is <b>{####}</b></p>'"
+  auto_verified_attributes   = ["email"]
+  username_attributes        = ["email"]
+
+  lambda_config {
+    pre_sign_up         = "arn:aws:lambda:${var.AWS_REGION}:${var.AWS_ACCOUNT_ID}:function:${var.RESOURCE_PREFIX}-CognitoPreSignupTriggerFn"
+    post_confirmation   = "arn:aws:lambda:${var.AWS_REGION}:${var.AWS_ACCOUNT_ID}:function:${var.RESOURCE_PREFIX}-CognitoPostConfirmationTriggerFn"
+    post_authentication = "arn:aws:lambda:${var.AWS_REGION}:${var.AWS_ACCOUNT_ID}:function:${var.RESOURCE_PREFIX}-CognitoPostAuthenticationTriggerFn"
+  }
+  password_policy {
+    minimum_length    = 12
+    require_lowercase = true
+    require_numbers   = true
+  }
+  schema {
+    name                = "email"
+    attribute_data_type = "String"
+    mutable             = false
+    required            = true
+    string_attribute_constraints { # if it is a string
+      min_length = 1               # 10 for "birthdate"
+      max_length = 2048            # 10 for "birthdate"
+    }
+
+  }
+
+  account_recovery_setting {
     recovery_mechanism {
       name     = "verified_email"
       priority = 1
     }
-   }
+  }
 }
 resource "aws_cognito_user_pool_client" "cognito_user_pool_client" {
-    name = var.COGNITO_USER_POOL_CLIENT
-    user_pool_id = aws_cognito_user_pool.cognito_user_pool.id
-    allowed_oauth_flows_user_pool_client = "true"
-    generate_secret     = false
-    refresh_token_validity = 30
-    prevent_user_existence_errors = "ENABLED"
-    callback_urls = ["https://${local.CALLBACK_URL}/index.html?action=login"]
-    logout_urls = ["https://${local.LOGOUT_URL}/index.html?action=logout"]
-    allowed_oauth_flows = ["implicit"]
-    allowed_oauth_scopes = ["openid"]
-    supported_identity_providers = ["COGNITO"]
+  name                                 = var.COGNITO_USER_POOL_CLIENT
+  user_pool_id                         = aws_cognito_user_pool.cognito_user_pool.id
+  allowed_oauth_flows_user_pool_client = "true"
+  generate_secret                      = false
+  refresh_token_validity               = 30
+  prevent_user_existence_errors        = "ENABLED"
+  callback_urls                        = ["https://${local.CALLBACK_URL}/index.html?action=login"]
+  logout_urls                          = ["https://${local.LOGOUT_URL}/index.html?action=logout"]
+  allowed_oauth_flows                  = ["implicit"]
+  allowed_oauth_scopes                 = ["openid"]
+  supported_identity_providers         = ["COGNITO"]
 
 }
 

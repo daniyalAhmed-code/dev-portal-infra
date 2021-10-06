@@ -1,6 +1,6 @@
 
 variable "CORS_ALLOW_ORIGIN" {
-  type = string
+  type    = string
   default = "*"
 }
 
@@ -10,13 +10,13 @@ variable "allow_headers" {
   type        = list(string)
 
   default = [
-   "Authorization",
+    "Authorization",
     "authorization",
     "Content-Type",
     "X-Amz-Date",
     "X-Amz-Security-Token",
     "X-Api-Key",
-    
+
   ]
 }
 
@@ -101,5 +101,5 @@ variable "Base_Path" {
 }
 variable "BACKEND_LAMBDA_NAME" {}
 variable "BACKEND_LAMBDA_INVOKE_ARN" {}
-variable "USE_CUSTOM_DOMAIN_NAME"{}
+variable "USE_CUSTOM_DOMAIN_NAME" {}
 variable "DOMAIN_NAME" {}

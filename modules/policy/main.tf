@@ -1,5 +1,5 @@
 resource "aws_iam_policy" "lambda_catalog_updater_policy" {
-  name = "${var.RESOURCE_PREFIX}-lambda-catalog-updater-policy"
+  name   = "${var.RESOURCE_PREFIX}-lambda-catalog-updater-policy"
   policy = <<EOF
 {
   "Version": "2012-10-17",
@@ -65,7 +65,7 @@ resource "aws_iam_role_policy_attachment" "lambda-catalog-updater-policy-role-at
 
 
 resource "aws_iam_policy" "lambda_backend_policy" {
-  name = "${var.RESOURCE_PREFIX}-lambda-backend-policy"
+  name   = "${var.RESOURCE_PREFIX}-lambda-backend-policy"
   policy = <<EOF
 {
   "Version": "2012-10-17",
@@ -149,7 +149,7 @@ resource "aws_iam_role_policy_attachment" "lambda-backend-policy-role-attachment
 
 
 resource "aws_iam_policy" "lambda_asset_uploader_policy" {
-  name = "${var.RESOURCE_PREFIX}-lambda-asset-uploader-policy"
+  name   = "${var.RESOURCE_PREFIX}-lambda-asset-uploader-policy"
   policy = <<EOF
 {
   "Version": "2012-10-17",
@@ -240,7 +240,7 @@ resource "aws_iam_role_policy_attachment" "lambda-asset-uploader-policy-role-att
 
 //
 resource "aws_iam_policy" "lambda_cognito_post_confirmation_trigger_policy" {
-  name = "${var.RESOURCE_PREFIX}-lambda-cognito-post-confirmation-trigger-policy"
+  name   = "${var.RESOURCE_PREFIX}-lambda-cognito-post-confirmation-trigger-policy"
   policy = <<EOF
 {
   "Version": "2012-10-17",
@@ -283,7 +283,7 @@ resource "aws_iam_role_policy_attachment" "lambda-cognito-post-confirmation-trig
 
 //
 resource "aws_iam_policy" "lambda_cognito_post_authentication_trigger_policy" {
-  name = "${var.RESOURCE_PREFIX}-lambda-cognito-post-authentication-trigger-policy"
+  name   = "${var.RESOURCE_PREFIX}-lambda-cognito-post-authentication-trigger-policy"
   policy = <<EOF
 {
   "Version": "2012-10-17",
@@ -334,7 +334,7 @@ resource "aws_iam_role_policy_attachment" "lambda-cognito-post-authentication-tr
 
 //
 resource "aws_iam_policy" "lambda_cognito_userpool_client_setting_policy" {
-  name = "${var.RESOURCE_PREFIX}-lambda-cognito-userpool-client-setting-policy"
+  name   = "${var.RESOURCE_PREFIX}-lambda-cognito-userpool-client-setting-policy"
   policy = <<EOF
 {
   "Version": "2012-10-17",
@@ -377,7 +377,7 @@ resource "aws_iam_role_policy_attachment" "lambda-cognito-userpool-client-settin
 
 //
 resource "aws_iam_policy" "lambda_cognito_presignup_trigger_policy" {
-  name = "${var.RESOURCE_PREFIX}-lambda-cognito-presignup-trigger-policy"
+  name   = "${var.RESOURCE_PREFIX}-lambda-cognito-presignup-trigger-policy"
   policy = <<EOF
 {
   "Version": "2012-10-17",
@@ -413,7 +413,7 @@ resource "aws_iam_role_policy_attachment" "lambda-cognito-presignup-trigger-poli
 
 //CognitoUserPoolDomian
 resource "aws_iam_policy" "manage_user_pool_domain" {
-  name = "ManageUserPoolDomain"
+  name   = "dev-ManageUserPoolDomain"
   policy = <<EOF
 {
   "Version": "2012-10-17",
@@ -458,7 +458,7 @@ resource "aws_iam_role_policy_attachment" "cognito-userpool-domain-write-cloudwa
 
 // DUMP V3 Account DATA
 resource "aws_iam_policy" "read_customer_table_policy" {
-  name = "ReadCustomersTable"
+  name   = "dev-ReadCustomersTable"
   policy = <<EOF
 {
   "Version": "2012-10-17",
@@ -478,7 +478,7 @@ EOF
 
 
 resource "aws_iam_policy" "list_user_pool_policy" {
-  name = "ReadCognitoCustomersTable"
+  name   = "dev-ReadCognitoCustomersTable"
   policy = <<EOF
 {
   "Version": "2012-10-17",
@@ -513,7 +513,7 @@ resource "aws_iam_role_policy_attachment" "dump-v3-list-user-pool-policy-role-at
 
 // UserGroupImporter Polocies
 resource "aws_iam_policy" "write_cloudwatch_logs_policy" {
-  name = "WriteCloudWatchLogs"
+  name   = "dev-WriteCloudWatchLogs"
   policy = <<EOF
 {
   "Version": "2012-10-17",
@@ -539,7 +539,7 @@ resource "aws_iam_role_policy_attachment" "lambda-write-cloudwatch-logs-role-att
 }
 
 resource "aws_iam_policy" "lambda_s3_get_object_policy" {
-  name = "S3GetObject"
+  name   = "dev-S3GetObject"
   policy = <<EOF
 {
   "Version": "2012-10-17",
@@ -574,9 +574,9 @@ resource "aws_iam_role_policy_attachment" "lambda-s3-get-objects-role-attachment
 #           "dynamodb:Scan"
 #         ],
 #         "Resource": [
-        
+
 #         ]"arn:aws:s3:::*/*"
-        
+
 #     }
 #    ]
 # }
@@ -590,7 +590,7 @@ resource "aws_iam_role_policy_attachment" "lambda-s3-get-objects-role-attachment
 
 
 resource "aws_iam_policy" "update_cognito_user_list_policy" {
-  name = "CognitoUserGroup"
+  name   = "dev-CognitoUserGroup"
   policy = <<EOF
 {
   "Version": "2012-10-17",
@@ -622,29 +622,29 @@ resource "aws_lambda_permission" "pre_signup_lambda_permission" {
   statement_id  = "${var.LAMBDA_COGNITO_PRE_SIGNUP_NAME}-lambda-permission"
   action        = "lambda:InvokeFunction"
   principal     = "cognito-idp.amazonaws.com"
-  source_arn = "arn:aws:cognito-idp:${var.AWS_REGION}:${var.CURRENT_ACCOUNT_ID}:userpool/${var.USERPOOL_ID}"
-  
+  source_arn    = "arn:aws:cognito-idp:${var.AWS_REGION}:${var.CURRENT_ACCOUNT_ID}:userpool/${var.USERPOOL_ID}"
+
 }
 resource "aws_lambda_permission" "post_confirmation_lambda_permission" {
   function_name = "${var.LAMBDA_COGNITO_POST_CONFIRMATION_NAME}"
   statement_id  = "${var.LAMBDA_COGNITO_POST_CONFIRMATION_NAME}-lambda-permission"
   action        = "lambda:InvokeFunction"
   principal     = "cognito-idp.amazonaws.com"
-  source_arn = "arn:aws:cognito-idp:${var.AWS_REGION}:${var.CURRENT_ACCOUNT_ID}:userpool/${var.USERPOOL_ID}"  
+  source_arn    = "arn:aws:cognito-idp:${var.AWS_REGION}:${var.CURRENT_ACCOUNT_ID}:userpool/${var.USERPOOL_ID}"
 }
 resource "aws_lambda_permission" "post_authentication_lambda_permission" {
   function_name = "${var.LAMBDA_COGNITO_POST_AUTHENTICATION_NAME}"
   statement_id  = "${var.LAMBDA_COGNITO_POST_AUTHENTICATION_NAME}-lambda-permission"
   action        = "lambda:InvokeFunction"
   principal     = "cognito-idp.amazonaws.com"
-  source_arn = "arn:aws:cognito-idp:${var.AWS_REGION}:${var.CURRENT_ACCOUNT_ID}:userpool/${var.USERPOOL_ID}"
-  
+  source_arn    = "arn:aws:cognito-idp:${var.AWS_REGION}:${var.CURRENT_ACCOUNT_ID}:userpool/${var.USERPOOL_ID}"
+
 }
 resource "aws_lambda_permission" "cloudfront_security_lambda_permission" {
   function_name = "${var.LAMBDA_CLOUDFRONT_SECURITY}"
   statement_id  = "${var.LAMBDA_CLOUDFRONT_SECURITY}-lambda-permission"
   action        = "lambda:GetFunction"
-  principal     = "replicator.lambda.amazonaws.com"  
+  principal     = "replicator.lambda.amazonaws.com"
 }
 
 
@@ -652,7 +652,7 @@ resource "aws_lambda_permission" "cloudfront_security_lambda_permission" {
 //Cognito Admin group Policy
 
 resource "aws_iam_policy" "cognito_admin_group_policy" {
-  name = "CognitoAdminRole"
+  name   = "dev-CognitoAdminRole"
   policy = <<EOF
 {
   "Version": "2012-10-17",
@@ -678,7 +678,7 @@ resource "aws_iam_role_policy_attachment" "cognito-admin-group-policy-role-attac
 
 
 resource "aws_iam_policy" "cognito_registered_group_policy" {
-  name = "CognitoRegisteredRole"
+  name   = "dev-CognitoRegisteredRole"
   policy = <<EOF
 {
   "Version": "2012-10-17",
@@ -710,7 +710,7 @@ resource "aws_iam_role_policy_attachment" "cognito-registered-group-policy-role-
 
 
 resource "aws_iam_policy" "cloudfront_security_policy" {
-  name = "Cloudfront-security"
+  name   = "dev-Cloudfront-security"
   policy = <<EOF
 {
   "Version": "2012-10-17",
@@ -766,19 +766,19 @@ resource "aws_s3_bucket_policy" "bucekt_policy" {
 
   # Terraform's "jsonencode" function converts a
   # Terraform expression's result to valid JSON syntax.
-  policy  = jsonencode({
- Version = "2012-10-17"
-    Id ="Policy1632784971110",
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Id      = "Policy1632784971110",
     Statement = [
-      {Effect = "Allow",
-          Principal = {
-                "AWS": "arn:aws:iam::cloudfront:user/CloudFront Origin Access Identity ${var.ORIGIN_ACCESS_IDENTITY}"
-            },
-            Action = "s3:*",
-        Resource = [ "arn:aws:s3:::${var.WEBSITE_BUCKET_NAME}/*"]  
-  }
-  ]
- }) 
+      { Effect = "Allow",
+        Principal = {
+          "AWS" : "arn:aws:iam::cloudfront:user/CloudFront Origin Access Identity ${var.ORIGIN_ACCESS_IDENTITY}"
+        },
+        Action   = "s3:*",
+        Resource = ["arn:aws:s3:::${var.WEBSITE_BUCKET_NAME}/*"]
+      }
+    ]
+  })
 
 }
 
