@@ -29,3 +29,4 @@ variable "USERPOOL_CLIENT_ID" {}
 variable "IDENTITYPOOL_ID" {}
 variable "FEEDBACK_ENABLED" {}
 variable "AWS_REGION" {}
+variable "APIGATEWAY_CUSTOM_DOMAIN_NAME" {}
