@@ -1,0 +1,1913 @@
+openapi: 3.0.0
+x-definitions:
+  Amazon:
+    type: object
+    x-amazon-apigateway-integration:
+      type: aws
+      httpMethod: POST
+      uri: >-
+        arn:aws:apigateway:${REGION}:lambda:path/2015-03-31/functions/${DEVICE_TYPE_LAMBDA_ARN}/invocations
+      credentials: "${EXECUTION_ROLE_ARN}"
+      requestTemplates:
+        application/json: |-
+          #set($inputRoot = $input.path('$'))
+          #set($allParams = $input.params())
+          #set( $convert = {
+            "name": "Name",
+            "primaryUom": "sitetracker__Primary_UoM__c",
+            "category": "sitetracker__Category__c",
+            "subcategory": "sitetracker__Sub_Category__c",
+            "type": "sitetracker__Type__c",
+            "subtype": "Sub_type__c",
+            "status": "Available_for_Use__c",
+            "trackingMethod": "sitetracker__Tracking_Method__c",
+            "usageType": "sitetracker__Usage_Type__c",
+            "beginOfLife": "Begin_of_Life__c",
+            "endOfLife": "End_of_Life__c",
+            "endOfService": "End_of_Service__c",
+            "dimensionWeight": "sitetracker__Weight__c",
+            "dimensionWidth": "sitetracker__Width__c",
+            "dimensionHeight": "sitetracker__Height__c",
+            "dimensionLength": "sitetracker__Length__c",
+            "dimensionUnit": "sitetracker__Dimensions_Unit__c",
+            "powerConsumption": "Maximum_Power_Consumption__c",
+            "coolingCapacity": "Cooling_Capacity__c",
+            "market": "Market__c"
+            })
+          {
+            "body-json" : {
+            #foreach($key in $inputRoot.keySet())
+              #if($convert[$key] != "")
+              "$convert[$key]" : "$inputRoot[$key]"
+              #else
+              "$key": "$inputRoot[$key]"
+              #end
+              #if( $foreach.hasNext ),#end
+            #end
+            },
+            "params" : {
+            #foreach($type in $allParams.keySet())
+              #set($params = $allParams.get($type))
+            "$type" : {
+              #foreach($paramName in $params.keySet())
+              "$paramName" : "$util.escapeJavaScript($params.get($paramName))"
+              #if($foreach.hasNext),#end
+              #end
+            }
+              #if($foreach.hasNext),#end
+            #end
+            },
+            "context" : {
+              "http-method" : "$context.httpMethod",
+              "request-id" : "$context.requestId",
+              "resource-path" : "$context.resourcePath",
+              "secret-arn" : "/SiteTracker/Credentials"
+            }
+          }
+      responses:
+        default:
+          statusCode: "500"
+          responseTemplates:
+            application/json: |-
+              #set($inputRoot = $input.path('$'))
+
+              #if($inputRoot.statusCode != "")
+                  #set($context.responseOverride.status = $inputRoot.statusCode)
+                  #set( $convert = {
+                  "Name": "name",
+                  "sitetracker__Primary_UoM__c": "primaryUom",
+                  "sitetracker__Category__c": "category",
+                  "sitetracker__Sub_Category__c": "subcategory",
+                  "sitetracker__Type__c": "type",
+                  "Sub_type__c": "subtype",
+                  "Available_for_Use__c": "status",
+                  "sitetracker__Tracking_Method__c": "trackingMethod",
+                  "sitetracker__Usage_Type__c": "usageType",
+                  "Begin_of_Life__c": "beginOfLife",
+                  "End_of_Life__c": "endOfLife",
+                  "End_of_Service__c": "endOfService",
+                  "sitetracker__Weight__c": "dimensionWeight",
+                  "sitetracker__Width__c": "dimensionWidth",
+                  "sitetracker__Height__c": "dimensionHeight",
+                  "sitetracker__Length__c": "dimensionLength",
+                  "sitetracker__Dimensions_Unit__c": "dimensionUnit",
+                  "Maximum_Power_Consumption__c": "powerConsumption",
+                  "Cooling_Capacity__c": "coolingCapacity",
+                  "Market__c": "market"
+                  })
+                  #if($inputRoot.body.records != $null)
+                    [
+                    #foreach( $r in $inputRoot.body.records )
+                      {
+                      #set($href = $r.attributes.url.replaceAll("/services/data/v\d\d\.\d/sobjects/sitetracker__Item__c", "/resource/deviceType"))
+                        "id":"$r.Id",
+                        "href": "$href",
+                        "@type": "DeviceType"
+                        #foreach($key in $r.keySet())
+                          #if($convert[$key] != "")
+                            #set($value = $r[$key])
+                            #if($value != $null)
+                              ,"$convert[$key]" : "$r[$key]"
+                            #else
+                              ,"$convert[$key]" : null
+                            #end
+                          #end
+                        #end
+                      }#if( $foreach.hasNext ),#end
+                    #end
+                    ]
+                  #elseif($inputRoot.statusCode >= 300)
+                      {
+                      #set($fields = ["code", "reason", "message", "status", "referenceError", "@type", "@schemaLocation"])
+                      ## #set($fields = ["message"])
+                      #set($isFirst=true)
+                      #foreach($key in $inputRoot.body.keySet())
+                          #if($fields.contains($key))
+                              #if($isFirst)#set($isFirst=false)#else,#end
+                              #set($value = $inputRoot.body[$key])
+                              #if($value != $null)
+                                  #if($value.class == "class java.lang.String")
+                                      "$key" : "$value"
+                                  #else
+                                      "$key" : $value
+                                  #end
+                              #else
+                                  "$key" : null
+                              #end
+                          #end
+                      #end
+                      }
+                  #else
+                      #set($r = $inputRoot.body)
+                      {
+                      #set($href = $r.attributes.url.replaceAll("/services/data/v\d\d\.\d/sobjects/sitetracker__Item__c", "/resource/deviceType"))
+                        "id":"$r.Id",
+                        "href": "$href",
+                        "@type": "DeviceType"
+                        #foreach($key in $r.keySet())
+                          #if($convert[$key] != "")
+                            #set($value = $r[$key])
+                            #if($value != $null)
+                              ,"$convert[$key]" : "$r[$key]"
+                            #else
+                              ,"$convert[$key]" : null
+                            #end
+                          #end
+                        #end
+                      }
+                  #end
+              #else
+                $input.json("$")
+              #end
+      passthroughBehavior: when_no_templates
+servers:
+  - url: "https://apiplatform.com/1.0.0"
+info:
+  description: This is a the OpenAPI 3.0 specification of the API Integration Platform.
+  version: 1.0.0
+  title: API Integration Platform
+tags:
+  - name: contact
+    description: Contact
+  - name: deviceType
+    description: Device Type
+x-amazon-apigateway-request-validators:
+  full:
+    validateRequestBody: true
+    validateRequestParameters: true
+  body-only:
+    validateRequestBody: true
+    validateRequestParameters: false
+x-amazon-apigateway-request-validator: full
+paths:
+  /site/contact:
+    post:
+      x-amazon-apigateway-request-validator: full
+      x-amazon-apigateway-integration:
+        type: aws
+        httpMethod: POST
+        uri: >-
+          arn:aws:apigateway:${REGION}:lambda:path/2015-03-31/functions/${DEVICE_TYPE_LAMBDA_ARN}/invocations
+        credentials: "${EXECUTION_ROLE_ARN}"
+        requestTemplates:
+          application/json: |-
+            #set($inputRoot = $input.path('$'))
+            #set($allParams = $input.params())
+            #set( $convert = {
+              "name": "Name",
+              "primaryUom": "sitetracker__Primary_UoM__c",
+              "category": "sitetracker__Category__c",
+              "subcategory": "sitetracker__Sub_Category__c",
+              "type": "sitetracker__Type__c",
+              "subtype": "Sub_type__c",
+              "status": "Available_for_Use__c",
+              "trackingMethod": "sitetracker__Tracking_Method__c",
+              "usageType": "sitetracker__Usage_Type__c",
+              "beginOfLife": "Begin_of_Life__c",
+              "endOfLife": "End_of_Life__c",
+              "endOfService": "End_of_Service__c",
+              "dimensionWeight": "sitetracker__Weight__c",
+              "dimensionWidth": "sitetracker__Width__c",
+              "dimensionHeight": "sitetracker__Height__c",
+              "dimensionLength": "sitetracker__Length__c",
+              "dimensionUnit": "sitetracker__Dimensions_Unit__c",
+              "powerConsumption": "Maximum_Power_Consumption__c",
+              "coolingCapacity": "Cooling_Capacity__c",
+              "market": "Market__c"
+              })
+            {
+              "body-json" : {
+              #foreach($key in $inputRoot.keySet())
+                #if($convert[$key] != "")
+                "$convert[$key]" : "$inputRoot[$key]"
+                #else
+                "$key": "$inputRoot[$key]"
+                #end
+                #if( $foreach.hasNext ),#end
+              #end
+              },
+              "params" : {
+              #foreach($type in $allParams.keySet())
+                #set($params = $allParams.get($type))
+              "$type" : {
+                #foreach($paramName in $params.keySet())
+                "$paramName" : "$util.escapeJavaScript($params.get($paramName))"
+                #if($foreach.hasNext),#end
+                #end
+              }
+                #if($foreach.hasNext),#end
+              #end
+              },
+              "context" : {
+                "http-method" : "$context.httpMethod",
+                "request-id" : "$context.requestId",
+                "resource-path" : "$context.resourcePath",
+                "secret-arn" : "/SiteTracker/Credentials"
+              }
+            }
+        responses:
+          default:
+            statusCode: "500"
+            responseTemplates:
+              application/json: |-
+                #set($inputRoot = $input.path('$'))
+
+                #if($inputRoot.statusCode != "")
+                    #set($context.responseOverride.status = $inputRoot.statusCode)
+                    #set( $convert = {
+                    "Name": "name",
+                    "sitetracker__Primary_UoM__c": "primaryUom",
+                    "sitetracker__Category__c": "category",
+                    "sitetracker__Sub_Category__c": "subcategory",
+                    "sitetracker__Type__c": "type",
+                    "Sub_type__c": "subtype",
+                    "Available_for_Use__c": "status",
+                    "sitetracker__Tracking_Method__c": "trackingMethod",
+                    "sitetracker__Usage_Type__c": "usageType",
+                    "Begin_of_Life__c": "beginOfLife",
+                    "End_of_Life__c": "endOfLife",
+                    "End_of_Service__c": "endOfService",
+                    "sitetracker__Weight__c": "dimensionWeight",
+                    "sitetracker__Width__c": "dimensionWidth",
+                    "sitetracker__Height__c": "dimensionHeight",
+                    "sitetracker__Length__c": "dimensionLength",
+                    "sitetracker__Dimensions_Unit__c": "dimensionUnit",
+                    "Maximum_Power_Consumption__c": "powerConsumption",
+                    "Cooling_Capacity__c": "coolingCapacity",
+                    "Market__c": "market"
+                    })
+                    #if($inputRoot.body.records != $null)
+                      [
+                      #foreach( $r in $inputRoot.body.records )
+                        {
+                        #set($href = $r.attributes.url.replaceAll("/services/data/v\d\d\.\d/sobjects/sitetracker__Item__c", "/resource/deviceType"))
+                          "id":"$r.Id",
+                          "href": "$href",
+                          "@type": "DeviceType"
+                          #foreach($key in $r.keySet())
+                            #if($convert[$key] != "")
+                              #set($value = $r[$key])
+                              #if($value != $null)
+                                ,"$convert[$key]" : "$r[$key]"
+                              #else
+                                ,"$convert[$key]" : null
+                              #end
+                            #end
+                          #end
+                        }#if( $foreach.hasNext ),#end
+                      #end
+                      ]
+                    #elseif($inputRoot.statusCode >= 300)
+                        {
+                        #set($fields = ["code", "reason", "message", "status", "referenceError", "@type", "@schemaLocation"])
+                        ## #set($fields = ["message"])
+                        #set($isFirst=true)
+                        #foreach($key in $inputRoot.body.keySet())
+                            #if($fields.contains($key))
+                                #if($isFirst)#set($isFirst=false)#else,#end
+                                #set($value = $inputRoot.body[$key])
+                                #if($value != $null)
+                                    #if($value.class == "class java.lang.String")
+                                        "$key" : "$value"
+                                    #else
+                                        "$key" : $value
+                                    #end
+                                #else
+                                    "$key" : null
+                                #end
+                            #end
+                        #end
+                        }
+                    #else
+                        #set($r = $inputRoot.body)
+                        {
+                        #set($href = $r.attributes.url.replaceAll("/services/data/v\d\d\.\d/sobjects/sitetracker__Item__c", "/resource/deviceType"))
+                          "id":"$r.Id",
+                          "href": "$href",
+                          "@type": "DeviceType"
+                          #foreach($key in $r.keySet())
+                            #if($convert[$key] != "")
+                              #set($value = $r[$key])
+                              #if($value != $null)
+                                ,"$convert[$key]" : "$r[$key]"
+                              #else
+                                ,"$convert[$key]" : null
+                              #end
+                            #end
+                          #end
+                        }
+                    #end
+                #else
+                  $input.json("$")
+                #end
+        passthroughBehavior: when_no_templates
+      tags:
+        - contact
+      summary: create a contact
+      description: Add a new contact
+      operationId: createContact
+      requestBody:
+        description: Create a new contact
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Contact"
+      responses:
+        "200":
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Contact"
+        "400":
+          description: "Invalid input, object invalid"
+        "409":
+          description: An existing contact already exists
+    get:
+      x-amazon-apigateway-request-validator: full
+      x-amazon-apigateway-integration:
+        type: aws
+        httpMethod: POST
+        uri: >-
+          arn:aws:apigateway:${REGION}:lambda:path/2015-03-31/functions/${DEVICE_TYPE_LAMBDA_ARN}/invocations
+        credentials: "${EXECUTION_ROLE_ARN}"
+        requestTemplates:
+          application/json: |-
+            #set($inputRoot = $input.path('$'))
+            #set($allParams = $input.params())
+            #set( $convert = {
+              "name": "Name",
+              "primaryUom": "sitetracker__Primary_UoM__c",
+              "category": "sitetracker__Category__c",
+              "subcategory": "sitetracker__Sub_Category__c",
+              "type": "sitetracker__Type__c",
+              "subtype": "Sub_type__c",
+              "status": "Available_for_Use__c",
+              "trackingMethod": "sitetracker__Tracking_Method__c",
+              "usageType": "sitetracker__Usage_Type__c",
+              "beginOfLife": "Begin_of_Life__c",
+              "endOfLife": "End_of_Life__c",
+              "endOfService": "End_of_Service__c",
+              "dimensionWeight": "sitetracker__Weight__c",
+              "dimensionWidth": "sitetracker__Width__c",
+              "dimensionHeight": "sitetracker__Height__c",
+              "dimensionLength": "sitetracker__Length__c",
+              "dimensionUnit": "sitetracker__Dimensions_Unit__c",
+              "powerConsumption": "Maximum_Power_Consumption__c",
+              "coolingCapacity": "Cooling_Capacity__c",
+              "market": "Market__c"
+              })
+            {
+              "body-json" : {
+              #foreach($key in $inputRoot.keySet())
+                #if($convert[$key] != "")
+                "$convert[$key]" : "$inputRoot[$key]"
+                #else
+                "$key": "$inputRoot[$key]"
+                #end
+                #if( $foreach.hasNext ),#end
+              #end
+              },
+              "params" : {
+              #foreach($type in $allParams.keySet())
+                #set($params = $allParams.get($type))
+              "$type" : {
+                #foreach($paramName in $params.keySet())
+                "$paramName" : "$util.escapeJavaScript($params.get($paramName))"
+                #if($foreach.hasNext),#end
+                #end
+              }
+                #if($foreach.hasNext),#end
+              #end
+              },
+              "context" : {
+                "http-method" : "$context.httpMethod",
+                "request-id" : "$context.requestId",
+                "resource-path" : "$context.resourcePath",
+                "secret-arn" : "/SiteTracker/Credentials"
+              }
+            }
+        responses:
+          default:
+            statusCode: "500"
+            responseTemplates:
+              application/json: |-
+                #set($inputRoot = $input.path('$'))
+
+                #if($inputRoot.statusCode != "")
+                    #set($context.responseOverride.status = $inputRoot.statusCode)
+                    #set( $convert = {
+                    "Name": "name",
+                    "sitetracker__Primary_UoM__c": "primaryUom",
+                    "sitetracker__Category__c": "category",
+                    "sitetracker__Sub_Category__c": "subcategory",
+                    "sitetracker__Type__c": "type",
+                    "Sub_type__c": "subtype",
+                    "Available_for_Use__c": "status",
+                    "sitetracker__Tracking_Method__c": "trackingMethod",
+                    "sitetracker__Usage_Type__c": "usageType",
+                    "Begin_of_Life__c": "beginOfLife",
+                    "End_of_Life__c": "endOfLife",
+                    "End_of_Service__c": "endOfService",
+                    "sitetracker__Weight__c": "dimensionWeight",
+                    "sitetracker__Width__c": "dimensionWidth",
+                    "sitetracker__Height__c": "dimensionHeight",
+                    "sitetracker__Length__c": "dimensionLength",
+                    "sitetracker__Dimensions_Unit__c": "dimensionUnit",
+                    "Maximum_Power_Consumption__c": "powerConsumption",
+                    "Cooling_Capacity__c": "coolingCapacity",
+                    "Market__c": "market"
+                    })
+                    #if($inputRoot.body.records != $null)
+                      [
+                      #foreach( $r in $inputRoot.body.records )
+                        {
+                        #set($href = $r.attributes.url.replaceAll("/services/data/v\d\d\.\d/sobjects/sitetracker__Item__c", "/resource/deviceType"))
+                          "id":"$r.Id",
+                          "href": "$href",
+                          "@type": "DeviceType"
+                          #foreach($key in $r.keySet())
+                            #if($convert[$key] != "")
+                              #set($value = $r[$key])
+                              #if($value != $null)
+                                ,"$convert[$key]" : "$r[$key]"
+                              #else
+                                ,"$convert[$key]" : null
+                              #end
+                            #end
+                          #end
+                        }#if( $foreach.hasNext ),#end
+                      #end
+                      ]
+                    #elseif($inputRoot.statusCode >= 300)
+                        {
+                        #set($fields = ["code", "reason", "message", "status", "referenceError", "@type", "@schemaLocation"])
+                        ## #set($fields = ["message"])
+                        #set($isFirst=true)
+                        #foreach($key in $inputRoot.body.keySet())
+                            #if($fields.contains($key))
+                                #if($isFirst)#set($isFirst=false)#else,#end
+                                #set($value = $inputRoot.body[$key])
+                                #if($value != $null)
+                                    #if($value.class == "class java.lang.String")
+                                        "$key" : "$value"
+                                    #else
+                                        "$key" : $value
+                                    #end
+                                #else
+                                    "$key" : null
+                                #end
+                            #end
+                        #end
+                        }
+                    #else
+                        #set($r = $inputRoot.body)
+                        {
+                        #set($href = $r.attributes.url.replaceAll("/services/data/v\d\d\.\d/sobjects/sitetracker__Item__c", "/resource/deviceType"))
+                          "id":"$r.Id",
+                          "href": "$href",
+                          "@type": "DeviceType"
+                          #foreach($key in $r.keySet())
+                            #if($convert[$key] != "")
+                              #set($value = $r[$key])
+                              #if($value != $null)
+                                ,"$convert[$key]" : "$r[$key]"
+                              #else
+                                ,"$convert[$key]" : null
+                              #end
+                            #end
+                          #end
+                        }
+                    #end
+                #else
+                  $input.json("$")
+                #end
+        passthroughBehavior: when_no_templates
+      tags:
+        - contact
+      summary: List of contacts by first and last name
+      description: Multiple Contacts according to defined filters
+      operationId: listContacts
+      parameters:
+        - name: first_name
+          in: query
+          required: false
+          description: First name of the contact considered for filter
+          schema:
+            type: string
+        - name: last_name
+          in: query
+          required: false
+          description: Last name of the contact considered for filter
+          schema:
+            type: string
+      responses:
+        "200":
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Contact"
+        "400":
+          description: Invalid status value
+  "/site/contact/{contact_id}":
+    get:
+      x-amazon-apigateway-request-validator: full
+      x-amazon-apigateway-integration:
+        type: aws
+        httpMethod: POST
+        uri: >-
+          arn:aws:apigateway:${REGION}:lambda:path/2015-03-31/functions/${DEVICE_TYPE_LAMBDA_ARN}/invocations
+        credentials: "${EXECUTION_ROLE_ARN}"
+        requestTemplates:
+          application/json: |-
+            #set($inputRoot = $input.path('$'))
+            #set($allParams = $input.params())
+            #set( $convert = {
+              "name": "Name",
+              "primaryUom": "sitetracker__Primary_UoM__c",
+              "category": "sitetracker__Category__c",
+              "subcategory": "sitetracker__Sub_Category__c",
+              "type": "sitetracker__Type__c",
+              "subtype": "Sub_type__c",
+              "status": "Available_for_Use__c",
+              "trackingMethod": "sitetracker__Tracking_Method__c",
+              "usageType": "sitetracker__Usage_Type__c",
+              "beginOfLife": "Begin_of_Life__c",
+              "endOfLife": "End_of_Life__c",
+              "endOfService": "End_of_Service__c",
+              "dimensionWeight": "sitetracker__Weight__c",
+              "dimensionWidth": "sitetracker__Width__c",
+              "dimensionHeight": "sitetracker__Height__c",
+              "dimensionLength": "sitetracker__Length__c",
+              "dimensionUnit": "sitetracker__Dimensions_Unit__c",
+              "powerConsumption": "Maximum_Power_Consumption__c",
+              "coolingCapacity": "Cooling_Capacity__c",
+              "market": "Market__c"
+              })
+            {
+              "body-json" : {
+              #foreach($key in $inputRoot.keySet())
+                #if($convert[$key] != "")
+                "$convert[$key]" : "$inputRoot[$key]"
+                #else
+                "$key": "$inputRoot[$key]"
+                #end
+                #if( $foreach.hasNext ),#end
+              #end
+              },
+              "params" : {
+              #foreach($type in $allParams.keySet())
+                #set($params = $allParams.get($type))
+              "$type" : {
+                #foreach($paramName in $params.keySet())
+                "$paramName" : "$util.escapeJavaScript($params.get($paramName))"
+                #if($foreach.hasNext),#end
+                #end
+              }
+                #if($foreach.hasNext),#end
+              #end
+              },
+              "context" : {
+                "http-method" : "$context.httpMethod",
+                "request-id" : "$context.requestId",
+                "resource-path" : "$context.resourcePath",
+                "secret-arn" : "/SiteTracker/Credentials"
+              }
+            }
+        responses:
+          default:
+            statusCode: "500"
+            responseTemplates:
+              application/json: |-
+                #set($inputRoot = $input.path('$'))
+
+                #if($inputRoot.statusCode != "")
+                    #set($context.responseOverride.status = $inputRoot.statusCode)
+                    #set( $convert = {
+                    "Name": "name",
+                    "sitetracker__Primary_UoM__c": "primaryUom",
+                    "sitetracker__Category__c": "category",
+                    "sitetracker__Sub_Category__c": "subcategory",
+                    "sitetracker__Type__c": "type",
+                    "Sub_type__c": "subtype",
+                    "Available_for_Use__c": "status",
+                    "sitetracker__Tracking_Method__c": "trackingMethod",
+                    "sitetracker__Usage_Type__c": "usageType",
+                    "Begin_of_Life__c": "beginOfLife",
+                    "End_of_Life__c": "endOfLife",
+                    "End_of_Service__c": "endOfService",
+                    "sitetracker__Weight__c": "dimensionWeight",
+                    "sitetracker__Width__c": "dimensionWidth",
+                    "sitetracker__Height__c": "dimensionHeight",
+                    "sitetracker__Length__c": "dimensionLength",
+                    "sitetracker__Dimensions_Unit__c": "dimensionUnit",
+                    "Maximum_Power_Consumption__c": "powerConsumption",
+                    "Cooling_Capacity__c": "coolingCapacity",
+                    "Market__c": "market"
+                    })
+                    #if($inputRoot.body.records != $null)
+                      [
+                      #foreach( $r in $inputRoot.body.records )
+                        {
+                        #set($href = $r.attributes.url.replaceAll("/services/data/v\d\d\.\d/sobjects/sitetracker__Item__c", "/resource/deviceType"))
+                          "id":"$r.Id",
+                          "href": "$href",
+                          "@type": "DeviceType"
+                          #foreach($key in $r.keySet())
+                            #if($convert[$key] != "")
+                              #set($value = $r[$key])
+                              #if($value != $null)
+                                ,"$convert[$key]" : "$r[$key]"
+                              #else
+                                ,"$convert[$key]" : null
+                              #end
+                            #end
+                          #end
+                        }#if( $foreach.hasNext ),#end
+                      #end
+                      ]
+                    #elseif($inputRoot.statusCode >= 300)
+                        {
+                        #set($fields = ["code", "reason", "message", "status", "referenceError", "@type", "@schemaLocation"])
+                        ## #set($fields = ["message"])
+                        #set($isFirst=true)
+                        #foreach($key in $inputRoot.body.keySet())
+                            #if($fields.contains($key))
+                                #if($isFirst)#set($isFirst=false)#else,#end
+                                #set($value = $inputRoot.body[$key])
+                                #if($value != $null)
+                                    #if($value.class == "class java.lang.String")
+                                        "$key" : "$value"
+                                    #else
+                                        "$key" : $value
+                                    #end
+                                #else
+                                    "$key" : null
+                                #end
+                            #end
+                        #end
+                        }
+                    #else
+                        #set($r = $inputRoot.body)
+                        {
+                        #set($href = $r.attributes.url.replaceAll("/services/data/v\d\d\.\d/sobjects/sitetracker__Item__c", "/resource/deviceType"))
+                          "id":"$r.Id",
+                          "href": "$href",
+                          "@type": "DeviceType"
+                          #foreach($key in $r.keySet())
+                            #if($convert[$key] != "")
+                              #set($value = $r[$key])
+                              #if($value != $null)
+                                ,"$convert[$key]" : "$r[$key]"
+                              #else
+                                ,"$convert[$key]" : null
+                              #end
+                            #end
+                          #end
+                        }
+                    #end
+                #else
+                  $input.json("$")
+                #end
+        passthroughBehavior: when_no_templates
+      tags:
+        - contact
+      summary: Find Contact by ID
+      description: Return a single Contact
+      operationId: getContact
+      parameters:
+        - name: contact_id
+          in: path
+          description: Unique identification of Contact to return.
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        "200":
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Contact"
+        "400":
+          description: Invalid ID supplied
+        "404":
+          description: Contact not found
+    patch:
+      x-amazon-apigateway-request-validator: full
+      x-amazon-apigateway-integration:
+        type: aws
+        httpMethod: POST
+        uri: >-
+          arn:aws:apigateway:${REGION}:lambda:path/2015-03-31/functions/${DEVICE_TYPE_LAMBDA_ARN}/invocations
+        credentials: "${EXECUTION_ROLE_ARN}"
+        requestTemplates:
+          application/json: |-
+            #set($inputRoot = $input.path('$'))
+            #set($allParams = $input.params())
+            #set( $convert = {
+              "name": "Name",
+              "primaryUom": "sitetracker__Primary_UoM__c",
+              "category": "sitetracker__Category__c",
+              "subcategory": "sitetracker__Sub_Category__c",
+              "type": "sitetracker__Type__c",
+              "subtype": "Sub_type__c",
+              "status": "Available_for_Use__c",
+              "trackingMethod": "sitetracker__Tracking_Method__c",
+              "usageType": "sitetracker__Usage_Type__c",
+              "beginOfLife": "Begin_of_Life__c",
+              "endOfLife": "End_of_Life__c",
+              "endOfService": "End_of_Service__c",
+              "dimensionWeight": "sitetracker__Weight__c",
+              "dimensionWidth": "sitetracker__Width__c",
+              "dimensionHeight": "sitetracker__Height__c",
+              "dimensionLength": "sitetracker__Length__c",
+              "dimensionUnit": "sitetracker__Dimensions_Unit__c",
+              "powerConsumption": "Maximum_Power_Consumption__c",
+              "coolingCapacity": "Cooling_Capacity__c",
+              "market": "Market__c"
+              })
+            {
+              "body-json" : {
+              #foreach($key in $inputRoot.keySet())
+                #if($convert[$key] != "")
+                "$convert[$key]" : "$inputRoot[$key]"
+                #else
+                "$key": "$inputRoot[$key]"
+                #end
+                #if( $foreach.hasNext ),#end
+              #end
+              },
+              "params" : {
+              #foreach($type in $allParams.keySet())
+                #set($params = $allParams.get($type))
+              "$type" : {
+                #foreach($paramName in $params.keySet())
+                "$paramName" : "$util.escapeJavaScript($params.get($paramName))"
+                #if($foreach.hasNext),#end
+                #end
+              }
+                #if($foreach.hasNext),#end
+              #end
+              },
+              "context" : {
+                "http-method" : "$context.httpMethod",
+                "request-id" : "$context.requestId",
+                "resource-path" : "$context.resourcePath",
+                "secret-arn" : "/SiteTracker/Credentials"
+              }
+            }
+        responses:
+          default:
+            statusCode: "500"
+            responseTemplates:
+              application/json: |-
+                #set($inputRoot = $input.path('$'))
+
+                #if($inputRoot.statusCode != "")
+                    #set($context.responseOverride.status = $inputRoot.statusCode)
+                    #set( $convert = {
+                    "Name": "name",
+                    "sitetracker__Primary_UoM__c": "primaryUom",
+                    "sitetracker__Category__c": "category",
+                    "sitetracker__Sub_Category__c": "subcategory",
+                    "sitetracker__Type__c": "type",
+                    "Sub_type__c": "subtype",
+                    "Available_for_Use__c": "status",
+                    "sitetracker__Tracking_Method__c": "trackingMethod",
+                    "sitetracker__Usage_Type__c": "usageType",
+                    "Begin_of_Life__c": "beginOfLife",
+                    "End_of_Life__c": "endOfLife",
+                    "End_of_Service__c": "endOfService",
+                    "sitetracker__Weight__c": "dimensionWeight",
+                    "sitetracker__Width__c": "dimensionWidth",
+                    "sitetracker__Height__c": "dimensionHeight",
+                    "sitetracker__Length__c": "dimensionLength",
+                    "sitetracker__Dimensions_Unit__c": "dimensionUnit",
+                    "Maximum_Power_Consumption__c": "powerConsumption",
+                    "Cooling_Capacity__c": "coolingCapacity",
+                    "Market__c": "market"
+                    })
+                    #if($inputRoot.body.records != $null)
+                      [
+                      #foreach( $r in $inputRoot.body.records )
+                        {
+                        #set($href = $r.attributes.url.replaceAll("/services/data/v\d\d\.\d/sobjects/sitetracker__Item__c", "/resource/deviceType"))
+                          "id":"$r.Id",
+                          "href": "$href",
+                          "@type": "DeviceType"
+                          #foreach($key in $r.keySet())
+                            #if($convert[$key] != "")
+                              #set($value = $r[$key])
+                              #if($value != $null)
+                                ,"$convert[$key]" : "$r[$key]"
+                              #else
+                                ,"$convert[$key]" : null
+                              #end
+                            #end
+                          #end
+                        }#if( $foreach.hasNext ),#end
+                      #end
+                      ]
+                    #elseif($inputRoot.statusCode >= 300)
+                        {
+                        #set($fields = ["code", "reason", "message", "status", "referenceError", "@type", "@schemaLocation"])
+                        ## #set($fields = ["message"])
+                        #set($isFirst=true)
+                        #foreach($key in $inputRoot.body.keySet())
+                            #if($fields.contains($key))
+                                #if($isFirst)#set($isFirst=false)#else,#end
+                                #set($value = $inputRoot.body[$key])
+                                #if($value != $null)
+                                    #if($value.class == "class java.lang.String")
+                                        "$key" : "$value"
+                                    #else
+                                        "$key" : $value
+                                    #end
+                                #else
+                                    "$key" : null
+                                #end
+                            #end
+                        #end
+                        }
+                    #else
+                        #set($r = $inputRoot.body)
+                        {
+                        #set($href = $r.attributes.url.replaceAll("/services/data/v\d\d\.\d/sobjects/sitetracker__Item__c", "/resource/deviceType"))
+                          "id":"$r.Id",
+                          "href": "$href",
+                          "@type": "DeviceType"
+                          #foreach($key in $r.keySet())
+                            #if($convert[$key] != "")
+                              #set($value = $r[$key])
+                              #if($value != $null)
+                                ,"$convert[$key]" : "$r[$key]"
+                              #else
+                                ,"$convert[$key]" : null
+                              #end
+                            #end
+                          #end
+                        }
+                    #end
+                #else
+                  $input.json("$")
+                #end
+        passthroughBehavior: when_no_templates
+      tags:
+        - contact
+      summary: Update an existing contact
+      description: Update an existing contact by ID
+      operationId: updateContact
+      parameters:
+        - name: contact_id
+          in: path
+          description: Id of the contact that need to be updated
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        description: Updated an existing Contact
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Contact"
+      responses:
+        "200":
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Contact"
+        "400":
+          description: Invalid ID supplied
+        "404":
+          description: Contact not found
+        "405":
+          description: Validation exception
+    delete:
+      x-amazon-apigateway-request-validator: full
+      x-amazon-apigateway-integration:
+        type: aws
+        httpMethod: POST
+        uri: >-
+          arn:aws:apigateway:${REGION}:lambda:path/2015-03-31/functions/${DEVICE_TYPE_LAMBDA_ARN}/invocations
+        credentials: "${EXECUTION_ROLE_ARN}"
+        requestTemplates:
+          application/json: |-
+            #set($inputRoot = $input.path('$'))
+            #set($allParams = $input.params())
+            #set( $convert = {
+              "name": "Name",
+              "primaryUom": "sitetracker__Primary_UoM__c",
+              "category": "sitetracker__Category__c",
+              "subcategory": "sitetracker__Sub_Category__c",
+              "type": "sitetracker__Type__c",
+              "subtype": "Sub_type__c",
+              "status": "Available_for_Use__c",
+              "trackingMethod": "sitetracker__Tracking_Method__c",
+              "usageType": "sitetracker__Usage_Type__c",
+              "beginOfLife": "Begin_of_Life__c",
+              "endOfLife": "End_of_Life__c",
+              "endOfService": "End_of_Service__c",
+              "dimensionWeight": "sitetracker__Weight__c",
+              "dimensionWidth": "sitetracker__Width__c",
+              "dimensionHeight": "sitetracker__Height__c",
+              "dimensionLength": "sitetracker__Length__c",
+              "dimensionUnit": "sitetracker__Dimensions_Unit__c",
+              "powerConsumption": "Maximum_Power_Consumption__c",
+              "coolingCapacity": "Cooling_Capacity__c",
+              "market": "Market__c"
+              })
+            {
+              "body-json" : {
+              #foreach($key in $inputRoot.keySet())
+                #if($convert[$key] != "")
+                "$convert[$key]" : "$inputRoot[$key]"
+                #else
+                "$key": "$inputRoot[$key]"
+                #end
+                #if( $foreach.hasNext ),#end
+              #end
+              },
+              "params" : {
+              #foreach($type in $allParams.keySet())
+                #set($params = $allParams.get($type))
+              "$type" : {
+                #foreach($paramName in $params.keySet())
+                "$paramName" : "$util.escapeJavaScript($params.get($paramName))"
+                #if($foreach.hasNext),#end
+                #end
+              }
+                #if($foreach.hasNext),#end
+              #end
+              },
+              "context" : {
+                "http-method" : "$context.httpMethod",
+                "request-id" : "$context.requestId",
+                "resource-path" : "$context.resourcePath",
+                "secret-arn" : "/SiteTracker/Credentials"
+              }
+            }
+        responses:
+          default:
+            statusCode: "500"
+            responseTemplates:
+              application/json: |-
+                #set($inputRoot = $input.path('$'))
+
+                #if($inputRoot.statusCode != "")
+                    #set($context.responseOverride.status = $inputRoot.statusCode)
+                    #set( $convert = {
+                    "Name": "name",
+                    "sitetracker__Primary_UoM__c": "primaryUom",
+                    "sitetracker__Category__c": "category",
+                    "sitetracker__Sub_Category__c": "subcategory",
+                    "sitetracker__Type__c": "type",
+                    "Sub_type__c": "subtype",
+                    "Available_for_Use__c": "status",
+                    "sitetracker__Tracking_Method__c": "trackingMethod",
+                    "sitetracker__Usage_Type__c": "usageType",
+                    "Begin_of_Life__c": "beginOfLife",
+                    "End_of_Life__c": "endOfLife",
+                    "End_of_Service__c": "endOfService",
+                    "sitetracker__Weight__c": "dimensionWeight",
+                    "sitetracker__Width__c": "dimensionWidth",
+                    "sitetracker__Height__c": "dimensionHeight",
+                    "sitetracker__Length__c": "dimensionLength",
+                    "sitetracker__Dimensions_Unit__c": "dimensionUnit",
+                    "Maximum_Power_Consumption__c": "powerConsumption",
+                    "Cooling_Capacity__c": "coolingCapacity",
+                    "Market__c": "market"
+                    })
+                    #if($inputRoot.body.records != $null)
+                      [
+                      #foreach( $r in $inputRoot.body.records )
+                        {
+                        #set($href = $r.attributes.url.replaceAll("/services/data/v\d\d\.\d/sobjects/sitetracker__Item__c", "/resource/deviceType"))
+                          "id":"$r.Id",
+                          "href": "$href",
+                          "@type": "DeviceType"
+                          #foreach($key in $r.keySet())
+                            #if($convert[$key] != "")
+                              #set($value = $r[$key])
+                              #if($value != $null)
+                                ,"$convert[$key]" : "$r[$key]"
+                              #else
+                                ,"$convert[$key]" : null
+                              #end
+                            #end
+                          #end
+                        }#if( $foreach.hasNext ),#end
+                      #end
+                      ]
+                    #elseif($inputRoot.statusCode >= 300)
+                        {
+                        #set($fields = ["code", "reason", "message", "status", "referenceError", "@type", "@schemaLocation"])
+                        ## #set($fields = ["message"])
+                        #set($isFirst=true)
+                        #foreach($key in $inputRoot.body.keySet())
+                            #if($fields.contains($key))
+                                #if($isFirst)#set($isFirst=false)#else,#end
+                                #set($value = $inputRoot.body[$key])
+                                #if($value != $null)
+                                    #if($value.class == "class java.lang.String")
+                                        "$key" : "$value"
+                                    #else
+                                        "$key" : $value
+                                    #end
+                                #else
+                                    "$key" : null
+                                #end
+                            #end
+                        #end
+                        }
+                    #else
+                        #set($r = $inputRoot.body)
+                        {
+                        #set($href = $r.attributes.url.replaceAll("/services/data/v\d\d\.\d/sobjects/sitetracker__Item__c", "/resource/deviceType"))
+                          "id":"$r.Id",
+                          "href": "$href",
+                          "@type": "DeviceType"
+                          #foreach($key in $r.keySet())
+                            #if($convert[$key] != "")
+                              #set($value = $r[$key])
+                              #if($value != $null)
+                                ,"$convert[$key]" : "$r[$key]"
+                              #else
+                                ,"$convert[$key]" : null
+                              #end
+                            #end
+                          #end
+                        }
+                    #end
+                #else
+                  $input.json("$")
+                #end
+        passthroughBehavior: when_no_templates
+      tags:
+        - contact
+      summary: Delete a Contact
+      operationId: deleteContact
+      parameters:
+        - name: contact_id
+          in: path
+          description: Contact ID to delete
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        "400":
+          description: Invalid Contact Id informed
+        "404":
+          description: Contact not found
+  /resource/deviceType:
+    post:
+      x-amazon-apigateway-request-validator: full
+      x-amazon-apigateway-integration:
+        type: aws
+        httpMethod: POST
+        uri: >-
+          arn:aws:apigateway:${REGION}:lambda:path/2015-03-31/functions/${DEVICE_TYPE_LAMBDA_ARN}/invocations
+        credentials: "${EXECUTION_ROLE_ARN}"
+        requestTemplates:
+          application/json: |-
+            #set($inputRoot = $input.path('$'))
+            #set($allParams = $input.params())
+            #set( $convert = {
+              "name": "Name",
+              "primaryUom": "sitetracker__Primary_UoM__c",
+              "category": "sitetracker__Category__c",
+              "subcategory": "sitetracker__Sub_Category__c",
+              "type": "sitetracker__Type__c",
+              "subtype": "Sub_type__c",
+              "status": "Available_for_Use__c",
+              "trackingMethod": "sitetracker__Tracking_Method__c",
+              "usageType": "sitetracker__Usage_Type__c",
+              "beginOfLife": "Begin_of_Life__c",
+              "endOfLife": "End_of_Life__c",
+              "endOfService": "End_of_Service__c",
+              "dimensionWeight": "sitetracker__Weight__c",
+              "dimensionWidth": "sitetracker__Width__c",
+              "dimensionHeight": "sitetracker__Height__c",
+              "dimensionLength": "sitetracker__Length__c",
+              "dimensionUnit": "sitetracker__Dimensions_Unit__c",
+              "powerConsumption": "Maximum_Power_Consumption__c",
+              "coolingCapacity": "Cooling_Capacity__c",
+              "market": "Market__c"
+              })
+            {
+              "body-json" : {
+              #foreach($key in $inputRoot.keySet())
+                #if($convert[$key] != "")
+                "$convert[$key]" : "$inputRoot[$key]"
+                #else
+                "$key": "$inputRoot[$key]"
+                #end
+                #if( $foreach.hasNext ),#end
+              #end
+              },
+              "params" : {
+              #foreach($type in $allParams.keySet())
+                #set($params = $allParams.get($type))
+              "$type" : {
+                #foreach($paramName in $params.keySet())
+                "$paramName" : "$util.escapeJavaScript($params.get($paramName))"
+                #if($foreach.hasNext),#end
+                #end
+              }
+                #if($foreach.hasNext),#end
+              #end
+              },
+              "context" : {
+                "http-method" : "$context.httpMethod",
+                "request-id" : "$context.requestId",
+                "resource-path" : "$context.resourcePath",
+                "secret-arn" : "/SiteTracker/Credentials"
+              }
+            }
+        responses:
+          default:
+            statusCode: "500"
+            responseTemplates:
+              application/json: |-
+                #set($inputRoot = $input.path('$'))
+
+                #if($inputRoot.statusCode != "")
+                    #set($context.responseOverride.status = $inputRoot.statusCode)
+                    #set( $convert = {
+                    "Name": "name",
+                    "sitetracker__Primary_UoM__c": "primaryUom",
+                    "sitetracker__Category__c": "category",
+                    "sitetracker__Sub_Category__c": "subcategory",
+                    "sitetracker__Type__c": "type",
+                    "Sub_type__c": "subtype",
+                    "Available_for_Use__c": "status",
+                    "sitetracker__Tracking_Method__c": "trackingMethod",
+                    "sitetracker__Usage_Type__c": "usageType",
+                    "Begin_of_Life__c": "beginOfLife",
+                    "End_of_Life__c": "endOfLife",
+                    "End_of_Service__c": "endOfService",
+                    "sitetracker__Weight__c": "dimensionWeight",
+                    "sitetracker__Width__c": "dimensionWidth",
+                    "sitetracker__Height__c": "dimensionHeight",
+                    "sitetracker__Length__c": "dimensionLength",
+                    "sitetracker__Dimensions_Unit__c": "dimensionUnit",
+                    "Maximum_Power_Consumption__c": "powerConsumption",
+                    "Cooling_Capacity__c": "coolingCapacity",
+                    "Market__c": "market"
+                    })
+                    #if($inputRoot.body.records != $null)
+                      [
+                      #foreach( $r in $inputRoot.body.records )
+                        {
+                        #set($href = $r.attributes.url.replaceAll("/services/data/v\d\d\.\d/sobjects/sitetracker__Item__c", "/resource/deviceType"))
+                          "id":"$r.Id",
+                          "href": "$href",
+                          "@type": "DeviceType"
+                          #foreach($key in $r.keySet())
+                            #if($convert[$key] != "")
+                              #set($value = $r[$key])
+                              #if($value != $null)
+                                ,"$convert[$key]" : "$r[$key]"
+                              #else
+                                ,"$convert[$key]" : null
+                              #end
+                            #end
+                          #end
+                        }#if( $foreach.hasNext ),#end
+                      #end
+                      ]
+                    #elseif($inputRoot.statusCode >= 300)
+                        {
+                        #set($fields = ["code", "reason", "message", "status", "referenceError", "@type", "@schemaLocation"])
+                        ## #set($fields = ["message"])
+                        #set($isFirst=true)
+                        #foreach($key in $inputRoot.body.keySet())
+                            #if($fields.contains($key))
+                                #if($isFirst)#set($isFirst=false)#else,#end
+                                #set($value = $inputRoot.body[$key])
+                                #if($value != $null)
+                                    #if($value.class == "class java.lang.String")
+                                        "$key" : "$value"
+                                    #else
+                                        "$key" : $value
+                                    #end
+                                #else
+                                    "$key" : null
+                                #end
+                            #end
+                        #end
+                        }
+                    #else
+                        #set($r = $inputRoot.body)
+                        {
+                        #set($href = $r.attributes.url.replaceAll("/services/data/v\d\d\.\d/sobjects/sitetracker__Item__c", "/resource/deviceType"))
+                          "id":"$r.Id",
+                          "href": "$href",
+                          "@type": "DeviceType"
+                          #foreach($key in $r.keySet())
+                            #if($convert[$key] != "")
+                              #set($value = $r[$key])
+                              #if($value != $null)
+                                ,"$convert[$key]" : "$r[$key]"
+                              #else
+                                ,"$convert[$key]" : null
+                              #end
+                            #end
+                          #end
+                        }
+                    #end
+                #else
+                  $input.json("$")
+                #end
+        passthroughBehavior: when_no_templates
+      tags:
+        - deviceType
+      summary: Create a Device Type
+      description: Add a new Device Type
+      operationId: createDeviceType
+      requestBody:
+        description: Create a new Device Type
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/DeviceType"
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DeviceType"
+        "400":
+          description: Bad Request
+        "404":
+          description: Not Found
+        "405":
+          description: Method Not Allowed
+        "409":
+          description: Conflict
+        "500":
+          description: Internal Server Error
+    get:
+      x-amazon-apigateway-request-validator: full
+      x-amazon-apigateway-integration:
+        type: aws
+        httpMethod: POST
+        uri: >-
+          arn:aws:apigateway:${REGION}:lambda:path/2015-03-31/functions/${DEVICE_TYPE_LAMBDA_ARN}/invocations
+        credentials: "${EXECUTION_ROLE_ARN}"
+        requestTemplates:
+          application/json: |-
+            #set($inputRoot = $input.path('$'))
+            #set($allParams = $input.params())
+            #set( $convert = {
+              "name": "Name",
+              "primaryUom": "sitetracker__Primary_UoM__c",
+              "category": "sitetracker__Category__c",
+              "subcategory": "sitetracker__Sub_Category__c",
+              "type": "sitetracker__Type__c",
+              "subtype": "Sub_type__c",
+              "status": "Available_for_Use__c",
+              "trackingMethod": "sitetracker__Tracking_Method__c",
+              "usageType": "sitetracker__Usage_Type__c",
+              "beginOfLife": "Begin_of_Life__c",
+              "endOfLife": "End_of_Life__c",
+              "endOfService": "End_of_Service__c",
+              "dimensionWeight": "sitetracker__Weight__c",
+              "dimensionWidth": "sitetracker__Width__c",
+              "dimensionHeight": "sitetracker__Height__c",
+              "dimensionLength": "sitetracker__Length__c",
+              "dimensionUnit": "sitetracker__Dimensions_Unit__c",
+              "powerConsumption": "Maximum_Power_Consumption__c",
+              "coolingCapacity": "Cooling_Capacity__c",
+              "market": "Market__c"
+              })
+            {
+              "body-json" : {
+              #foreach($key in $inputRoot.keySet())
+                #if($convert[$key] != "")
+                "$convert[$key]" : "$inputRoot[$key]"
+                #else
+                "$key": "$inputRoot[$key]"
+                #end
+                #if( $foreach.hasNext ),#end
+              #end
+              },
+              "params" : {
+              #foreach($type in $allParams.keySet())
+                #set($params = $allParams.get($type))
+              "$type" : {
+                #foreach($paramName in $params.keySet())
+                "$paramName" : "$util.escapeJavaScript($params.get($paramName))"
+                #if($foreach.hasNext),#end
+                #end
+              }
+                #if($foreach.hasNext),#end
+              #end
+              },
+              "context" : {
+                "http-method" : "$context.httpMethod",
+                "request-id" : "$context.requestId",
+                "resource-path" : "$context.resourcePath",
+                "secret-arn" : "/SiteTracker/Credentials"
+              }
+            }
+        responses:
+          default:
+            statusCode: "500"
+            responseTemplates:
+              application/json: |-
+                #set($inputRoot = $input.path('$'))
+
+                #if($inputRoot.statusCode != "")
+                    #set($context.responseOverride.status = $inputRoot.statusCode)
+                    #set( $convert = {
+                    "Name": "name",
+                    "sitetracker__Primary_UoM__c": "primaryUom",
+                    "sitetracker__Category__c": "category",
+                    "sitetracker__Sub_Category__c": "subcategory",
+                    "sitetracker__Type__c": "type",
+                    "Sub_type__c": "subtype",
+                    "Available_for_Use__c": "status",
+                    "sitetracker__Tracking_Method__c": "trackingMethod",
+                    "sitetracker__Usage_Type__c": "usageType",
+                    "Begin_of_Life__c": "beginOfLife",
+                    "End_of_Life__c": "endOfLife",
+                    "End_of_Service__c": "endOfService",
+                    "sitetracker__Weight__c": "dimensionWeight",
+                    "sitetracker__Width__c": "dimensionWidth",
+                    "sitetracker__Height__c": "dimensionHeight",
+                    "sitetracker__Length__c": "dimensionLength",
+                    "sitetracker__Dimensions_Unit__c": "dimensionUnit",
+                    "Maximum_Power_Consumption__c": "powerConsumption",
+                    "Cooling_Capacity__c": "coolingCapacity",
+                    "Market__c": "market"
+                    })
+                    #if($inputRoot.body.records != $null)
+                      [
+                      #foreach( $r in $inputRoot.body.records )
+                        {
+                        #set($href = $r.attributes.url.replaceAll("/services/data/v\d\d\.\d/sobjects/sitetracker__Item__c", "/resource/deviceType"))
+                          "id":"$r.Id",
+                          "href": "$href",
+                          "@type": "DeviceType"
+                          #foreach($key in $r.keySet())
+                            #if($convert[$key] != "")
+                              #set($value = $r[$key])
+                              #if($value != $null)
+                                ,"$convert[$key]" : "$r[$key]"
+                              #else
+                                ,"$convert[$key]" : null
+                              #end
+                            #end
+                          #end
+                        }#if( $foreach.hasNext ),#end
+                      #end
+                      ]
+                    #elseif($inputRoot.statusCode >= 300)
+                        {
+                        #set($fields = ["code", "reason", "message", "status", "referenceError", "@type", "@schemaLocation"])
+                        ## #set($fields = ["message"])
+                        #set($isFirst=true)
+                        #foreach($key in $inputRoot.body.keySet())
+                            #if($fields.contains($key))
+                                #if($isFirst)#set($isFirst=false)#else,#end
+                                #set($value = $inputRoot.body[$key])
+                                #if($value != $null)
+                                    #if($value.class == "class java.lang.String")
+                                        "$key" : "$value"
+                                    #else
+                                        "$key" : $value
+                                    #end
+                                #else
+                                    "$key" : null
+                                #end
+                            #end
+                        #end
+                        }
+                    #else
+                        #set($r = $inputRoot.body)
+                        {
+                        #set($href = $r.attributes.url.replaceAll("/services/data/v\d\d\.\d/sobjects/sitetracker__Item__c", "/resource/deviceType"))
+                          "id":"$r.Id",
+                          "href": "$href",
+                          "@type": "DeviceType"
+                          #foreach($key in $r.keySet())
+                            #if($convert[$key] != "")
+                              #set($value = $r[$key])
+                              #if($value != $null)
+                                ,"$convert[$key]" : "$r[$key]"
+                              #else
+                                ,"$convert[$key]" : null
+                              #end
+                            #end
+                          #end
+                        }
+                    #end
+                #else
+                  $input.json("$")
+                #end
+        passthroughBehavior: when_no_templates
+      tags:
+        - deviceType
+      summary: List of all Device Types
+      description: All Device Types
+      operationId: listDeviceTypes
+      responses:
+        "200":
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/DeviceType"
+        "400":
+          description: Bad Request
+        "404":
+          description: Not Found
+        "405":
+          description: Method Not Allowed
+        "500":
+          description: Internal Server Error
+  "/resource/deviceType/{id}":
+    patch:
+      x-amazon-apigateway-request-validator: full
+      x-amazon-apigateway-integration:
+        type: aws
+        httpMethod: POST
+        uri: >-
+          arn:aws:apigateway:${REGION}:lambda:path/2015-03-31/functions/${DEVICE_TYPE_LAMBDA_ARN}/invocations
+        credentials: "${EXECUTION_ROLE_ARN}"
+        requestTemplates:
+          application/json: |-
+            #set($inputRoot = $input.path('$'))
+            #set($allParams = $input.params())
+            #set( $convert = {
+              "name": "Name",
+              "primaryUom": "sitetracker__Primary_UoM__c",
+              "category": "sitetracker__Category__c",
+              "subcategory": "sitetracker__Sub_Category__c",
+              "type": "sitetracker__Type__c",
+              "subtype": "Sub_type__c",
+              "status": "Available_for_Use__c",
+              "trackingMethod": "sitetracker__Tracking_Method__c",
+              "usageType": "sitetracker__Usage_Type__c",
+              "beginOfLife": "Begin_of_Life__c",
+              "endOfLife": "End_of_Life__c",
+              "endOfService": "End_of_Service__c",
+              "dimensionWeight": "sitetracker__Weight__c",
+              "dimensionWidth": "sitetracker__Width__c",
+              "dimensionHeight": "sitetracker__Height__c",
+              "dimensionLength": "sitetracker__Length__c",
+              "dimensionUnit": "sitetracker__Dimensions_Unit__c",
+              "powerConsumption": "Maximum_Power_Consumption__c",
+              "coolingCapacity": "Cooling_Capacity__c",
+              "market": "Market__c"
+              })
+            {
+              "body-json" : {
+              #foreach($key in $inputRoot.keySet())
+                #if($convert[$key] != "")
+                "$convert[$key]" : "$inputRoot[$key]"
+                #else
+                "$key": "$inputRoot[$key]"
+                #end
+                #if( $foreach.hasNext ),#end
+              #end
+              },
+              "params" : {
+              #foreach($type in $allParams.keySet())
+                #set($params = $allParams.get($type))
+              "$type" : {
+                #foreach($paramName in $params.keySet())
+                "$paramName" : "$util.escapeJavaScript($params.get($paramName))"
+                #if($foreach.hasNext),#end
+                #end
+              }
+                #if($foreach.hasNext),#end
+              #end
+              },
+              "context" : {
+                "http-method" : "$context.httpMethod",
+                "request-id" : "$context.requestId",
+                "resource-path" : "$context.resourcePath",
+                "secret-arn" : "/SiteTracker/Credentials"
+              }
+            }
+        responses:
+          default:
+            statusCode: "500"
+            responseTemplates:
+              application/json: |-
+                #set($inputRoot = $input.path('$'))
+
+                #if($inputRoot.statusCode != "")
+                    #set($context.responseOverride.status = $inputRoot.statusCode)
+                    #set( $convert = {
+                    "Name": "name",
+                    "sitetracker__Primary_UoM__c": "primaryUom",
+                    "sitetracker__Category__c": "category",
+                    "sitetracker__Sub_Category__c": "subcategory",
+                    "sitetracker__Type__c": "type",
+                    "Sub_type__c": "subtype",
+                    "Available_for_Use__c": "status",
+                    "sitetracker__Tracking_Method__c": "trackingMethod",
+                    "sitetracker__Usage_Type__c": "usageType",
+                    "Begin_of_Life__c": "beginOfLife",
+                    "End_of_Life__c": "endOfLife",
+                    "End_of_Service__c": "endOfService",
+                    "sitetracker__Weight__c": "dimensionWeight",
+                    "sitetracker__Width__c": "dimensionWidth",
+                    "sitetracker__Height__c": "dimensionHeight",
+                    "sitetracker__Length__c": "dimensionLength",
+                    "sitetracker__Dimensions_Unit__c": "dimensionUnit",
+                    "Maximum_Power_Consumption__c": "powerConsumption",
+                    "Cooling_Capacity__c": "coolingCapacity",
+                    "Market__c": "market"
+                    })
+                    #if($inputRoot.body.records != $null)
+                      [
+                      #foreach( $r in $inputRoot.body.records )
+                        {
+                        #set($href = $r.attributes.url.replaceAll("/services/data/v\d\d\.\d/sobjects/sitetracker__Item__c", "/resource/deviceType"))
+                          "id":"$r.Id",
+                          "href": "$href",
+                          "@type": "DeviceType"
+                          #foreach($key in $r.keySet())
+                            #if($convert[$key] != "")
+                              #set($value = $r[$key])
+                              #if($value != $null)
+                                ,"$convert[$key]" : "$r[$key]"
+                              #else
+                                ,"$convert[$key]" : null
+                              #end
+                            #end
+                          #end
+                        }#if( $foreach.hasNext ),#end
+                      #end
+                      ]
+                    #elseif($inputRoot.statusCode >= 300)
+                        {
+                        #set($fields = ["code", "reason", "message", "status", "referenceError", "@type", "@schemaLocation"])
+                        ## #set($fields = ["message"])
+                        #set($isFirst=true)
+                        #foreach($key in $inputRoot.body.keySet())
+                            #if($fields.contains($key))
+                                #if($isFirst)#set($isFirst=false)#else,#end
+                                #set($value = $inputRoot.body[$key])
+                                #if($value != $null)
+                                    #if($value.class == "class java.lang.String")
+                                        "$key" : "$value"
+                                    #else
+                                        "$key" : $value
+                                    #end
+                                #else
+                                    "$key" : null
+                                #end
+                            #end
+                        #end
+                        }
+                    #else
+                        #set($r = $inputRoot.body)
+                        {
+                        #set($href = $r.attributes.url.replaceAll("/services/data/v\d\d\.\d/sobjects/sitetracker__Item__c", "/resource/deviceType"))
+                          "id":"$r.Id",
+                          "href": "$href",
+                          "@type": "DeviceType"
+                          #foreach($key in $r.keySet())
+                            #if($convert[$key] != "")
+                              #set($value = $r[$key])
+                              #if($value != $null)
+                                ,"$convert[$key]" : "$r[$key]"
+                              #else
+                                ,"$convert[$key]" : null
+                              #end
+                            #end
+                          #end
+                        }
+                    #end
+                #else
+                  $input.json("$")
+                #end
+        passthroughBehavior: when_no_templates
+      tags:
+        - deviceType
+      summary: Update an existing Device Type
+      description: Update an existing Device Type by ID
+      operationId: updateDeviceType
+      parameters:
+        - name: id
+          in: path
+          description: Id of the device type that need to be updated
+          required: true
+          schema:
+            type: string
+      requestBody:
+        description: Updated an existing Device Type
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/DeviceType"
+      responses:
+        "200":
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DeviceType"
+        "400":
+          description: Bad Request
+        "404":
+          description: Not Found
+        "405":
+          description: Method Not Allowed
+        "409":
+          description: Conflict
+        "500":
+          description: Internal Server Error
+components:
+  schemas:
+    Contact:
+      type: object
+      additionalProperties: false
+      required:
+        - tims_site_id
+        - local_market_site_id
+        - first_name
+        - last_name
+      properties:
+        contact_id:
+          type: integer
+          format: int64
+          example: null
+        tims_site_id:
+          type: string
+          example: null
+        local_market_site_id:
+          type: string
+          example: null
+        first_name:
+          type: string
+          example: null
+        last_name:
+          type: string
+          example: null
+        telephone:
+          type: string
+          example: null
+        mobile_number:
+          type: string
+          example: null
+        company_name:
+          type: string
+          example: null
+        type_of_contact:
+          type: string
+          example: null
+        postcode:
+          type: string
+          example: null
+        city:
+          type: string
+          example: null
+        street_address_1:
+          type: string
+          example: null
+    DeviceType:
+      type: object
+      additionalProperties: false
+      required:
+        - name
+        - primaryUom
+        - category
+        - subcategory
+        - type
+        - subtype
+        - status
+        - trackingMethod
+        - usageType
+        - market
+      properties:
+        id:
+          description: Unique Record ID
+          type: string
+          minLength: 1
+          maxLength: 18
+          example: a3S0D000000WhCGUA0
+        name:
+          description: >-
+            Unique Identification. The MNO short name will be add automatically
+            before the device type name.
+          type: string
+          minLength: 1
+          maxLength: 73
+          example: VFDE - Device Type Name
+        primaryUom:
+          description: Unit of measure used when the item is consumed
+          type: string
+          enum:
+            - Each
+            - Box
+            - Feet
+            - Meters
+            - Hours
+            - Days
+          example: Each
+        category:
+          description: "Grouping of similar Items, enabling filtering and searching"
+          type: string
+          example: Tower
+        subcategory:
+          description: Grouping within the parent category
+          type: string
+          example: Concrete Tower
+        type:
+          description: >-
+            The type of Item. Only Material and Tool/Equipment can be made
+            Available for Receipt and require a Usage Type and Tracking Method.
+            Other Types (Labor, Service, Expense) cannot use those fields
+          type: string
+          enum:
+            - Material
+            - Tool/Equipment
+            - Labor
+            - Service
+            - Expense
+            - Standard System
+          example: Material
+        subtype:
+          description: >-
+            Optional field that falls within the hierarchy of the "Type" chosen
+            for this record
+          type: string
+          maxLength: 155
+          example: null
+        status:
+          description: >-
+            Indicates whether the item is available for use, or whether it is
+            available for use under special permission from the lifecycle
+            manager
+          type: string
+          enum:
+            - "Yes"
+            - "No"
+            - Yes with confirmation from Lifecycle Manager
+          example: "Yes"
+        trackingMethod:
+          description: >-
+            Indicates whether the item is available for use, or whether it is
+            available for use under special permission from the lifecycle
+            manager
+          type: string
+          enum:
+            - Uniquely Tracked
+            - Quantity Tracked
+            - Container Tracked
+          example: Container Tracked
+        usageType:
+          description: >-
+            Indicates whether the item is available for use, or whether it is
+            available for use under special permission from the lifecycle
+            manager
+          type: string
+          enum:
+            - Installable
+            - Consumable
+            - Tool/Equipment
+          example: Installable
+        beginOfLife:
+          description: Date this item was manufactured or certificate
+          type: string
+          format: date-time
+          example: "2021-01-30T08:30:00Z"
+        endOfLife:
+          description: The expiration date of this item
+          type: string
+          format: date-time
+          example: "2021-01-30T08:30:00Z"
+        endOfService:
+          description: >-
+            Date that the item has been discontinued. End of Service of this
+            item. If applicable
+          type: string
+          format: date-time
+          example: "2021-01-30T08:30:00Z"
+        dimensionWeight:
+          description: "The weight of the item in kilograms. Number (16 int, 2 decimal)"
+          type: integer
+          format: double
+          example: null
+        dimensionWidth:
+          description: >-
+            The Width of the item. Width, Height, Depth and Diameter need to
+            have the same dimension unit, as fixed in the field "General
+            Dimensions Unit". Number (16 int, 2 decimal)
+          type: integer
+          format: double
+          example: null
+        dimensionHeight:
+          description: >-
+            The Height of the item. Height, Width, Depth and Diameter need to
+            have the same dimension unit, as fixed in the field "General
+            Dimensions Unit". Number (16 int, 2 decimal)
+          type: integer
+          format: double
+          example: null
+        dimensionLength:
+          description: >-
+            Length of the Item (using Dimensions Unit). Number (16 int, 2
+            decimal)
+          type: integer
+          format: double
+          example: null
+        dimensionUnit:
+          description: >-
+            The unit of measure for the dimensions of the items fields height,
+            width, and depth
+          type: string
+          enum:
+            - in
+            - ft
+            - mn
+            - cm
+            - m
+          example: cm
+        powerConsumption:
+          description: >-
+            Maximum power consumption of an item (in Watt) for calculation of
+            total power supply and total heat load. Number (12 int, 2 decimal)
+          type: integer
+          format: double
+          example: null
+        coolingCapacity:
+          description: >-
+            TGE cooling capacity of the item in British Temperature Unit (BTU -
+            1 Watt = 0,29351 BTU). Number (16 int, 2 decimal)
+          type: integer
+          format: double
+          example: null
+        market:
+          description: Market this item belongs to.
+          type: string
+          enum:
+            - CZ
+            - DE
+            - ES
+            - GR
+            - HU
+            - IE
+            - PT
+            - RO
+            - VF
+          example: PT

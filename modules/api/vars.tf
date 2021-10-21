@@ -1,193 +1,42 @@
-# variable "allow_headers" {
-#   description = "Allow headers"
-#   type        = list(string)
-
-#   default = [
-#     "*"
-#   ]
-# }
-
-# # var.allow_methods
-# variable "allow_methods" {
-#   description = "Allow methods"
-#   type        = list(string)
-
-#   default = [
-#     "OPTIONS",
-#     "HEAD",
-#     "GET",
-#     "POST",
-#     "PUT",
-#     "PATCH",
-#     "DELETE",
-#   ]
-# }
-
-# # var.allow_max_age
-# variable "allow_max_age" {
-#   description = "Allow response caching time"
-#   type        = string
-#   default     = "7200"
-# }
-
-# # var.allowed_credentials
-# variable "allow_credentials" {
-#   description = "Allow credentials"
-#   default     = true
-# }
-
-# # ##################
-
-# variable "Strict_Transport_Security" {
-#   default = "max-age=31536000; includeSubDomains; preload"
-# }
-
-# variable "Referrer_Policy" {
-#   default = "same-origin"
-# }
-
-# variable "X_XSS_Protection" {
-#   default = "1; mode=block"
-# }
-
-# variable "X_Frame_Options" {
-#   default = "DENY"
-# }
-
-# variable "X_Content_Type_Options" {
-#   default = "nosniff"
-# }
-
-# variable "Content_Security_Policy" {
-#   default = "default-src 'self';"
-# }
-variable "CORS_ALLOW_ORIGIN" {
-  type = string
-  default = "*"
-}
-
-# variable "AUTHORIZATION" {
-#   default = "AWS_IAM" // CUSTOM
-# }
-
-# variable "Base_Path" {
-#   default = "prod" //notification
-# }
-# variable "ENV" {}
-# variable "RESOURCE_PREFIX" {}
-# variable "BACKEND_LAMBDA_NAME" {}
-# variable "BACKEND_LAMBDA_INVOKE_ARN" {}
-# variable "USE_CUSTOM_DOMAIN_NAME"{}
-# variable "DOMAIN_NAME" {}
-
-
-variable "allow_headers" {
-  description = "Allow headers"
-  type        = list(string)
-
-  default = [
-    "Authorization",
-    "authorization",
-    "Content-Type",
-    "X-Amz-Date",
-    "X-Amz-Security-Token",
-    "X-Api-Key",
-    "X-Amz-User-Agent",
-    "Strict-Transport-Security",
-    "strict-transport-security",
-    "Referrer-Policy",
-    "referrer-policy",
-    "X-XSS-Protection",
-    "x-xss-protection",
-    "X-Content-Type-Options",
-    "x-content-type-options",
-    "X-Frame-Options",
-    "x-frame-options",
-    "Content-Security-Policy",
-    "content-security-policy"
-  ]
-}
-
-# var.allow_methods
-variable "allow_methods" {
-  description = "Allow methods"
-  type        = list(string)
-
-  default = [
-    "*",
-    # "HEAD",
-    # "GET",
-    # "POST",
-    # "PUT",
-    # "PATCH",
-    # "DELETE",
-  ]
-}
-
-# # var.allow_origin
-variable "allow_origin" {
-  description = "Allow origin"
-  type        = "string"
-  default     = "*"
-}
-
-# var.allow_max_age
-variable "allow_max_age" {
-  description = "Allow response caching time"
+# Global
+variable "env" {
+  description = "Environment"
   type        = string
-  default     = "7200"
 }
 
-# var.allowed_credentials
-variable "allow_credentials" {
-  description = "Allow credentials"
-  default     = true
+## API
+variable "name" {
+  description = "API Gateway name"
+  type        = string
 }
 
-##################
-
-variable "Strict_Transport_Security" {
-  default = "max-age=31536000; includeSubDomains; preload"
+variable "description" {
+  description = "API description"
+  type        = string
 }
 
-variable "Referrer_Policy" {
-  default = "same-origin"
+## Swagger file
+variable "swagger_file" {
+  description = "Path to the swagger file"
+  type        = string
+  default     = ""
 }
 
-variable "X_XSS_Protection" {
-  default = "1; mode=block"
+variable "swagger_vars" {
+  description = "Map with the variables to be included in the swagger file"
+  type        = map(string)
 }
 
-variable "X_Frame_Options" {
-  default = "DENY"
+## Lambda
+variable "lambda_functions_names" {
+  description = "List of lambda functions names to be integrated with API Gateway"
+  type        = list(string)
+  default     = []
 }
 
-variable "X_Content_Type_Options" {
-  default = "nosniff"
+## WAF
+variable "waf_acl_id" {
+  description = "WAF ID to add to the API Gateway"
+  type        = string
+  default     = ""
 }
-
-variable "Content_Security_Policy" {
-  default = "default-src 'self';"
-}
-# variable "CORS_ALLOW_ORIGIN" {}
-
-# variable "COMMON_TAGS" {}
-variable "ENV" {}
-variable "RESOURCE_PREFIX" {}
-variable "CURRENT_ACCOUNT_ID" {}
-variable "AWS_REGION" {}
-
-
-# variable "LAMBDA_ENTITY_AUTHORIZER_INVOKE_ARN" {}
-variable "AUTHORIZATION" {
-  default = "AWS_IAM" // CUSTOM
-}
-
-
-variable "Base_Path" {
-  default = "prod" //notification
-}
-variable "BACKEND_LAMBDA_NAME" {}
-variable "BACKEND_LAMBDA_INVOKE_ARN" {}
-variable "USE_CUSTOM_DOMAIN_NAME"{}
-variable "DOMAIN_NAME" {}

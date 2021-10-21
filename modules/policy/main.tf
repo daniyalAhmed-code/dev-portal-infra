@@ -1,5 +1,6 @@
 resource "aws_iam_policy" "lambda_catalog_updater_policy" {
-  name = "${var.RESOURCE_PREFIX}-lambda-catalog-updater-policy"
+  provider         = aws.src
+  name   = "${var.RESOURCE_PREFIX}-lambda-catalog-updater-policy"
   policy = <<EOF
 {
   "Version": "2012-10-17",
@@ -26,7 +27,7 @@ resource "aws_iam_policy" "lambda_catalog_updater_policy" {
     {
       "Effect": "Allow",
       "Action": [
-        "s3:ListBucket"
+        "s3:*"
       ],
       "Resource": [
         "arn:aws:s3:::${var.WEBSITE_BUCKET_NAME}",
@@ -58,14 +59,16 @@ EOF
 }
 
 resource "aws_iam_role_policy_attachment" "lambda-catalog-updater-policy-role-attachment" {
-  role       = "${var.LAMBDA_CATALOG_UPDATER_ROLE_NAME}"
-  policy_arn = "${aws_iam_policy.lambda_catalog_updater_policy.arn}"
+  provider         = aws.src
+  role       = var.LAMBDA_CATALOG_UPDATER_ROLE_NAME
+  policy_arn = aws_iam_policy.lambda_catalog_updater_policy.arn
 }
 
 
 
 resource "aws_iam_policy" "lambda_backend_policy" {
-  name = "${var.RESOURCE_PREFIX}-lambda-backend-policy"
+  provider         = aws.src
+  name   = "${var.RESOURCE_PREFIX}-lambda-backend-policy"
   policy = <<EOF
 {
   "Version": "2012-10-17",
@@ -107,7 +110,8 @@ resource "aws_iam_policy" "lambda_backend_policy" {
         "dynamodb:Query",
         "dynamodb:PutItem",
         "dynamodb:UpdateItem",
-        "dynamodb:DeleteItem"
+        "dynamodb:DeleteItem",
+        "dynamodb:Scan"
 
       ],
       "Resource": [
@@ -125,22 +129,54 @@ resource "aws_iam_policy" "lambda_backend_policy" {
       "Resource": [
         "*"
       ]
-    }
-  ]
+    },
+{
+      "Effect": "Allow",
+      "Action": [
+        "cognito-idp:AdminListGroupsForUser",
+        "cognito-idp:ListUsersInGroup",
+        "cognito-idp:ListUsers",
+        "cognito-idp:AdminCreateUser",
+        "cognito-idp:AdminDeleteUser",
+        "cognito-idp:AdminSetUserMFAPreference"
+      ],
+      "Resource": [
+        "*"
+      ]
+    
+},
+{
+      "Effect": "Allow",
+      "Action": [
+        "lambda:InvokeFunction"
+      ],
+      "Resource": "${var.CATALOG_UPDATER_LAMBDA_ARN}"
+
+},
+{
+      "Effect": "Allow",
+      "Action": [
+        "secretsmanager:CreateSecret"
+      ],
+      "Resource": "*"
+}
+]
 }
 EOF
 }
 
 resource "aws_iam_role_policy_attachment" "lambda-backend-policy-role-attachment" {
-  role       = "${var.LAMBDA_BACKEND_ROLE_NAME}"
-  policy_arn = "${aws_iam_policy.lambda_backend_policy.arn}"
+  provider         = aws.src
+  role       = var.LAMBDA_BACKEND_ROLE_NAME
+  policy_arn = aws_iam_policy.lambda_backend_policy.arn
 }
 
 
 
 
 resource "aws_iam_policy" "lambda_asset_uploader_policy" {
-  name = "${var.RESOURCE_PREFIX}-lambda-asset-uploader-policy"
+  provider         = aws.src
+  name   = "${var.RESOURCE_PREFIX}-lambda-asset-uploader-policy"
   policy = <<EOF
 {
   "Version": "2012-10-17",
@@ -211,8 +247,8 @@ resource "aws_iam_policy" "lambda_asset_uploader_policy" {
     {
       "Effect": "Allow",
       "Action": [
-        "s3:GetObjet",
-        "s3:Putobjet"
+        "s3:GetObject",
+        "s3:Putobject"
       ],
       "Resource": [
         "arn:aws:s3:::${var.ARTIFACTS_S3_BUCKET_NAME}/*"
@@ -224,14 +260,16 @@ EOF
 }
 
 resource "aws_iam_role_policy_attachment" "lambda-asset-uploader-policy-role-attachment" {
-  role       = "${var.LAMBDA_ASSET_UPLOADER_ROLE_NAME}"
-  policy_arn = "${aws_iam_policy.lambda_asset_uploader_policy.arn}"
+  provider         = aws.src
+  role       = var.LAMBDA_ASSET_UPLOADER_ROLE_NAME
+  policy_arn = aws_iam_policy.lambda_asset_uploader_policy.arn
 }
 
 
 //
 resource "aws_iam_policy" "lambda_cognito_post_confirmation_trigger_policy" {
-  name = "${var.RESOURCE_PREFIX}-lambda-cognito-post-confirmation-trigger-policy"
+  provider         = aws.src
+  name   = "${var.RESOURCE_PREFIX}-lambda-cognito-post-confirmation-trigger-policy"
   policy = <<EOF
 {
   "Version": "2012-10-17",
@@ -268,13 +306,15 @@ EOF
 }
 
 resource "aws_iam_role_policy_attachment" "lambda-cognito-post-confirmation-trigger-policy-role-attachment" {
-  role       = "${var.LAMBDA_COGNITO_POST_CONFIRMATION_TRIGGER_ROLE_NAME}"
-  policy_arn = "${aws_iam_policy.lambda_cognito_post_confirmation_trigger_policy.arn}"
+  provider         = aws.src
+  role       = var.LAMBDA_COGNITO_POST_CONFIRMATION_TRIGGER_ROLE_NAME
+  policy_arn = aws_iam_policy.lambda_cognito_post_confirmation_trigger_policy.arn
 }
 
 //
 resource "aws_iam_policy" "lambda_cognito_post_authentication_trigger_policy" {
-  name = "${var.RESOURCE_PREFIX}-lambda-cognito-post-authentication-trigger-policy"
+  provider         = aws.src
+  name   = "${var.RESOURCE_PREFIX}-lambda-cognito-post-authentication-trigger-policy"
   policy = <<EOF
 {
   "Version": "2012-10-17",
@@ -319,13 +359,15 @@ resource "aws_iam_policy" "lambda_cognito_post_authentication_trigger_policy" {
 EOF
 }
 resource "aws_iam_role_policy_attachment" "lambda-cognito-post-authentication-trigger-policy-role-attachment" {
-  role       = "${var.LAMBDA_COGNITO_POST_AUTHENTICATION_TRIGGER_ROLE_NAME}"
-  policy_arn = "${aws_iam_policy.lambda_cognito_post_authentication_trigger_policy.arn}"
+  provider         = aws.src
+  role       = var.LAMBDA_COGNITO_POST_AUTHENTICATION_TRIGGER_ROLE_NAME
+  policy_arn = aws_iam_policy.lambda_cognito_post_authentication_trigger_policy.arn
 }
 
 //
 resource "aws_iam_policy" "lambda_cognito_userpool_client_setting_policy" {
-  name = "${var.RESOURCE_PREFIX}-lambda-cognito-userpool-client-setting-policy"
+  provider         = aws.src
+  name   = "${var.RESOURCE_PREFIX}-lambda-cognito-userpool-client-setting-policy"
   policy = <<EOF
 {
   "Version": "2012-10-17",
@@ -362,13 +404,15 @@ EOF
 }
 
 resource "aws_iam_role_policy_attachment" "lambda-cognito-userpool-client-setting-policy-role-attachment" {
-  role       = "${var.LAMBDA_COGNITO_USERPOOL_CLIENT_SETTING_ROLE_NAME}"
-  policy_arn = "${aws_iam_policy.lambda_cognito_presignup_trigger_policy.arn}"
+  provider         = aws.src
+  role       = var.LAMBDA_COGNITO_USERPOOL_CLIENT_SETTING_ROLE_NAME
+  policy_arn = aws_iam_policy.lambda_cognito_presignup_trigger_policy.arn
 }
 
 //
 resource "aws_iam_policy" "lambda_cognito_presignup_trigger_policy" {
-  name = "${var.RESOURCE_PREFIX}-lambda-cognito-presignup-trigger-policy"
+  provider         = aws.src
+  name   = "${var.RESOURCE_PREFIX}-lambda-cognito-presignup-trigger-policy"
   policy = <<EOF
 {
   "Version": "2012-10-17",
@@ -397,14 +441,16 @@ EOF
 }
 
 resource "aws_iam_role_policy_attachment" "lambda-cognito-presignup-trigger-policy-role-attachment" {
-  role       = "${var.LAMBDA_COGNITO_PRESIGNUP_TRIGGER_ROLE_NAME}"
-  policy_arn = "${aws_iam_policy.lambda_cognito_presignup_trigger_policy.arn}"
+  provider         = aws.src
+  role       = var.LAMBDA_COGNITO_PRESIGNUP_TRIGGER_ROLE_NAME
+  policy_arn = aws_iam_policy.lambda_cognito_presignup_trigger_policy.arn
 }
 
 
 //CognitoUserPoolDomian
 resource "aws_iam_policy" "manage_user_pool_domain" {
-  name = "ManageUserPoolDomain"
+  provider         = aws.src
+  name   = "${var.RESOURCE_PREFIX}-ManageUserPoolDomain"
   policy = <<EOF
 {
   "Version": "2012-10-17",
@@ -439,17 +485,20 @@ EOF
 }
 
 resource "aws_iam_role_policy_attachment" "cognito-userpool-domain-manage-user-pool-policy-role-attachment" {
-  role       = "${var.LAMBDA_COGNITO_USERPOOL_DOMAIN_ROLE_NAME}"
-  policy_arn = "${aws_iam_policy.manage_user_pool_domain.arn}"
+  provider         = aws.src
+  role       = var.LAMBDA_COGNITO_USERPOOL_DOMAIN_ROLE_NAME
+  policy_arn = aws_iam_policy.manage_user_pool_domain.arn
 }
 resource "aws_iam_role_policy_attachment" "cognito-userpool-domain-write-cloudwatch-policy-role-attachment" {
-  role       = "${var.LAMBDA_COGNITO_USERPOOL_DOMAIN_ROLE_NAME}"
-  policy_arn = "${aws_iam_policy.write_cloudwatch_logs_policy.arn}"
+  provider         = aws.src
+  role       = var.LAMBDA_COGNITO_USERPOOL_DOMAIN_ROLE_NAME
+  policy_arn = aws_iam_policy.write_cloudwatch_logs_policy.arn
 }
 
 // DUMP V3 Account DATA
 resource "aws_iam_policy" "read_customer_table_policy" {
-  name = "ReadCustomersTable"
+  provider         = aws.src
+  name   = "${var.RESOURCE_PREFIX}-ReadCustomersTable"
   policy = <<EOF
 {
   "Version": "2012-10-17",
@@ -469,7 +518,8 @@ EOF
 
 
 resource "aws_iam_policy" "list_user_pool_policy" {
-  name = "ReadCognitoCustomersTable"
+  provider         = aws.src
+  name   = "${var.RESOURCE_PREFIX}-ReadCognitoCustomersTable"
   policy = <<EOF
 {
   "Version": "2012-10-17",
@@ -489,22 +539,26 @@ EOF
 }
 
 resource "aws_iam_role_policy_attachment" "dump-v3-account-read-customer-table-policy-role-attachment" {
-  role       = "${var.LAMBDA_DUMP_V3_ACCOUNT_ROLE_NAME}"
-  policy_arn = "${aws_iam_policy.read_customer_table_policy.arn}"
+  provider         = aws.src
+  role       = var.LAMBDA_DUMP_V3_ACCOUNT_ROLE_NAME
+  policy_arn = aws_iam_policy.read_customer_table_policy.arn
 }
 resource "aws_iam_role_policy_attachment" "dump-v3-account-write-cloud-watchlog-policy-role-attachment" {
-  role       = "${var.LAMBDA_DUMP_V3_ACCOUNT_ROLE_NAME}"
-  policy_arn = "${aws_iam_policy.write_cloudwatch_logs_policy.arn}"
+  provider         = aws.src
+  role       = var.LAMBDA_DUMP_V3_ACCOUNT_ROLE_NAME
+  policy_arn = aws_iam_policy.write_cloudwatch_logs_policy.arn
 }
 
 resource "aws_iam_role_policy_attachment" "dump-v3-list-user-pool-policy-role-attachment" {
-  role       = "${var.LAMBDA_DUMP_V3_ACCOUNT_ROLE_NAME}"
-  policy_arn = "${aws_iam_policy.list_user_pool_policy.arn}"
+  provider         = aws.src
+  role       = var.LAMBDA_DUMP_V3_ACCOUNT_ROLE_NAME
+  policy_arn = aws_iam_policy.list_user_pool_policy.arn
 }
 
 // UserGroupImporter Polocies
 resource "aws_iam_policy" "write_cloudwatch_logs_policy" {
-  name = "WriteCloudWatchLogs"
+  provider         = aws.src
+  name   = "${var.RESOURCE_PREFIX}-WriteCloudWatchLogs"
   policy = <<EOF
 {
   "Version": "2012-10-17",
@@ -525,12 +579,14 @@ EOF
 }
 
 resource "aws_iam_role_policy_attachment" "lambda-write-cloudwatch-logs-role-attachment" {
-  role       = "${var.LAMBDA_USERGROUP_IMPORTER_ROLE_NAME}"
-  policy_arn = "${aws_iam_policy.write_cloudwatch_logs_policy.arn}"
+  provider         = aws.src
+  role       = var.LAMBDA_USERGROUP_IMPORTER_ROLE_NAME
+  policy_arn = aws_iam_policy.write_cloudwatch_logs_policy.arn
 }
 
 resource "aws_iam_policy" "lambda_s3_get_object_policy" {
-  name = "S3GetObject"
+  provider         = aws.src
+  name   = "${var.RESOURCE_PREFIX}-S3GetObject"
   policy = <<EOF
 {
   "Version": "2012-10-17",
@@ -549,8 +605,9 @@ EOF
 }
 
 resource "aws_iam_role_policy_attachment" "lambda-s3-get-objects-role-attachment" {
-  role       = "${var.LAMBDA_USERGROUP_IMPORTER_ROLE_NAME}"
-  policy_arn = "${aws_iam_policy.lambda_s3_get_object_policy.arn}"
+  provider         = aws.src
+  role       = var.LAMBDA_USERGROUP_IMPORTER_ROLE_NAME
+  policy_arn = aws_iam_policy.lambda_s3_get_object_policy.arn
 }
 
 # resource "aws_iam_policy" "lambda_restore_tables_policy" {
@@ -565,9 +622,9 @@ resource "aws_iam_role_policy_attachment" "lambda-s3-get-objects-role-attachment
 #           "dynamodb:Scan"
 #         ],
 #         "Resource": [
-        
+
 #         ]"arn:aws:s3:::*/*"
-        
+
 #     }
 #    ]
 # }
@@ -581,7 +638,8 @@ resource "aws_iam_role_policy_attachment" "lambda-s3-get-objects-role-attachment
 
 
 resource "aws_iam_policy" "update_cognito_user_list_policy" {
-  name = "CognitoUserGroup"
+  provider         = aws.src
+  name   = "${var.RESOURCE_PREFIX}-CognitoUserGroup"
   policy = <<EOF
 {
   "Version": "2012-10-17",
@@ -601,41 +659,46 @@ EOF
 }
 
 resource "aws_iam_role_policy_attachment" "update-config-user-s3-get-objects-role-attachment" {
-  role       = "${var.LAMBDA_USERGROUP_IMPORTER_ROLE_NAME}"
-  policy_arn = "${aws_iam_policy.update_cognito_user_list_policy.arn}"
+  provider         = aws.src
+  role       = var.LAMBDA_USERGROUP_IMPORTER_ROLE_NAME
+  policy_arn = aws_iam_policy.update_cognito_user_list_policy.arn
 }
 
 
 
 # Lambda Permissions
 resource "aws_lambda_permission" "pre_signup_lambda_permission" {
-  function_name = "${var.LAMBDA_COGNITO_PRE_SIGNUP_NAME}"
+  provider         = aws.src
+  function_name = var.LAMBDA_COGNITO_PRE_SIGNUP_NAME
   statement_id  = "${var.LAMBDA_COGNITO_PRE_SIGNUP_NAME}-lambda-permission"
   action        = "lambda:InvokeFunction"
   principal     = "cognito-idp.amazonaws.com"
-  source_arn = "arn:aws:cognito-idp:${var.AWS_REGION}:${var.CURRENT_ACCOUNT_ID}:userpool/${var.USERPOOL_ID}"
-  
+  source_arn    = "arn:aws:cognito-idp:${var.AWS_REGION}:${var.CURRENT_ACCOUNT_ID}:userpool/${var.USERPOOL_ID}"
+
 }
 resource "aws_lambda_permission" "post_confirmation_lambda_permission" {
-  function_name = "${var.LAMBDA_COGNITO_POST_CONFIRMATION_NAME}"
+  provider         = aws.src
+  function_name = var.LAMBDA_COGNITO_POST_CONFIRMATION_NAME
   statement_id  = "${var.LAMBDA_COGNITO_POST_CONFIRMATION_NAME}-lambda-permission"
   action        = "lambda:InvokeFunction"
   principal     = "cognito-idp.amazonaws.com"
-  source_arn = "arn:aws:cognito-idp:${var.AWS_REGION}:${var.CURRENT_ACCOUNT_ID}:userpool/${var.USERPOOL_ID}"  
+  source_arn    = "arn:aws:cognito-idp:${var.AWS_REGION}:${var.CURRENT_ACCOUNT_ID}:userpool/${var.USERPOOL_ID}"
 }
 resource "aws_lambda_permission" "post_authentication_lambda_permission" {
-  function_name = "${var.LAMBDA_COGNITO_POST_AUTHENTICATION_NAME}"
+  provider         = aws.src
+  function_name = var.LAMBDA_COGNITO_POST_AUTHENTICATION_NAME
   statement_id  = "${var.LAMBDA_COGNITO_POST_AUTHENTICATION_NAME}-lambda-permission"
   action        = "lambda:InvokeFunction"
   principal     = "cognito-idp.amazonaws.com"
-  source_arn = "arn:aws:cognito-idp:${var.AWS_REGION}:${var.CURRENT_ACCOUNT_ID}:userpool/${var.USERPOOL_ID}"
-  
+  source_arn    = "arn:aws:cognito-idp:${var.AWS_REGION}:${var.CURRENT_ACCOUNT_ID}:userpool/${var.USERPOOL_ID}"
+
 }
 resource "aws_lambda_permission" "cloudfront_security_lambda_permission" {
-  function_name = "${var.LAMBDA_CLOUDFRONT_SECURITY}"
-  statement_id  = "${var.LAMBDA_CLOUDFRONT_SECURITY}-lambda-permission"
+  provider         = aws.global
+  function_name = var.LAMBDA_CLOUDFRONT_SECURITY
+  statement_id  = "${var.LAMBDA_CLOUDFRONT_SECURITY}-security-lambda-permission"
   action        = "lambda:GetFunction"
-  principal     = "replicator.lambda.amazonaws.com"  
+  principal     = "replicator.lambda.amazonaws.com"
 }
 
 
@@ -643,7 +706,8 @@ resource "aws_lambda_permission" "cloudfront_security_lambda_permission" {
 //Cognito Admin group Policy
 
 resource "aws_iam_policy" "cognito_admin_group_policy" {
-  name = "CognitoAdminRole"
+  provider         = aws.src
+  name   = "${var.RESOURCE_PREFIX}-CognitoAdminRole"
   policy = <<EOF
 {
   "Version": "2012-10-17",
@@ -661,15 +725,17 @@ EOF
 }
 
 resource "aws_iam_role_policy_attachment" "cognito-admin-group-policy-role-attachment" {
-  role       = "${var.COGNITO_ADMIN_GROUP_ROLE}"
-  policy_arn = "${aws_iam_policy.cognito_admin_group_policy.arn}"
+  provider         = aws.src
+  role       = var.COGNITO_ADMIN_GROUP_ROLE
+  policy_arn = aws_iam_policy.cognito_admin_group_policy.arn
 }
 
 //Cognito Registered group Policy
 
 
 resource "aws_iam_policy" "cognito_registered_group_policy" {
-  name = "CognitoRegisteredRole"
+  provider         = aws.src
+  name   = "${var.RESOURCE_PREFIX}-CognitoRegisteredRole"
   policy = <<EOF
 {
   "Version": "2012-10-17",
@@ -695,13 +761,15 @@ EOF
 }
 
 resource "aws_iam_role_policy_attachment" "cognito-registered-group-policy-role-attachment" {
-  role       = "${var.COGNITO_REGISTERED_GROUP_ROLE}"
-  policy_arn = "${aws_iam_policy.cognito_registered_group_policy.arn}"
+  provider         = aws.src
+  role       = var.COGNITO_REGISTERED_GROUP_ROLE
+  policy_arn = aws_iam_policy.cognito_registered_group_policy.arn
 }
 
 
 resource "aws_iam_policy" "cloudfront_security_policy" {
-  name = "Cloudfront-security"
+  provider         = aws.src
+  name   = "${var.RESOURCE_PREFIX}-Cloudfront-security"
   policy = <<EOF
 {
   "Version": "2012-10-17",
@@ -748,32 +816,104 @@ EOF
 }
 
 resource "aws_iam_role_policy_attachment" "cloudfront-security-policy-role-attachment" {
-  role       = "${var.LAMBDA_CLOUDFRONT_SECURITY_ROLE}"
-  policy_arn = "${aws_iam_policy.cloudfront_security_policy.arn}"
+  provider         = aws.src
+  role       = var.LAMBDA_CLOUDFRONT_SECURITY_ROLE
+  policy_arn = aws_iam_policy.cloudfront_security_policy.arn
 }
 
 resource "aws_s3_bucket_policy" "bucekt_policy" {
+  provider         = aws.src
   bucket = var.WEBSITE_BUCKET_NAME
 
   # Terraform's "jsonencode" function converts a
   # Terraform expression's result to valid JSON syntax.
-  policy  = jsonencode({
- Version = "2012-10-17"
-    Id ="Policy1632784971110",
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Id      = "Policy1632784971110",
     Statement = [
-      {Effect = "Allow",
-          Principal = {
-                "AWS": "arn:aws:iam::cloudfront:user/CloudFront Origin Access Identity ${var.ORIGIN_ACCESS_IDENTITY}"
-            },
-            Action = "s3:*",
-        Resource = [ "arn:aws:s3:::${var.WEBSITE_BUCKET_NAME}/*"]  
-  }
-  ]
- }) 
+      { Effect = "Allow",
+        Principal = {
+          "AWS" : "arn:aws:iam::cloudfront:user/CloudFront Origin Access Identity ${var.ORIGIN_ACCESS_IDENTITY}"
+        },
+        Action   = "s3:*",
+        Resource = ["arn:aws:s3:::${var.WEBSITE_BUCKET_NAME}/*"]
+      }
+    ]
+  })
 
 }
 
 
 
+resource "aws_iam_policy" "api_key_invocation_policy" {
+  provider         = aws.src
+  name   = "${var.RESOURCE_PREFIX}-api_key_invocation_policy"
+  policy = <<EOF
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Action": "lambda:InvokeFunction",
+      "Effect": "Allow",
+      "Resource": "${var.API_KEY_AUTHORIZATION_LAMBDA_ARN}"
+    },
+    {
+      "Effect": "Allow",
+      "Action": [
+          "apigateway:GET"
+      ],
+      "Resource": "arn:aws:apigateway:*::/*"
+    },
+    {
+      "Effect": "Allow",
+      "Action": [
+          "dynamodb:Query"
+      ],
+      "Resource": "*"
+    },
+    {
+      "Effect": "Allow",
+      "Action": [
+          "cognito-idp:AdminGetUser"
+      ],
+      "Resource": "*"
+    }
+  ]
+}
+EOF
+}
+
+resource "aws_iam_role_policy_attachment" "api_key_invocation_policy_role_attachment" {
+  provider         = aws.src
+  role       = var.API_KEY_AUTHORIZATION_ROLE_NAME
+  policy_arn = aws_iam_policy.api_key_invocation_policy.arn
+}
 
 
+resource "aws_iam_policy" "cognito_sms_caller_role_policy" {
+  provider = aws.src
+  name     = "${var.RESOURCE_PREFIX}-cognito-sms-caller-role-policy"
+  policy   = <<EOF
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Effect": "Allow",
+            "Action": [
+                "sns:publish"
+            ],
+            "Resource": [
+                "*"
+            ]
+        }
+    ]
+}
+EOF
+}
+
+
+resource "aws_iam_role_policy_attachment" "cognito_sns_policy_role_attachment" {
+  provider   = aws.src
+  role       = var.COGNITO_SMS_CALLER_ROLE_NAME
+  policy_arn = aws_iam_policy.cognito_sms_caller_role_policy.arn
+}

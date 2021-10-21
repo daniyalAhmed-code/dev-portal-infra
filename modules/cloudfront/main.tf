@@ -1,35 +1,35 @@
 resource "aws_cloudfront_origin_access_identity" "cloudfront_origin_access_identity" {
-  #  count = var.DEVELOPMENT_MODE ? 1 : 0
-  comment = "${var.RESOURCE_PREFIX}"
+  comment = var.RESOURCE_PREFIX
 }
 
 
 
 resource "aws_cloudfront_distribution" "s3_distribution" {
-    count = var.CUSTOM_DOMAIN_NAME != "" ? 1 : 0
-    default_root_object = "index.html"
-    enabled             = true
-    http_version = "http1.1"
+  count               = var.CUSTOM_DOMAIN_NAME != "" ? 1 : 0
+  default_root_object = "index.html"
+  enabled             = true
+  http_version        = "http1.1"
+  # web_acl_id          = var.waf_acl_id
 
-    aliases = [var.CUSTOM_DOMAIN_NAME]
-    origin {
-      domain_name = var.AWS_REGION == "us-east-1" ? "${var.DEV_PORTAL_SITE_S3_BUCKET}.s3.amazonaws.com":"${var.DEV_PORTAL_SITE_S3_BUCKET}.s3-${var.AWS_REGION}.amazonaws.com."
-      origin_id   = var.BUCKET_REGIONAL_DOMAIN_NAME
+  aliases = [var.CUSTOM_DOMAIN_NAME]
+  origin {
+    domain_name = var.AWS_REGION == "us-east-1" ? "${var.DEV_PORTAL_SITE_S3_BUCKET}.s3.amazonaws.com" : "${var.DEV_PORTAL_SITE_S3_BUCKET}.s3.amazonaws.com"
+    origin_id   = var.BUCKET_REGIONAL_DOMAIN_NAME
 
-      s3_origin_config {
-        origin_access_identity = "${aws_cloudfront_origin_access_identity.cloudfront_origin_access_identity.cloudfront_access_identity_path}"
-      }
+    s3_origin_config {
+      origin_access_identity = aws_cloudfront_origin_access_identity.cloudfront_origin_access_identity.cloudfront_access_identity_path
     }
-    custom_error_response {
-      error_caching_min_ttl = 300
-        error_code = "403"
-        response_code = "403"
-        response_page_path = "/index.html"
-    }
-    default_cache_behavior {
-    allowed_methods  = ["GET", "HEAD"]
-    cached_methods   = ["GET", "HEAD"]
-    target_origin_id = var.BUCKET_REGIONAL_DOMAIN_NAME
+  }
+  custom_error_response {
+    error_caching_min_ttl = 300
+    error_code            = "403"
+    response_code         = "403"
+    response_page_path    = "/index.html"
+  }
+  default_cache_behavior {
+    allowed_methods        = ["GET", "HEAD"]
+    cached_methods         = ["GET", "HEAD"]
+    target_origin_id       = var.BUCKET_REGIONAL_DOMAIN_NAME
     viewer_protocol_policy = "redirect-to-https"
     forwarded_values {
       query_string = true
@@ -37,53 +37,53 @@ resource "aws_cloudfront_distribution" "s3_distribution" {
       cookies {
         forward = "none"
       }
-      
+
     }
     lambda_function_association {
       event_type   = "origin-response"
-      lambda_arn   ="${var.CLOUDFRONT_SECURITY_HEADER_SETUP}"
+      lambda_arn   = var.CLOUDFRONT_SECURITY_HEADER_SETUP
       include_body = false
     }
-    }  
-     restrictions {
-          geo_restriction{
-            restriction_type = "none"
-
-          }
-     }
-    
-    
-    
-  
-  viewer_certificate {
-      acm_certificate_arn = var.ACM_CERTIFICATE_ARN
-      ssl_support_method = "sni-only"
   }
+  restrictions {
+    geo_restriction {
+      restriction_type = "none"
+
     }
+  }
+
+  viewer_certificate {
+    acm_certificate_arn = var.ACM_CERTIFICATE_ARN
+    ssl_support_method  = "sni-only"
+  }
+}
 
 
 resource "aws_cloudfront_distribution" "default_domain_cloudfront_distribution" {
-    enabled             = true
-    default_root_object = "index.html"
-    http_version = "http1.1"
-    origin {
-      domain_name = var.AWS_REGION == "us-east-1" ? "${var.DEV_PORTAL_SITE_S3_BUCKET}.s3.amazonaws.com":"${var.DEV_PORTAL_SITE_S3_BUCKET}.s3-${var.AWS_REGION}.amazonaws.com"
-      origin_id   = var.BUCKET_REGIONAL_DOMAIN_NAME
+  count               = var.CUSTOM_DOMAIN_NAME == "" ? 1 : 0
+  enabled             = true
+  default_root_object = "index.html"
+  http_version        = "http1.1"
+  web_acl_id          = var.waf_acl_id
 
-      s3_origin_config {
-        origin_access_identity = "${aws_cloudfront_origin_access_identity.cloudfront_origin_access_identity.cloudfront_access_identity_path}"
-      }
+  origin {
+    domain_name = var.AWS_REGION == "us-east-1" ? "${var.DEV_PORTAL_SITE_S3_BUCKET}.s3.amazonaws.com" : "${var.DEV_PORTAL_SITE_S3_BUCKET}.s3-${var.AWS_REGION}.amazonaws.com"
+    origin_id   = var.BUCKET_REGIONAL_DOMAIN_NAME
+
+    s3_origin_config {
+      origin_access_identity = aws_cloudfront_origin_access_identity.cloudfront_origin_access_identity.cloudfront_access_identity_path
     }
-    custom_error_response {
-      error_caching_min_ttl = 300
-        error_code = "403"
-        response_code = "403"
-        response_page_path = "/index.html"
-    }
-    default_cache_behavior {
-    allowed_methods  = ["GET", "HEAD"]
-    cached_methods   = ["GET", "HEAD"]
-    target_origin_id = var.BUCKET_REGIONAL_DOMAIN_NAME
+  }
+  custom_error_response {
+    error_caching_min_ttl = 300
+    error_code            = "403"
+    response_code         = "403"
+    response_page_path    = "/index.html"
+  }
+  default_cache_behavior {
+    allowed_methods        = ["GET", "HEAD"]
+    cached_methods         = ["GET", "HEAD"]
+    target_origin_id       = var.BUCKET_REGIONAL_DOMAIN_NAME
     viewer_protocol_policy = "redirect-to-https"
     forwarded_values {
       query_string = true
@@ -91,24 +91,24 @@ resource "aws_cloudfront_distribution" "default_domain_cloudfront_distribution" 
       cookies {
         forward = "none"
       }
-       
+
     }
-     lambda_function_association {
+    lambda_function_association {
       event_type   = "origin-response"
-      lambda_arn   = "${var.CLOUDFRONT_SECURITY_HEADER_SETUP}"
+      lambda_arn   = var.CLOUDFRONT_SECURITY_HEADER_SETUP
       include_body = false
     }
-    }
-     restrictions {
-          geo_restriction{
-            restriction_type = "none"
-
-          }
-     }
-   
-    
-  viewer_certificate {
-      cloudfront_default_certificate = true
-      ssl_support_method = "sni-only"
   }
+  restrictions {
+    geo_restriction {
+      restriction_type = "none"
+
     }
+  }
+
+
+  viewer_certificate {
+    cloudfront_default_certificate = true
+    ssl_support_method             = "sni-only"
+  }
+}
