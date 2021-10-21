@@ -3,7 +3,7 @@ locals {
 }
 
 resource "aws_lambda_layer_version" "lambda-common-layer" {
-  # provider            = aws.src
+  provider            = aws.src
   filename            = "${path.module}/layers/nodejs.zip"
   layer_name          = "dev-portal-common"
   compatible_runtimes = ["nodejs12.x"]
@@ -12,7 +12,7 @@ resource "aws_lambda_layer_version" "lambda-common-layer" {
 
 
 resource "aws_lambda_function" "lambda_catalog_updater_lambda_function" {
-  # provider            = aws.src
+  provider            = aws.src
   filename         = "${path.module}/zip/catalog-updater.zip"
   function_name    = "${var.RESOURCE_PREFIX}-catalog-updater"
   role             = "${var.LAMBDA_CATALOG_UPDATER_ROLE_ARN}"
@@ -30,7 +30,7 @@ resource "aws_lambda_function" "lambda_catalog_updater_lambda_function" {
 }
 
 resource "aws_lambda_function" "lambda_backend_lambda_function" {
-  # provider            = aws.src
+  provider            = aws.src
   filename         = "${path.module}/zip/backend.zip"
   function_name    = "${var.RESOURCE_PREFIX}-backend"
   role             = "${var.LAMBDA_BACKEND_ROLE_ARN}"
@@ -60,7 +60,7 @@ resource "aws_lambda_function" "lambda_backend_lambda_function" {
 
 
 resource "aws_lambda_function" "lambda_cognito_presignup_trigger_function" {
-  # provider            = aws.src
+  provider            = aws.src
   filename         = "${path.module}/zip/cognito-pre-signup-trigger.zip"
   function_name    = "${var.RESOURCE_PREFIX}-CognitoPreSignupTriggerFn"
   role             = "${var.LAMBDA_COGNITO_PRESIGNUP_TRIGGER_ROLE_ARN}"
@@ -77,7 +77,7 @@ resource "aws_lambda_function" "lambda_cognito_presignup_trigger_function" {
 }
 
 resource "aws_lambda_function" "lambda_cognito_post_confirmation_trigger_function" {
-  # provider            = aws.src
+  provider            = aws.src
   filename         = "${path.module}/zip/cognito-post-confirmation-trigger.zip"
   function_name    = "${var.RESOURCE_PREFIX}-CognitoPostConfirmationTriggerFn"
   role             = "${var.LAMBDA_COGNITO_POST_CONFIRMATION_TRIGGER_ROLE_ARN}"
@@ -95,7 +95,7 @@ resource "aws_lambda_function" "lambda_cognito_post_confirmation_trigger_functio
   }
 }
 resource "aws_lambda_function" "lambda_cognito_post_authentication_trigger_function" {
-  # provider            = aws.src
+  provider            = aws.src
   filename         = "${path.module}/zip/cognito-post-authentication-trigger.zip"
   function_name    = "${var.RESOURCE_PREFIX}-CognitoPostAuthenticationTriggerFn"
   role             = "${var.LAMBDA_COGNITO_POST_AUTHENTICATION_TRIGGER_ROLE_ARN}"
@@ -115,7 +115,7 @@ resource "aws_lambda_function" "lambda_cognito_post_authentication_trigger_funct
 }
 
 resource "aws_lambda_function" "lambda_cognito_userpool_client_settings_function" {
-  # provider            = aws.src
+  provider            = aws.src
   filename         = "${path.module}/zip/cfn-cognito-user-pools-client-settings.zip"
   function_name    = "${var.RESOURCE_PREFIX}-CognitoUserPoolClientSettingsBackingFn"
   role             = "${var.LAMBDA_COGNITO_USERPOOL_CLIENT_SETTING_ROLE_ARN}"
@@ -128,7 +128,7 @@ resource "aws_lambda_function" "lambda_cognito_userpool_client_settings_function
 
 
 resource "aws_lambda_function" "lambda_cognito_userpool_domain_function" {
-  # provider            = aws.src
+  provider            = aws.src
   filename         = "${path.module}/zip/cfn-cognito-user-pools-domain.zip"
   function_name    = "${var.RESOURCE_PREFIX}-CognitoUserPoolDomainBackingFn"
   role             = "${var.LAMBDA_COGNITO_USERPOOL_DOMAIN_ROLE_ARN}"
@@ -140,7 +140,7 @@ resource "aws_lambda_function" "lambda_cognito_userpool_domain_function" {
 }
 
 resource "aws_lambda_function" "lambda_dump_v3_account_data_function" {
-  # provider            = aws.src
+  provider            = aws.src
   filename         = "${path.module}/zip/dump-v3-account-data.zip"
   function_name    = "${var.RESOURCE_PREFIX}-DumpV3AccountDataFn"
   role             = "${var.LAMBDA_DUMP_V3_ACCOUNT_ROLE_ARN}"
@@ -160,7 +160,7 @@ resource "aws_lambda_function" "lambda_dump_v3_account_data_function" {
 }
 
 resource "aws_lambda_function" "lambda_user_group_importer_function" {
-  # provider            = aws.src
+  provider            = aws.src
   filename         = "${path.module}/zip/user-group-importer.zip"
   function_name    = "${var.RESOURCE_PREFIX}-UserGroupImporter"
   role             = "${var.LAMBDA_USERGROUP_IMPORTER_ROLE_ARN}"
@@ -183,7 +183,7 @@ resource "aws_lambda_function" "lambda_user_group_importer_function" {
 
 
 resource "aws_lambda_function" "lambda_api_key_authoriser_function" {
-  # provider            = aws.src
+  provider            = aws.src
   filename         = "${path.module}/zip/authoriser.zip"
   function_name    = "${var.RESOURCE_PREFIX}-api-key-authoriser"
   role             = "${var.LAMBDA_USERGROUP_IMPORTER_ROLE_ARN}"
@@ -204,7 +204,7 @@ resource "aws_lambda_function" "lambda_api_key_authoriser_function" {
 
 
 resource "aws_lambda_function" "lambda_cloudfront_security_function" {
-  # provider            = aws.global
+  provider            = aws.global
   publish          = true
   filename         = "${path.module}/zip/cloudfront-security.zip"
   function_name    = "${var.RESOURCE_PREFIX}-cloudfront-security"
@@ -224,21 +224,21 @@ resource "time_sleep" "wait_30_seconds" {
 }
 
 resource "aws_s3_bucket_object" "upload_config_to_s3" {
-  # provider            = aws.src
+  provider            = aws.src
   bucket       = "${var.WEBSITE_BUCKET_NAME}"
   key          = "config.js"
   content      = "${local.s3_config_rendered_content}"
   content_type = "application/javascript"
 }
 resource "aws_s3_bucket_object" "upload_sdkGeneration_to_s3" {
-  # provider            = aws.src
+  provider            = aws.src
   bucket       = "${var.ARTIFACTS_S3_BUCKET_NAME}"
   key          = "sdkGeneration.json"
   content      = "${local.s3_sdkGeneration_rendered_content}"
   content_type = "application/json"
 }
 resource "aws_s3_bucket_object" "upload_catalog_to_s3" {
-  # provider            = aws.src
+  provider            = aws.src
   bucket       = "${var.ARTIFACTS_S3_BUCKET_NAME}"
   key          = "catalog.json"
   content      = "${local.s3_catalog_rendered_content}"
