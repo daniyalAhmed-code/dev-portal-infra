@@ -8,7 +8,7 @@ ENV = "dani-develop"
 
 ACCOUNT_REGISTRATION_MODE       = "open"
 CUSTOM_DOMAIN_NAME              = "xxxx.xxxx.net"
-PORTAL_DOMAIN_NAME              = "api.xxxx.net"
+PORTAL_CUSTOM_DOMAIN_NAME              = "api.xxxx.net"
 COGNITO_ADMIN_GROUP_DESCRIPTION = "Group for Admins"
 
 COGNITO_REGISTERED_GROUP_DESCRIPTION = "Group for registered users"

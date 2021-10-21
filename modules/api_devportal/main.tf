@@ -5,7 +5,7 @@ resource "aws_api_gateway_rest_api" "api-gateway" {
 }
 
 resource "aws_api_gateway_base_path_mapping" "api-gateway-base-path-mapping" {
-  count       = var.PORTAL_CUSTOM_DOMAIN_NAME != "" ? 1 : 0
+  count       = var.PORTAL_CUSTOM_DOMAIN_NAME != null ? 1 : 0
   api_id      = "${aws_api_gateway_rest_api.api-gateway.id}"
   stage_name  = "${aws_api_gateway_deployment.api-gateway-deployment.stage_name}"
   domain_name = var.PORTAL_CUSTOM_DOMAIN_NAME
