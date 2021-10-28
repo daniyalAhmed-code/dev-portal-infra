@@ -105,3 +105,5 @@ variable "USE_CUSTOM_DOMAIN_NAME" {}
 variable "DOMAIN_NAME" {}
 variable "API_KEY_AUTHORIZATION_ROLE_ARN" {}
 variable "API_KEY_AUTHORIZATION_INVOKE_ARN" {}
+
+variable "PORTAL_CUSTOM_DOMAIN_NAME" {default = null}

@@ -138,7 +138,8 @@ resource "aws_iam_policy" "lambda_backend_policy" {
         "cognito-idp:ListUsers",
         "cognito-idp:AdminCreateUser",
         "cognito-idp:AdminDeleteUser",
-        "cognito-idp:AdminSetUserMFAPreference"
+        "cognito-idp:AdminSetUserMFAPreference",
+        "cognito-idp:AdminUpdateUserAttributes"
       ],
       "Resource": [
         "*"
@@ -156,7 +157,8 @@ resource "aws_iam_policy" "lambda_backend_policy" {
 {
       "Effect": "Allow",
       "Action": [
-        "secretsmanager:CreateSecret"
+        "secretsmanager:CreateSecret",
+        "secretsmanager:PutSecretValue"
       ],
       "Resource": "*"
 }

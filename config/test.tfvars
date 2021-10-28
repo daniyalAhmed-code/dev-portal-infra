@@ -1,3 +1,4 @@
+
 ENABLE_FEEDBACK_SUBMISSION = "admin@email.com"
 
 NAME = "vap-api"
@@ -18,3 +19,5 @@ ORIGIN_ID                            = true
 
 DEVELOPMENT_MODE = true
 NODE_ENV         = "production"
+
+PORTAL_CUSTOM_DOMAIN_NAME              = "api.xxxx.net"

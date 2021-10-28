@@ -85,6 +85,7 @@ module "lambda" {
   USERPOOL_DOMAIN                                     = "https://${var.COGNITO_USER_POOL_DOMAIN}.auth.${data.aws_region.current.name}.amazoncognito.com"
   USERPOOL_CLIENT_ID                                  = module.cognito.COGNITO_USERPOOL_CLIENT
   IDENTITYPOOL_ID                                     = module.cognito.COGNITO_IDENTITY_POOL
+  APIGATEWAY_CUSTOM_DOMAIN_NAME                       = var.PORTAL_CUSTOM_DOMAIN_NAME
 }
 
 
@@ -101,6 +102,7 @@ module "api" {
   AWS_REGION                       = data.aws_region.current.name
   API_KEY_AUTHORIZATION_ROLE_ARN   = module.role.API_KEY_AUTHORIZATION_ROLE_ARN
   API_KEY_AUTHORIZATION_INVOKE_ARN = module.lambda.API_KEY_AUTHORIZATION_INVOKE_ARN
+  PORTAL_CUSTOM_DOMAIN_NAME      = var.PORTAL_CUSTOM_DOMAIN_NAME
 
 }
 
