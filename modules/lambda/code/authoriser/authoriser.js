@@ -63,7 +63,7 @@ exports.handler = async (event, context, callback) => {
         return deny(awsAccountId, apiOptions);
     }
 
-    let username = apisResponse.Items[0].UserPoolId
+    let username = apisResponse.Items[0].Username
     
     let cognitoResponse = await cognito.adminGetUser({
         UserPoolId: userPoolId,
