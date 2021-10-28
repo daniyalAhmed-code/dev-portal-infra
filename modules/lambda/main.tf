@@ -224,23 +224,23 @@ resource "time_sleep" "wait_30_seconds" {
 }
 
 resource "aws_s3_bucket_object" "upload_config_to_s3" {
-  provider            = aws.src
   bucket       = "${var.WEBSITE_BUCKET_NAME}"
   key          = "config.js"
   content      = "${local.s3_config_rendered_content}"
   content_type = "application/javascript"
+  source_hash  =  "${filebase64sha256("${path.module}/template/config.tmpl")}"
 }
 resource "aws_s3_bucket_object" "upload_sdkGeneration_to_s3" {
-  provider            = aws.src
   bucket       = "${var.ARTIFACTS_S3_BUCKET_NAME}"
   key          = "sdkGeneration.json"
   content      = "${local.s3_sdkGeneration_rendered_content}"
   content_type = "application/json"
+ source_hash   =  "${filebase64sha256("${path.module}/template/sdkGeneration.tmpl")}"
 }
 resource "aws_s3_bucket_object" "upload_catalog_to_s3" {
-  provider            = aws.src
   bucket       = "${var.ARTIFACTS_S3_BUCKET_NAME}"
   key          = "catalog.json"
   content      = "${local.s3_catalog_rendered_content}"
   content_type = "application/json"
+  source_hash  =  "${filebase64sha256("${path.module}/template/catalog.tmpl")}"
 }
