@@ -74,19 +74,20 @@ exports.handler = async (event, context, callback) => {
     } else {
         api_date = apiKey.createdDate
     }
-    
     let ApiDate = new Date(api_date)
     ApiDate.setDate(ApiDate.getDate() + apisResponse.Items[0].ApiKeyDuration);
-    let timeDiff = Math.abs(ApiDate.getTime() - current_date.getTime());
-    let diffDays = Math.floor(timeDiff / (1000 * 3600 * 24));
     
-    if (diffDays <= 0)
-        return deny(awsAccountId, apiOptions);
-    else {
+    if (ApiDate > current_date){
         var authPolicy = new AuthPolicy(`${awsAccountId}`, awsAccountId, apiOptions);
         authPolicy.allowMethod(AuthPolicy.HttpVerb.ALL, "/*");
         var generated = authPolicy.build();
-
+        generated["context"] = {
+            "username": username,
+            "user_id": userId
+        }
         return generated
     }
+    else 
+        return deny(awsAccountId, apiOptions);
+    
 };
