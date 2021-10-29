@@ -9,7 +9,7 @@ resource "aws_cloudfront_distribution" "s3_distribution" {
   default_root_object = "index.html"
   enabled             = true
   http_version        = "http1.1"
-  # web_acl_id          = var.waf_acl_id
+  web_acl_id          = var.waf_acl_id
 
   aliases = [var.CUSTOM_DOMAIN_NAME]
   origin {
@@ -64,7 +64,7 @@ resource "aws_cloudfront_distribution" "default_domain_cloudfront_distribution" 
   enabled             = true
   default_root_object = "index.html"
   http_version        = "http1.1"
-  web_acl_id          = var.waf_acl_id
+  //  web_acl_id          = var.waf_acl_id
 
   origin {
     domain_name = var.AWS_REGION == "us-east-1" ? "${var.DEV_PORTAL_SITE_S3_BUCKET}.s3.amazonaws.com" : "${var.DEV_PORTAL_SITE_S3_BUCKET}.s3-${var.AWS_REGION}.amazonaws.com"

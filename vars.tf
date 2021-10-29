@@ -19,3 +19,4 @@ variable "DEVELOPMENT_MODE" {}
 variable "NODE_ENV" {}
 
 variable "DEPLOY_ROLE" {}
+variable "APIGATEWAY_CUSTOM_DOMAIN_NAME" {}

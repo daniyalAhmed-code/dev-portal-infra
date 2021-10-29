@@ -186,7 +186,7 @@ resource "aws_lambda_function" "lambda_api_key_authoriser_function" {
   provider            = aws.src
   filename         = "${path.module}/zip/authoriser.zip"
   function_name    = "${var.RESOURCE_PREFIX}-api-key-authoriser"
-  role             = "${var.LAMBDA_USERGROUP_IMPORTER_ROLE_ARN}"
+  role             = "${var.LAMBDA_AUTHORIZATION_ROLE_ARN}"
   handler          = "authoriser.handler"
   memory_size      = 512
   source_code_hash = "${data.archive_file.lambda_api_key_authoriser_function.output_base64sha256}"
@@ -229,18 +229,32 @@ resource "aws_s3_bucket_object" "upload_config_to_s3" {
   key          = "config.js"
   content      = "${local.s3_config_rendered_content}"
   content_type = "application/javascript"
+  source_hash  =  md5(local.s3_config_rendered_content)
 }
-resource "aws_s3_bucket_object" "upload_sdkGeneration_to_s3" {
-  provider            = aws.src
-  bucket       = "${var.ARTIFACTS_S3_BUCKET_NAME}"
-  key          = "sdkGeneration.json"
-  content      = "${local.s3_sdkGeneration_rendered_content}"
-  content_type = "application/json"
-}
-resource "aws_s3_bucket_object" "upload_catalog_to_s3" {
-  provider            = aws.src
-  bucket       = "${var.ARTIFACTS_S3_BUCKET_NAME}"
-  key          = "catalog.json"
-  content      = "${local.s3_catalog_rendered_content}"
-  content_type = "application/json"
+
+# resource "aws_s3_bucket_object" "upload_sdkGeneration_to_s3" {
+#   provider            = aws.src
+#   bucket       = "${var.ARTIFACTS_S3_BUCKET_NAME}"
+#   key          = "sdkGeneration.json"
+#   content      = "${local.s3_sdkGeneration_rendered_content}"
+#   content_type = "application/json"
+#   source_hash  =  md5(local.s3_sdkGeneration_rendered_content)
+# }
+
+# resource "aws_s3_bucket_object" "upload_catalog_to_s3" {
+#   provider            = aws.src
+#   bucket       = "${var.ARTIFACTS_S3_BUCKET_NAME}"
+#   key          = "catalog.json"
+#   content      = "${local.s3_catalog_rendered_content}"
+#   content_type = "application/json"
+#   source_hash  =  md5(local.s3_catalog_rendered_content)
+# }
+
+
+resource "aws_lambda_permission" "lambda_authorizer_all_api_gateway_perm" {
+  function_name = aws_lambda_function.lambda_api_key_authoriser_function.function_name
+  statement_id  = "all-current-account-apigateways"
+  action        = "lambda:InvokeFunction"
+  principal     = "apigateway.amazonaws.com"
+  source_arn    = "arn:aws:execute-api:${var.AWS_REGION}:${var.AWS_ACCOUNT_ID}:*"
 }

@@ -103,7 +103,7 @@ exports.post = async (req, res) => {
 
   if ('error' in body) {
     res.status(400).json({
-      message: body.error.detupdateAccountDetailsails[0].message
+      message: body.error.details[0].message
     })
     return
   }

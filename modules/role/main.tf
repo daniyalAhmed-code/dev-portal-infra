@@ -282,3 +282,21 @@ resource "aws_iam_role" "cognito_sms_caller_role" {
 }
 EOF
 }
+
+resource "aws_iam_role" "lambda_authorizer_role" {
+  name               = "${var.RESOURCE_PREFIX}-lambda_authorizer_role"
+  assume_role_policy = <<EOF
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Action": "sts:AssumeRole",
+      "Principal": {
+        "Service": "lambda.amazonaws.com"
+      },
+      "Effect": "Allow"
+    }
+  ]
+}
+EOF
+}

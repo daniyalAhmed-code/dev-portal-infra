@@ -99,3 +99,9 @@ output "SMS_CALLER_ROLE_ARN" {
 output "SMS_CALLER_ROLE_NAME" {
   value = aws_iam_role.cognito_sms_caller_role.name
 }
+output "LAMBDA_AUTHORIZATION_ROLE_ARN" {
+  value = aws_iam_role.lambda_authorizer_role.arn
+}
+output "LAMBDA_AUTHORIZATION_ROLE_NAME" {
+  value = aws_iam_role.lambda_authorizer_role.name
+}

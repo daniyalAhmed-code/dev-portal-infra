@@ -36,6 +36,8 @@ module "policy" {
   LAMBDA_COGNITO_POST_AUTHENTICATION_NAME              = module.lambda.COGNITO_POST_AUTHENTICATION_TRIGGER_LAMBDA_NAME
   LAMBDA_CLOUDFRONT_SECURITY                           = module.lambda.CLOUDFRONT_SECURITY_LAMBDA_NAME
   LAMBDA_SECURITY_HEADER                               = module.lambda.CLOUDFRONT_SECURITY_HEADER_NAME
+  LAMBDA_AUTHORIZATION_ROLE_ARN                        = module.role.LAMBDA_AUTHORIZATION_ROLE_ARN
+  LAMBDA_AUTHORIZATION_ROLE_NAME                        = module.role.LAMBDA_AUTHORIZATION_ROLE_NAME
   USERPOOL_ID                                          = module.cognito.COGNITO_USER_POOL
   API_GATEWAY_API                                      = module.api.API_GATEWAY_API
   COGNITO_ADMIN_GROUP_ROLE                             = module.role.COGNITO_ADMIN_GROUP_ROLE_NAME
@@ -66,6 +68,7 @@ module "lambda" {
   LAMBDA_USERGROUP_IMPORTER_ROLE_ARN                  = module.role.LAMBDA_USERGROUP_IMPORTER_ROLE_ARN
   LAMBDA_DUMP_V3_ACCOUNT_ROLE_ARN                     = module.role.LAMBDA_DUMP_V3_ACCOUNT_ROLE_ARN
   LAMBDA_CLOUDFRONT_SECURITY_ROLE_ARN                 = module.role.CLOUDFRONT_SECURITY_ROLE_ARN
+  LAMBDA_AUTHORIZATION_ROLE_ARN                       = module.role.LAMBDA_AUTHORIZATION_ROLE_ARN
   NODE_ENV                                            = var.NODE_ENV
   WEBSITE_BUCKET_NAME                                 = local.DEV_PORTAL_SITE_S3_BUCKET
   CUSTOMER_TABLE_NAME                                 = local.DEV_PORTAL_CUSTOMERS_TABLE_NAME
@@ -80,11 +83,13 @@ module "lambda" {
   REGISTERED_GROUP_NAME                               = local.REGISTERED_GROUP_NAME
   DEVELOPMENT_MODE                                    = var.DEVELOPMENT_MODE ? true : false
   AWS_REGION                                          = data.aws_region.current.name
+  AWS_ACCOUNT_ID                                      = local.CURRENT_ACCOUNT_ID
   API_GATEWAY_API                                     = module.api.API_GATEWAY_ID
   FEEDBACK_ENABLED                                    = local.IS_ADMIN
   USERPOOL_DOMAIN                                     = "https://${var.COGNITO_USER_POOL_DOMAIN}.auth.${data.aws_region.current.name}.amazoncognito.com"
   USERPOOL_CLIENT_ID                                  = module.cognito.COGNITO_USERPOOL_CLIENT
   IDENTITYPOOL_ID                                     = module.cognito.COGNITO_IDENTITY_POOL
+  APIGATEWAY_CUSTOM_DOMAIN_NAME                       = var.APIGATEWAY_CUSTOM_DOMAIN_NAME
 }
 
 
@@ -101,11 +106,11 @@ module "api" {
   AWS_REGION                       = data.aws_region.current.name
   API_KEY_AUTHORIZATION_ROLE_ARN   = module.role.API_KEY_AUTHORIZATION_ROLE_ARN
   API_KEY_AUTHORIZATION_INVOKE_ARN = module.lambda.API_KEY_AUTHORIZATION_INVOKE_ARN
+  APIGATEWAY_CUSTOM_DOMAIN_NAME    = var.APIGATEWAY_CUSTOM_DOMAIN_NAME
 
 }
 
 module "cloudfront" {
-  # depends_on = [module.waf_global]
   source = "./modules/cloudfront"
   providers = {
     aws = aws.global_region
@@ -120,7 +125,7 @@ module "cloudfront" {
   AWS_REGION                       = data.aws_region.current.name
   ACM_CERTIFICATE_ARN              = var.ACM_CERTIFICATE_ARN
   BUCKET_REGIONAL_DOMAIN_NAME      = local.BUCKET_REGIONAL_DOMAIN_NAME
-  # waf_acl_id                       = module.waf_global.waf_acl_id
+  waf_acl_id                       = local.global_waf_id
 }
 
 module "route53" {
@@ -154,40 +159,54 @@ module "cognito" {
   # BUCEKT_REGIONAL_DOMAIN_NAME = var.BUCKET_REGIONAL_NAME
 }
 
-### WAF ###
-
-# Regional Waf
-/* module "waf_regional" {
-  source      = "./modules/waf"
-  name        = "vap-waf-regional"
-  is_regional = true
-}
-
-# Global Waf
-module "waf_global" {
-  source      = "./modules/waf"
-  name        = "vap-waf-global"
-  is_regional = false
-  providers = {
-    aws = aws.global_region
-  }
-} */
-
 ### API ###
 
-# API UC13
-module "api_uc13" {
-  # depends_on   = [module.waf_regional]
-  source       = "./modules/api"
-  env          = var.ENV
-  name         = "${var.NAME}-uc13"
-  description  = "API Gateway for use case 13"
-  swagger_file = "./templates/swaggers/uc13.yaml"
-  # waf_acl_id   = module.waf_regional.waf_acl_id
-  swagger_vars = {
-    REGION                 = data.aws_region.current.name
-    DEVICE_TYPE_LAMBDA_ARN = data.terraform_remote_state.st_connector.outputs.device_type_lambda_arn
-    EXECUTION_ROLE_ARN     = module.lambda_execution_role.iam_role_arn
-  }
-  lambda_functions_names = [data.terraform_remote_state.st_connector.outputs.device_type_lambda_name]
+resource "aws_api_gateway_account" "this" {
+  depends_on          = [aws_iam_role.api_gateway_cloudwatch]
+  cloudwatch_role_arn = aws_iam_role.api_gateway_cloudwatch.arn
+}
+
+resource "aws_iam_role" "api_gateway_cloudwatch" {
+  name               = "api-gateway-cloudwatch-role"
+  assume_role_policy = <<EOF
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Sid": "",
+      "Effect": "Allow",
+      "Principal": {
+        "Service": "apigateway.amazonaws.com"
+      },
+      "Action": "sts:AssumeRole"
+    }
+  ]
+}
+EOF
+}
+
+resource "aws_iam_role_policy" "api_gateway_cloudwatch" {
+  name = "api-gateway-cloudwatch-policy"
+  role = aws_iam_role.api_gateway_cloudwatch.id
+
+  policy = <<EOF
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Effect": "Allow",
+            "Action": [
+                "logs:CreateLogGroup",
+                "logs:CreateLogStream",
+                "logs:DescribeLogGroups",
+                "logs:DescribeLogStreams",
+                "logs:PutLogEvents",
+                "logs:GetLogEvents",
+                "logs:FilterLogEvents"
+            ],
+            "Resource": "*"
+        }
+    ]
+}
+EOF
 }

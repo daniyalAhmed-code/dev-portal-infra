@@ -3,6 +3,7 @@ data "archive_file" "lambda_catalog_updater_lambda_function" {
   source_dir  = "${path.module}/code/catalog-updater"
   output_path = "${path.module}/zip/catalog-updater.zip"
 }
+
 data "archive_file" "lambda_backend_lambda_function" {
   type        = "zip"
   source_dir  = "${path.module}/code/backend"

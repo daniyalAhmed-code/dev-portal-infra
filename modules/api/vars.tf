@@ -40,3 +40,10 @@ variable "waf_acl_id" {
   type        = string
   default     = ""
 }
+
+## Cloudwatch Logs
+variable "log_retention_days" {
+  description = "Specifies the number of days you want to retain log events in the specified log group. Possible values are: 1, 3, 5, 7, 14, 30, 60, 90, 120, 150, 180, 365, 400, 545, 731, 1827, 3653, and 0"
+  type        = number
+  default     = 30
+}

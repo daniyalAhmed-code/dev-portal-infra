@@ -16,8 +16,10 @@ resource "aws_lambda_permission" "this" {
 
 ## API Rest
 resource "aws_api_gateway_rest_api" "this" {
-  name = var.name
-  body = data.template_file.swagger.rendered
+  name                         = var.name
+  body                         = data.template_file.swagger.rendered
+  disable_execute_api_endpoint = true
+  api_key_source               = "AUTHORIZER"
 }
 
 ## API Gateway
@@ -39,10 +41,15 @@ resource "aws_api_gateway_stage" "this" {
   stage_name    = var.env
 }
 
-
 ## Add WAF
-/* resource "aws_wafregional_web_acl_association" "this" {
+resource "aws_wafv2_web_acl_association" "this" {
+  count        = var.waf_acl_id != "" ? 1 : 0
   resource_arn = aws_api_gateway_stage.this.arn
-  web_acl_id   = var.waf_acl_id
-} */
+  web_acl_arn  = var.waf_acl_id
+}
 
+## Logs
+resource "aws_cloudwatch_log_group" "this" {
+  name              = "API-Gateway-Execution-Logs_${aws_api_gateway_rest_api.this.id}/${var.env}"
+  retention_in_days = var.log_retention_days
+}

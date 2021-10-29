@@ -31,7 +31,9 @@ resource "aws_iam_policy" "lambda_catalog_updater_policy" {
       ],
       "Resource": [
         "arn:aws:s3:::${var.WEBSITE_BUCKET_NAME}",
-        "arn:aws:s3:::${var.ARTIFACTS_S3_BUCKET_NAME}"
+        "arn:aws:s3:::${var.WEBSITE_BUCKET_NAME}/*",
+        "arn:aws:s3:::${var.ARTIFACTS_S3_BUCKET_NAME}",
+        "arn:aws:s3:::${var.ARTIFACTS_S3_BUCKET_NAME}/*"
       ]
     },
         {
@@ -41,7 +43,8 @@ resource "aws_iam_policy" "lambda_catalog_updater_policy" {
         "s3:PutObject"
       ],
       "Resource": [
-        "arn:aws:s3:::${var.ARTIFACTS_S3_BUCKET_NAME}"
+        "arn:aws:s3:::${var.ARTIFACTS_S3_BUCKET_NAME}",
+        "arn:aws:s3:::${var.ARTIFACTS_S3_BUCKET_NAME}/*"
       ]
     },
     {
@@ -138,7 +141,9 @@ resource "aws_iam_policy" "lambda_backend_policy" {
         "cognito-idp:ListUsers",
         "cognito-idp:AdminCreateUser",
         "cognito-idp:AdminDeleteUser",
-        "cognito-idp:AdminSetUserMFAPreference"
+        "cognito-idp:AdminSetUserMFAPreference",
+        "cognito-idp:AdminUpdateUserAttributes",
+        "cognito-idp:AdminAddUserToGroup"
       ],
       "Resource": [
         "*"
@@ -156,7 +161,8 @@ resource "aws_iam_policy" "lambda_backend_policy" {
 {
       "Effect": "Allow",
       "Action": [
-        "secretsmanager:CreateSecret"
+        "secretsmanager:CreateSecret",
+        "secretsmanager:PutSecretValue"
       ],
       "Resource": "*"
 }
@@ -179,81 +185,88 @@ resource "aws_iam_policy" "lambda_asset_uploader_policy" {
   name   = "${var.RESOURCE_PREFIX}-lambda-asset-uploader-policy"
   policy = <<EOF
 {
-  "Version": "2012-10-17",
-  "Statement": [
-    {
-        "Effect": "Allow",
-        "Action": [
-          "logs:CreateLogGroup",
-          "logs:CreateLogStream",
-          "logs:PutLogEvents"
-        ],
-        "Resource": "arn:aws:logs:*:*:*"
-        
-    },
-    {
-      "Effect": "Allow",
-      "Action": [
-        "s3:PutObject"
-      ],
-      "Resource": [
-        "arn:aws:s3:::${var.WEBSITE_BUCKET_NAME}/*"
-      ]
-    },
-        {
-      "Effect": "Allow",
-      "Action": [
-        "s3:PutObjectAcl"
-      ],
-      "Resource": [
-        "arn:aws:s3:::${var.WEBSITE_BUCKET_NAME}/*"
-      ]
-    },{
-      "Effect": "Allow",
-      "Action": [
-        "s3:ListBucket"
-      ],
-      "Resource": [
-        "arn:aws:s3:::${var.WEBSITE_BUCKET_NAME}"
-      ]
-    },
-    {
-      "Effect": "Allow",
-      "Action": [
-        "s3:DeleteObject"
-      ],
-      "Resource": [
-        "arn:aws:s3:::${var.WEBSITE_BUCKET_NAME}/*"
-      ]
-    },
-    {
-      "Effect": "Allow",
-      "Action": [
-        "s3:DeleteObject"
-      ],
-      "Resource": [
-        "arn:aws:s3:::${var.ARTIFACTS_S3_BUCKET_NAME}/*"
-      ]
-    },
-    {
-      "Effect": "Allow",
-      "Action": [
-        "s3:ListBucket"
-      ],
-      "Resource": [
-        "arn:aws:s3:::${var.ARTIFACTS_S3_BUCKET_NAME}"
-      ]
-    },
-    {
-      "Effect": "Allow",
-      "Action": [
-        "s3:GetObject",
-        "s3:Putobject"
-      ],
-      "Resource": [
-        "arn:aws:s3:::${var.ARTIFACTS_S3_BUCKET_NAME}/*"
-      ]
-    }
+   "Version":"2012-10-17",
+   "Statement":[
+      {
+         "Effect":"Allow",
+         "Action":[
+            "logs:CreateLogGroup",
+            "logs:CreateLogStream",
+            "logs:PutLogEvents"
+         ],
+         "Resource":"arn:aws:logs:*:*:*"
+      },
+      {
+         "Effect":"Allow",
+         "Action":[
+            "s3:PutObject"
+         ],
+         "Resource":[
+            "arn:aws:s3:::${var.WEBSITE_BUCKET_NAME}/*",
+            "arn:aws:s3:::${var.WEBSITE_BUCKET_NAME}"
+         ]
+      },
+      {
+         "Effect":"Allow",
+         "Action":[
+            "s3:PutObjectAcl"
+         ],
+         "Resource":[
+            "arn:aws:s3:::${var.WEBSITE_BUCKET_NAME}/*",
+            "arn:aws:s3:::${var.WEBSITE_BUCKET_NAME}"
+         ]
+      },
+      {
+         "Effect":"Allow",
+         "Action":[
+            "s3:ListBucket"
+         ],
+         "Resource":[
+            "arn:aws:s3:::${var.WEBSITE_BUCKET_NAME}",
+            "arn:aws:s3:::${var.WEBSITE_BUCKET_NAME}/*"
+         ]
+      },
+      {
+         "Effect":"Allow",
+         "Action":[
+            "s3:DeleteObject"
+         ],
+         "Resource":[
+            "arn:aws:s3:::${var.WEBSITE_BUCKET_NAME}/*",
+            "arn:aws:s3:::${var.WEBSITE_BUCKET_NAME}"
+         ]
+      },
+      {
+         "Effect":"Allow",
+         "Action":[
+            "s3:DeleteObject"
+         ],
+         "Resource":[
+            "arn:aws:s3:::${var.ARTIFACTS_S3_BUCKET_NAME}",
+            "arn:aws:s3:::${var.ARTIFACTS_S3_BUCKET_NAME}/*"
+         ]
+      },
+      {
+         "Effect":"Allow",
+         "Action":[
+            "s3:ListBucket"
+         ],
+         "Resource":[
+            "arn:aws:s3:::${var.ARTIFACTS_S3_BUCKET_NAME}",
+            "arn:aws:s3:::${var.ARTIFACTS_S3_BUCKET_NAME}/*"
+         ]
+      },
+      {
+         "Effect":"Allow",
+         "Action":[
+            "s3:GetObject",
+            "s3:Putobject"
+         ],
+         "Resource":[
+            "arn:aws:s3:::${var.ARTIFACTS_S3_BUCKET_NAME}/*",
+            "arn:aws:s3:::${var.ARTIFACTS_S3_BUCKET_NAME}"
+         ]
+      }
    ]
 }
 EOF
@@ -807,7 +820,7 @@ resource "aws_iam_policy" "cloudfront_security_policy" {
           "s3:DeleteObject",
           "s3:PutObject"
         ],
-        "Resource": "arn:aws:s3:::${var.ARTIFACTS_S3_BUCKET_NAME}/*"
+        "Resource": ["arn:aws:s3:::${var.ARTIFACTS_S3_BUCKET_NAME}/*", "arn:aws:s3:::${var.ARTIFACTS_S3_BUCKET_NAME}"]
     }
 
    ]
@@ -836,7 +849,7 @@ resource "aws_s3_bucket_policy" "bucekt_policy" {
           "AWS" : "arn:aws:iam::cloudfront:user/CloudFront Origin Access Identity ${var.ORIGIN_ACCESS_IDENTITY}"
         },
         Action   = "s3:*",
-        Resource = ["arn:aws:s3:::${var.WEBSITE_BUCKET_NAME}/*"]
+        Resource = ["arn:aws:s3:::${var.WEBSITE_BUCKET_NAME}/*", "arn:aws:s3:::${var.WEBSITE_BUCKET_NAME}"]
       }
     ]
   })
@@ -916,4 +929,54 @@ resource "aws_iam_role_policy_attachment" "cognito_sns_policy_role_attachment" {
   provider   = aws.src
   role       = var.COGNITO_SMS_CALLER_ROLE_NAME
   policy_arn = aws_iam_policy.cognito_sms_caller_role_policy.arn
+}
+
+
+resource "aws_iam_policy" "lambda_authorizer_role_policy" {
+  provider = aws.src
+  name     = "${var.RESOURCE_PREFIX}-lambda-authorizer-role-policy"
+  policy   = <<EOF
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+         "Effect":"Allow",
+         "Action":[
+            "logs:CreateLogGroup",
+            "logs:CreateLogStream",
+            "logs:PutLogEvents"
+         ],
+         "Resource":"arn:aws:logs:*:*:*"
+        },
+        {
+            "Effect": "Allow",
+            "Action": [
+                "apigateway:GET"
+            ],
+            "Resource": "arn:aws:apigateway:*::/*"
+        },
+        {
+            "Effect": "Allow",
+            "Action": [
+                "dynamodb:Query"
+            ],
+            "Resource": "*"
+        },
+        {
+            "Effect": "Allow",
+            "Action": [
+                "cognito-idp:AdminGetUser"
+            ],
+            "Resource": "*"
+        }
+    ]
+}
+EOF
+}
+
+
+resource "aws_iam_role_policy_attachment" "lambda_authorizer_role_policy_attachement" {
+  provider   = aws.src
+  role       = var.LAMBDA_AUTHORIZATION_ROLE_NAME
+  policy_arn = aws_iam_policy.lambda_authorizer_role_policy.arn
 }
