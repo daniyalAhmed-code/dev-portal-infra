@@ -25,12 +25,12 @@ resource "aws_iam_policy" "lambda_catalog_updater_policy" {
           "apigateway:DELETE"
       ],
       "Resource": [
-          "arn:aws:apigateway:us-east-1::/apikeys",
-          "arn:aws:apigateway:us-east-1::/usageplans",
-          "arn:aws:apigateway:us-east-1::/restapis",
-          "arn:aws:apigateway:us-east-1::/apikeys/*",
-          "arn:aws:apigateway:us-east-1::/restapis/*",
-          "arn:aws:apigateway:us-east-1::/usageplans/*"
+          "arn:aws:apigateway:${var.AWS_REGION}::/apikeys",
+          "arn:aws:apigateway:${var.AWS_REGION}::/usageplans",
+          "arn:aws:apigateway:${var.AWS_REGION}::/restapis",
+          "arn:aws:apigateway:${var.AWS_REGION}::/apikeys/*",
+          "arn:aws:apigateway:${var.AWS_REGION}::/restapis/*",
+          "arn:aws:apigateway:${var.AWS_REGION}::/usageplans/*"
       ]
     },
     {
@@ -107,12 +107,12 @@ resource "aws_iam_policy" "lambda_backend_policy" {
           "apigateway:DELETE"
       ],
       "Resource": [
-          "arn:aws:apigateway:us-east-1::/apikeys",
-          "arn:aws:apigateway:us-east-1::/usageplans",
-          "arn:aws:apigateway:us-east-1::/restapis",
-          "arn:aws:apigateway:us-east-1::/apikeys/*",
-          "arn:aws:apigateway:us-east-1::/restapis/*",
-          "arn:aws:apigateway:us-east-1::/usageplans/*"
+          "arn:aws:apigateway:${var.AWS_REGION}::/apikeys",
+          "arn:aws:apigateway:${var.AWS_REGION}::/usageplans",
+          "arn:aws:apigateway:${var.AWS_REGION}::/restapis",
+          "arn:aws:apigateway:${var.AWS_REGION}::/apikeys/*",
+          "arn:aws:apigateway:${var.AWS_REGION}::/restapis/*",
+          "arn:aws:apigateway:${var.AWS_REGION}::/usageplans/*"
       ]
     },
     {
