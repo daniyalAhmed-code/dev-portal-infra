@@ -852,8 +852,8 @@ resource "aws_s3_bucket_policy" "bucekt_policy" {
         Principal = {
           "AWS" : "arn:aws:iam::cloudfront:user/CloudFront Origin Access Identity ${var.ORIGIN_ACCESS_IDENTITY}"
         },
-        Action   = "s3:*",
-        Resource = ["arn:aws:s3:::${var.WEBSITE_BUCKET_NAME}/*", "arn:aws:s3:::${var.WEBSITE_BUCKET_NAME}"]
+        Action   = "s3:GetObject",
+        Resource = "arn:aws:s3:::${var.WEBSITE_BUCKET_NAME}/*"
       }
     ]
   })
