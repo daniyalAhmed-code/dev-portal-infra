@@ -48,6 +48,9 @@ module "policy" {
   API_KEY_AUTHORIZATION_ROLE_NAME                      = module.role.API_KEY_AUTHORIZATION_ROLE_NAME
   CATALOG_UPDATER_LAMBDA_ARN                           = module.lambda.CATALOG_UPDATER_LAMBDA_ARN
   COGNITO_SMS_CALLER_ROLE_NAME                         = module.role.SMS_CALLER_ROLE_NAME
+  BACKEND_LAMBDA_NAME                                  = module.lambda.BACKEND_LAMBDA_NAME
+  COGNITO_USERPOOL_CLIENT_SETTINGS_NAME                = module.lambda.COGNITO_USERPOOL_CLIENT_SETTINGS_NAME
+
 }
 
 module "lambda" {

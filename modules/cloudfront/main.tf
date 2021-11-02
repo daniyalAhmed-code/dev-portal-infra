@@ -51,10 +51,15 @@ resource "aws_cloudfront_distribution" "s3_distribution" {
 
     }
   }
-
+  logging_config {
+    include_cookies = false
+    bucket          = "${var.DEV_PORTAL_SITE_S3_BUCKET}.s3.amazonaws.com"
+    prefix          = "${var.DEV_PORTAL_SITE_S3_BUCKET}-logs"
+  }
   viewer_certificate {
     acm_certificate_arn = var.ACM_CERTIFICATE_ARN
     ssl_support_method  = "sni-only"
+    minimum_protocol_version =  "TLSv1.2_2021"
   }
 }
 
@@ -105,10 +110,16 @@ resource "aws_cloudfront_distribution" "default_domain_cloudfront_distribution" 
 
     }
   }
-
+  logging_config {
+    include_cookies = false
+    bucket          = "${var.DEV_PORTAL_SITE_S3_BUCKET}.s3.amazonaws.com"
+    prefix          = "${var.DEV_PORTAL_SITE_S3_BUCKET}-logs"
+  }
 
   viewer_certificate {
     cloudfront_default_certificate = true
     ssl_support_method             = "sni-only"
+    minimum_protocol_version =  "TLSv1.2_2021"
+
   }
 }

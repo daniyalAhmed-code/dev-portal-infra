@@ -39,6 +39,9 @@ resource "aws_lambda_function" "lambda_backend_lambda_function" {
   runtime          = "nodejs12.x"
   timeout          = "20"
   layers           = ["${aws_lambda_layer_version.lambda-common-layer.arn}"]
+  tracing_config {
+    mode = "Passthrough"
+  } 
   environment {
     variables = {
       "NODE_ENV"                  = "${var.NODE_ENV}"
@@ -69,6 +72,9 @@ resource "aws_lambda_function" "lambda_cognito_presignup_trigger_function" {
   runtime          = "nodejs12.x"
   timeout          = "3"
   layers           = ["${aws_lambda_layer_version.lambda-common-layer.arn}"]
+  tracing_config {
+    mode = "Passthrough"
+  }
   environment {
     variables = {
       "AccountRegistrationMode" = "${var.ACCOUNT_REGISTRATION_MODE}"
@@ -104,6 +110,9 @@ resource "aws_lambda_function" "lambda_cognito_post_authentication_trigger_funct
   runtime          = "nodejs12.x"
   timeout          = "3"
   layers           = ["${aws_lambda_layer_version.lambda-common-layer.arn}"]
+  tracing_config {
+    mode = "Passthrough"
+  }
   environment {
     variables = {
       "AccountRegistrationMode"   = "${var.ACCOUNT_REGISTRATION_MODE}"
@@ -123,6 +132,9 @@ resource "aws_lambda_function" "lambda_cognito_userpool_client_settings_function
   source_code_hash = "${data.archive_file.lambda_cognito_userpool_client_settings_function.output_base64sha256}"
   runtime          = "nodejs12.x"
   timeout          = "300"
+  tracing_config {
+    mode = "Passthrough"
+  }
   layers           = ["${aws_lambda_layer_version.lambda-common-layer.arn}"]
 }
 
@@ -169,6 +181,9 @@ resource "aws_lambda_function" "lambda_user_group_importer_function" {
   source_code_hash = "${data.archive_file.lambda_user_group_importer_function.output_base64sha256}"
   runtime          = "nodejs12.x"
   timeout          = "900"
+  tracing_config {
+    mode = "Passthrough"
+  }
   layers           = ["${aws_lambda_layer_version.lambda-common-layer.arn}"]
   environment {
     variables = {
@@ -193,6 +208,9 @@ resource "aws_lambda_function" "lambda_api_key_authoriser_function" {
   runtime          = "nodejs12.x"
   timeout          = "900"
   layers           = ["${aws_lambda_layer_version.lambda-common-layer.arn}"]
+  tracing_config {
+    mode = "Passthrough"
+  }
   environment {
     variables = {
       "UserPoolId"         = "${var.USERPOOL_ID}"
