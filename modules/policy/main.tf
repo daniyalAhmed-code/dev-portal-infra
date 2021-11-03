@@ -60,7 +60,7 @@ resource "aws_iam_policy" "lambda_catalog_updater_policy" {
       "Action": [
         "secretsmanager:CreateSecret",
         "secretsmanager:PutSecretValue",
-        "secretsmanager:DescribeSecret"
+        "secretsmanager:GetSecretValue"
       ],
       "Resource": "arn:aws:secretsmanager:${var.AWS_REGION}:${var.CURRENT_ACCOUNT_ID}:secret:*"
 }
