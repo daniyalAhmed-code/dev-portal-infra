@@ -58,6 +58,9 @@ app.delete('/admin/catalog/:id/sdkGeneration', wrapError(require('./routes/admin
 // Account management APIs
 app.get('/admin/accounts', wrapError(require('./routes/admin/accounts').get))
 app.post('/admin/accounts', wrapError(require('./routes/admin/accounts').post))
+app.get('/admin/accounts/:userId', wrapError(require('./routes/admin/users').get))
+app.get('/admin/accounts/callbackauth/:userId', wrapError(require('./routes/admin/callbackauth').get))
+
 app.put('/admin/accounts/resendInvite', wrapError(require('./routes/accounts/resendInvite').put))
 // Not ready for prime time just yet.
 // app.put('/admin/accounts/:userId/approveRequest', wrapError(require('./routes/accounts/approveRequest').put))

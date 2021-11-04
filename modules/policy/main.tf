@@ -54,7 +54,16 @@ resource "aws_iam_policy" "lambda_catalog_updater_policy" {
             "lambda:InvokeAsync"
         ],
         "Resource": "arn:aws:lambda:${var.AWS_REGION}:${var.CURRENT_ACCOUNT_ID}:function:${var.CATALOG_UPDATER_LAMBDA_NAME}"
-    }
+    },
+    {
+      "Effect": "Allow",
+      "Action": [
+        "secretsmanager:CreateSecret",
+        "secretsmanager:PutSecretValue",
+        "secretsmanager:GetSecretValue"
+      ],
+      "Resource": "arn:aws:secretsmanager:${var.AWS_REGION}:${var.CURRENT_ACCOUNT_ID}:secret:*"
+}
     
   ]
 }
