@@ -230,3 +230,13 @@ exports.delete = async (req, res) => {
   await customersController.deleteAccountByUserId(userId)
   res.status(200).json({})
 }
+
+
+exports.get_logged_in_user_details = async (req, res) => {
+  console.log('GET /admin/accounts/loggedInUser')
+  let username = req.apiGateway.event.requestContext.identity.userArn.split("/")[1]
+  let user = await customersController.getLoggedInUserDetails(username)
+  return res.status(200).json({
+    "user_details" :user
+})
+}

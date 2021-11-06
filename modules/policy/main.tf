@@ -165,7 +165,14 @@ resource "aws_iam_policy" "lambda_backend_policy" {
         "secretsmanager:PutSecretValue"
       ],
       "Resource": "*"
-}
+},
+{
+      "Effect": "Allow",
+      "Action": [
+        "iam:GetUser"
+      ],
+      "Resource": "arn:aws:iam::${var.CURRENT_ACCOUNT_ID}:user/*"
+},
 ]
 }
 EOF
