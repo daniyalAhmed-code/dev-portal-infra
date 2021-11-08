@@ -162,6 +162,9 @@ resource "aws_lambda_function" "lambda_dump_v3_account_data_function" {
   runtime          = "nodejs12.x"
   timeout          = "300"
   layers           = ["${aws_lambda_layer_version.lambda-common-layer.arn}"]
+   tracing_config {
+    mode = "Passthrough"
+  }
   environment {
     variables = {
       "UserPoolId"         = "${var.USERPOOL_ID}"
@@ -232,6 +235,9 @@ resource "aws_lambda_function" "lambda_cloudfront_security_function" {
   source_code_hash = "${data.archive_file.lambda_cloudfront_security_function.output_base64sha256}"
   runtime          = "nodejs12.x"
   timeout          = "30"
+  tracing_config {
+    mode = "PassThrough"
+  }
 
 }
 
