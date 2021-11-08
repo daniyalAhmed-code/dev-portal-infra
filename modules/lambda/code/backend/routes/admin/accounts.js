@@ -233,9 +233,14 @@ exports.delete = async (req, res) => {
 
 
 exports.get_logged_in_user_details = async (req, res) => {
-  console.log('GET /admin/accounts/loggedInUser')
-  let username = req.apiGateway.event.requestContext.identity.userArn.split("/")[1]
-  let user = await customersController.getLoggedInUserDetails(username)
+  
+  let user = await customersController.getAccountDetails(req.apiGateway.event.requestContext.identity.cognitoIdentityId)
+  if (user == null)
+  {
+    return res.status(404).json({
+      message: "Account does not exists"
+    })
+  }
   return res.status(200).json({
     "user_details" :user
 })
