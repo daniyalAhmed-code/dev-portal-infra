@@ -50,6 +50,7 @@ module "policy" {
   COGNITO_SMS_CALLER_ROLE_NAME                         = module.role.SMS_CALLER_ROLE_NAME
   BACKEND_LAMBDA_NAME                                  = module.lambda.BACKEND_LAMBDA_NAME
   COGNITO_USERPOOL_CLIENT_SETTINGS_NAME                = module.lambda.COGNITO_USERPOOL_CLIENT_SETTINGS_NAME
+  API_KEY_AUTHORIZATION_LAMBDA_NAME                    = module.lambda.API_KEY_AUTHORIZATION_LAMBDA_NAME
 
 }
 
@@ -207,7 +208,7 @@ resource "aws_iam_role_policy" "api_gateway_cloudwatch" {
                 "logs:GetLogEvents",
                 "logs:FilterLogEvents"
             ],
-            "Resource": "*"
+            "Resource": "arn:aws:logs:${var.AWS_REGION}:${var.CURRENT_ACCOUNT_ID}:log-group:*:*"
         }
     ]
 }

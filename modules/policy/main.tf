@@ -487,7 +487,7 @@ resource "aws_iam_policy" "manage_user_pool_domain" {
         "Action": [
           "cognito-idp:CreateUserPoolDomain"
         ],
-        "Resource": "arn:aws:cognito-idp:${var.AWS_REGION}:${var.CURRENT_ACCOUNT_ID}:userpool/*"
+        "Resource": "arn:aws:cognito-idp:${var.AWS_REGION}:${var.CURRENT_ACCOUNT_ID}:userpool/${var.USERPOOL_ID}"
         
     },
     {
@@ -495,7 +495,7 @@ resource "aws_iam_policy" "manage_user_pool_domain" {
         "Action": [
           "cognito-idp:DeleteUserPoolDomain"
         ],
-        "Resource": "arn:aws:cognito-idp:${var.AWS_REGION}:${var.CURRENT_ACCOUNT_ID}:userpool/*"
+        "Resource": "arn:aws:cognito-idp:${var.AWS_REGION}:${var.CURRENT_ACCOUNT_ID}:userpool/${var.USERPOOL_ID}"
         
     },
     {
@@ -503,7 +503,7 @@ resource "aws_iam_policy" "manage_user_pool_domain" {
         "Action": [
           "cognito-idp:DescribeUserPoolDomain"
         ],
-        "Resource": "arn:aws:cognito-idp:${var.AWS_REGION}:${var.CURRENT_ACCOUNT_ID}:userpool/*"
+        "Resource": "arn:aws:cognito-idp:${var.AWS_REGION}:${var.CURRENT_ACCOUNT_ID}:userpool/${var.USERPOOL_ID}"
         
     }
    ]
@@ -623,7 +623,10 @@ resource "aws_iam_policy" "lambda_s3_get_object_policy" {
         "Action": [
           "s3:GetObject"
         ],
-        "Resource": "arn:aws:s3:::*/*"
+        "Resource":  [
+          "arn:aws:s3:::${var.ARTIFACTS_S3_BUCKET_NAME}/*,
+           "arn:aws:s3:::${var.WEBSITE_BUCKET_NAME}/*"
+           ]
         
     }
    ]
@@ -964,8 +967,7 @@ resource "aws_iam_policy" "lambda_authorizer_role_policy" {
               "logs:CreateLogStream",
               "logs:PutLogEvents"
           ],
-          "Resource": "arn:aws:logs:${var.AWS_REGION}:${var.CURRENT_ACCOUNT_ID}:*"
-        },
+                  "Resource": "arn:aws:logs:${var.AWS_REGION}:${var.CURRENT_ACCOUNT_ID}:log-group:/aws/lambda/${var.API_KEY_AUTHORIZATION_LAMBDA_NAME}:*"        },
         {
           "Effect": "Allow",
           "Action": [

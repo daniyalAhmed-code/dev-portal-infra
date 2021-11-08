@@ -63,6 +63,9 @@ output "API_KEY_AUTHORIZATION_LAMBDA_ARN" {
 output "API_KEY_AUTHORIZATION_INVOKE_ARN" {
   value = "${aws_lambda_function.lambda_api_key_authoriser_function.invoke_arn}"
 }
+output "API_KEY_AUTHORIZATION_LAMBDA_NAME" {
+  value = aws_lambda_function.lambda_api_key_authoriser_function.function_name
+}
 
 
 output "COGNITO_USERPOOL_CLIENT_SETTINGS_NAME" {
