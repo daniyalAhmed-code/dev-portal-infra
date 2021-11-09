@@ -54,7 +54,7 @@ app.delete('/admin/catalog/visibility/:id', wrapError(require('./routes/admin/ca
 app.delete('/admin/catalog/visibility/generic/:genericId', wrapError(require('./routes/admin/catalog/visibility').delete))
 app.put('/admin/catalog/:id/sdkGeneration', wrapError(require('./routes/admin/catalog/sdkGeneration').put))
 app.delete('/admin/catalog/:id/sdkGeneration', wrapError(require('./routes/admin/catalog/sdkGeneration').delete))
-app.get('/admin/accounts/loggedInUsers', wrapError(require('./routes/admin/accounts').get_logged_in_user_details))
+app.get('/admin/accounts/currentUserProfile', wrapError(require('./routes/admin/accounts').get_current_user_profile))
 
 // Account management APIs
 app.get('/admin/accounts', wrapError(require('./routes/admin/accounts').get))

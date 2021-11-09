@@ -232,7 +232,7 @@ exports.delete = async (req, res) => {
 }
 
 
-exports.get_logged_in_user_details = async (req, res) => {
+exports.get_current_user_profile = async (req, res) => {
   
   let user = await customersController.getAccountDetails(req.apiGateway.event.requestContext.identity.cognitoIdentityId)
   if (user == null)
