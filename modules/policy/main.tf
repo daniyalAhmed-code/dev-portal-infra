@@ -980,3 +980,110 @@ resource "aws_iam_role_policy_attachment" "lambda_authorizer_role_policy_attache
   role       = var.LAMBDA_AUTHORIZATION_ROLE_NAME
   policy_arn = aws_iam_policy.lambda_authorizer_role_policy.arn
 }
+
+resource "aws_iam_policy" "lambda_api_key_rotation_role_policy" {
+  provider         = aws.src
+  name     = "${var.RESOURCE_PREFIX}-lambda-api-key-rotation-role-policy"
+  policy   = <<EOF
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+          "Effect":"Allow",
+          "Action":[
+              "logs:CreateLogGroup",
+              "logs:CreateLogStream",
+              "logs:PutLogEvents"
+          ],
+          "Resource": "arn:aws:logs:${var.AWS_REGION}:${var.CURRENT_ACCOUNT_ID}:log-group:/aws/lambda/${var.API_KEY_ROTATION_LAMBDA_NAME}:*"
+        },
+        {
+          "Effect": "Allow",
+          "Action": [
+              "apigateway:GET"
+          ],
+          "Resource": "arn:aws:apigateway:${var.AWS_REGION}::/*"
+        },
+        {
+          "Effect": "Allow",
+          "Action": [
+              "dynamodb:Scan"
+          ],
+          "Resource": [
+              "arn:aws:dynamodb:${var.AWS_REGION}:${var.CURRENT_ACCOUNT_ID}:table/${var.CUSTOMER_TABLE_NAME}"
+            ]
+        },
+        {
+          "Effect": "Allow",
+          "Action": [
+                "lambda:InvokeFunction"
+          ],
+          "Resource": [
+              "*"
+            ]
+        }
+    ]
+}
+EOF
+}
+
+
+resource "aws_iam_role_policy_attachment" "lambda_api_key_rotation_role_policy_attachement" {
+  provider         = aws.src
+  role       = var.LAMBDA_API_KEY_ROTATION_ROLE_ARN
+  policy_arn = aws_iam_policy.lambda_authorizer_role_policy.arn
+}
+
+
+resource "aws_iam_policy" "lambda_invoke_api_key_rotation_role_policy" {
+  provider         = aws.src
+  name     = "${var.RESOURCE_PREFIX}-lambda-invoke-api-key-rotation-role-policy"
+  policy   = <<EOF
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+          "Effect":"Allow",
+          "Action":[
+              "logs:CreateLogGroup",
+              "logs:CreateLogStream",
+              "logs:PutLogEvents"
+          ],
+          "Resource": "arn:aws:logs:${var.AWS_REGION}:${var.CURRENT_ACCOUNT_ID}:log-group:/aws/lambda/${var.INVOKE_API_KEY_ROTATION_LAMBDA_NAME}:*"
+        },
+        {
+          "Effect": "Allow",
+          "Action": [
+              "apigateway:POST"
+          ],
+          "Resource": "arn:aws:apigateway:${var.AWS_REGION}::/*"
+        },
+        {
+          "Effect": "Allow",
+          "Action": [
+              "dynamodb:UpdateItem"
+          ],
+          "Resource": [
+              "arn:aws:dynamodb:${var.AWS_REGION}:${var.CURRENT_ACCOUNT_ID}:table/${var.CUSTOMER_TABLE_NAME}"
+            ]
+        },
+        {
+          "Effect": "Allow",
+          "Action": [
+                "lambda:InvokeFunction"
+          ],
+          "Resource": [
+              "*"
+            ]
+        }
+    ]
+}
+EOF
+}
+
+
+resource "aws_iam_role_policy_attachment" "lambda_invoke_api_key_rotation_role_policy_attachement" {
+  provider         = aws.src
+  role       = var.LAMBDA_INVOKE_API_KEY_ROTATION_ROLE_ARN
+  policy_arn = aws_iam_policy.lambda_authorizer_role_policy.arn
+}
