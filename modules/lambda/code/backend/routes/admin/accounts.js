@@ -76,8 +76,9 @@ exports.post = async (req, res) => {
     }),
     targetEmailAddress: Joi.string().email().required().messages({
       'string.empty': `"email" cannot be an empty field`
-    })
-  });
+    }),
+    targetKeyRotation: Joi.boolean().required()
+ });
 
 
   const inviterUserId = util.getCognitoIdentityId(req)
@@ -96,7 +97,9 @@ exports.post = async (req, res) => {
     targetCallBackAuth,
     targetMno,
     targetMfa,
-    targetCallBackUrl
+    targetCallBackUrl,
+    targetKeyRotation
+
   } = req.body
   let body = await schema.validate(req.body);
   console.log(body.error)
@@ -127,6 +130,7 @@ exports.post = async (req, res) => {
     targetMno,
     targetMfa,
     targetCallBackUrl,
+    targetKeyRotation,
     inviterUserSub: util.getCognitoIdentitySub(req),
     inviterUserId
   })
@@ -167,7 +171,8 @@ exports.put = async (req, res) => {
     ApiKeyDuration: Joi.number().min(1).max(90).required().messages({
       'number.min': `"api duration key" cannot be less than 1`,
       'number.max': "api key duration cannot be greater than 90",
-    })
+    }),
+    KeyRotation: Joi.boolean().required()
   });
 
   let userId = req.params.userId
