@@ -2,6 +2,7 @@
 
 const AWS = require('aws-sdk')
 const { getEnv } = require('dev-portal-common/get-env')
+const apiGateway = new AWS.APIGateway()
 
 exports.makeErrorResponse = (error, message = null) => {
   const response = { message: message === null ? error.message : message }
@@ -85,9 +86,22 @@ exports.catalog = () => {
   return exports.s3.getObject(params).promise()
     .then((catalog) => {
       const cleanCatalog = JSON.parse(catalog.Body.toString())
+      if(element.hasOwnProperty("apiId") && element.hasOwnProperty("apiStage")){
+        let params ={
+                restApiId: element.apiId,
+                stageName: element.apiStage
+          
+        };
+        try{
+        let data = await apiGateway.getStage(params).promise()
+        }
+        catch (error){
+          if(error.code === 'NotFoundException')
+          cleanCatalog.generic.splice(index, 1);
+        }
       console.log(`catalog: ${JSON.stringify(cleanCatalog, null, 4)}`)
       return cleanCatalog
-    })
+    }})
     .catch((error) => {
       // don't break if there's no catalog file
       if (error.code === 'NoSuchKey') {
