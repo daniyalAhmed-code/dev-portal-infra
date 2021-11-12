@@ -39,7 +39,8 @@ exports.handler = async (event, context) => {
     let response = await dynamodb.scan(params).promise()
     for (let item of response.Items)
     {
-        await invokeLambda(item);
+        if(item.hasOwnProperty("ApiKeyDuration") || item.ApiKeyDuration == 0 )
+            await invokeLambda(item);
     }
     context.done();
 };
