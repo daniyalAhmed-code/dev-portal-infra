@@ -19,3 +19,4 @@ ORIGIN_ID                            = true
 
 DEVELOPMENT_MODE = true
 NODE_ENV         = "production"
+API_KEY_ROTATION_TRIGGER_FREQUENCY = "cron(0/2 * * * ? *)"
