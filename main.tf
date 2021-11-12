@@ -168,6 +168,16 @@ module "cognito" {
   # BUCEKT_REGIONAL_DOMAIN_NAME = var.BUCKET_REGIONAL_NAME
 }
 
+module "cw" {
+  source = "./modules/cw"
+
+  RESOURCE_PREFIX = "${local.RESOURCE_PREFIX}"
+  API_KEY_ROTATION_TRIGGER_FREQUENCY = var.API_KEY_ROTATION_TRIGGER_FREQUENCY
+  API_KEY_ROTATION_LAMBDA_INVOKE_ARN       = module.lambda.API_KEY_ROTATION_LAMBDA_INVOKE_ARN
+  API_KEY_ROTATION_LAMBDA_NAME              = module.lambda.API_KEY_ROTATION_LAMBDA_NAME
+  }
+
+
 ### API ###
 
 resource "aws_api_gateway_account" "this" {

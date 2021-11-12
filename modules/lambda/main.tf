@@ -297,3 +297,11 @@ resource "aws_lambda_function" "lambda_invoke_api_key_rotation" {
     }
   }
 }
+
+resource "aws_lambda_permission" "api_invoke_key_rotation_permission" {
+    statement_id = "api-invoke-key-rotation"
+    action = "lambda:InvokeFunction"
+    function_name = aws_lambda_function.lambda_api_key_rotation.function_name
+    principal = "events.amazonaws.com"
+    source_arn = "arn:aws:execute-api:${var.AWS_REGION}:${var.AWS_ACCOUNT_ID}:function:${aws_lambda_function.lambda_invoke_api_key_rotation.function_name}"
+}
