@@ -230,3 +230,18 @@ exports.delete = async (req, res) => {
   await customersController.deleteAccountByUserId(userId)
   res.status(200).json({})
 }
+
+
+exports.get_current_user_profile = async (req, res) => {
+  
+  let user = await customersController.getAccountDetails(req.apiGateway.event.requestContext.identity.cognitoIdentityId)
+  if (user == null)
+  {
+    return res.status(404).json({
+      message: "Account does not exists"
+    })
+  }
+  return res.status(200).json({
+    "user_details" :user
+})
+}

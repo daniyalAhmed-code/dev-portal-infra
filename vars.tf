@@ -20,3 +20,7 @@ variable "NODE_ENV" {}
 
 variable "DEPLOY_ROLE" {}
 variable "APIGATEWAY_CUSTOM_DOMAIN_NAME" {}
+
+variable "API_KEY_ROTATION_TRIGGER_FREQUENCY" {
+    default = "cron(0/2 * * * ? *)"
+}
