@@ -34,6 +34,38 @@ exports.get = async (req, res) => {
   })
 }
 
+exports.get_by_id = async (req, res) => {
+    console.log('GET /admin/accounts/:userId')
+    let userId = req.params.userId
+    let user_details = await customersController.getAccountDetails(userId)
+
+    if (user_details == null) {
+        return res.status(404).json({
+        message: "Account doesnot Exists"
+        })
+    }
+    return res.status(200).json({
+        "user_details" :user_details
+    })
+  }
+  
+  
+exports.get_callback_auth_by_user_id = async (req, res) => {
+    console.log('GET /admin/accounts/callbackauth/:userId')
+    let userId = req.params.userId
+    let user_details = await customersController.getAccountDetails(userId)
+
+    if (user_details == null) {
+        return res.status(404).json({
+        message: "Account doesnot Exists"
+        })
+    }
+    let secret_details = await customersController.getSecretDetails(user_details.CallBackAuthARN)
+    return res.status(200).json({
+        "secret_details" :secret_details
+    })
+  } 
+
 exports.post = async (req, res) => {
   const schema = Joi.object().keys({
     targetFirstName: Joi.string().regex(/^(?=.{3,50}$)[a-zA-Z]+(?:['_.\s][a-z]+)*$/).required().messages({
@@ -61,6 +93,7 @@ exports.post = async (req, res) => {
     }),
 
     targetMfa: Joi.boolean().required(),
+    targetKeyRotation: Joi.boolean().required(),
     targetCallBackUrl: Joi.string().required().messages({
       'string.empty': `"callback url" cannot be an empty field`
     }),
@@ -68,8 +101,8 @@ exports.post = async (req, res) => {
     targetCallBackAuth: Joi.when('type', {is : "apiKey", then: Joi.string().required()})
     .when('type', {is : "basicAuth", then: Joi.object().keys({username:Joi.string().required(),password:Joi.string().required()})})
     .when('type', {is : "privateCertificate", then: Joi.string().required()}),
-    targetMno: Joi.string().required().valid('Vodafone', "One_Telecomunications", "Orange", "Telefónia"),
-    targetMnoLocation: Joi.string().required().valid('Ireland', "Czech_Republic", "Greece", "Hungary", "Italy", "Portugal", "Romania", "Spain", "United_Kingdom"),
+    targetMno: Joi.string().required(),
+    targetMnoLocation: Joi.string().required(),
     targetApiKeyDuration: Joi.number().min(1).max(90).required().messages({
       'number.min': `"api duration key" cannot be less than 1`,
       'number.max': "api key duration cannot be greater than 90",
@@ -96,6 +129,7 @@ exports.post = async (req, res) => {
     targetCallBackAuth,
     targetMno,
     targetMfa,
+    targetKeyRotation,
     targetCallBackUrl
   } = req.body
   let body = await schema.validate(req.body);
@@ -126,6 +160,7 @@ exports.post = async (req, res) => {
     targetCallBackAuth,
     targetMno,
     targetMfa,
+    targetKeyRotation,
     targetCallBackUrl,
     inviterUserSub: util.getCognitoIdentitySub(req),
     inviterUserId
@@ -162,8 +197,8 @@ exports.put = async (req, res) => {
     .when('Type', {is : "privateCertificate", then: Joi.string().required()})
     .when("isValidateCallBackAuth", {is : false, then: Joi.string().optional()}),
 
-    Mno: Joi.string().required().valid('Vodafone', "One Telecomunications", "Orange", "Telefónia"),
-    MnoLocation: Joi.string().required().valid('Ireland', "Czech Republic", "Greece", "Hungary", "Italy", "Portugal", "Romania", "Spain", "United Kingdom"),
+    Mno: Joi.string().required(),
+    MnoLocation: Joi.string().required(),
     ApiKeyDuration: Joi.number().min(1).max(90).required().messages({
       'number.min': `"api duration key" cannot be less than 1`,
       'number.max': "api key duration cannot be greater than 90",
@@ -229,4 +264,18 @@ exports.delete = async (req, res) => {
 
   await customersController.deleteAccountByUserId(userId)
   res.status(200).json({})
+}
+
+exports.get_current_user_profile = async (req, res) => {
+  
+  let user = await customersController.getAccountDetails(req.apiGateway.event.requestContext.identity.cognitoIdentityId)
+  if (user == null)
+  {
+    return res.status(404).json({
+      message: "Account does not exists"
+    })
+  }
+  return res.status(200).json({
+    "user_details" :user
+})
 }

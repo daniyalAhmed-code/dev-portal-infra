@@ -63,3 +63,17 @@ output "API_KEY_AUTHORIZATION_LAMBDA_ARN" {
 output "API_KEY_AUTHORIZATION_INVOKE_ARN" {
   value = "${aws_lambda_function.lambda_api_key_authoriser_function.invoke_arn}"
 }
+
+
+output "API_KEY_ROTATION_LAMBDA_NAME" {
+  value = aws_lambda_function.lambda_api_key_rotation.function_name
+}
+
+output "API_KEY_ROTATION_LAMBDA_INVOKE_ARN" {
+  value = aws_lambda_function.lambda_api_key_rotation.arn
+}
+
+
+output "INVOKE_API_KEY_ROTATION_LAMBDA_NAME" {
+  value = aws_lambda_function.lambda_invoke_api_key_rotation.function_name
+}

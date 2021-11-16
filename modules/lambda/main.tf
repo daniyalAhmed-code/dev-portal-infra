@@ -258,3 +258,50 @@ resource "aws_lambda_permission" "lambda_authorizer_all_api_gateway_perm" {
   principal     = "apigateway.amazonaws.com"
   source_arn    = "arn:aws:execute-api:${var.AWS_REGION}:${var.AWS_ACCOUNT_ID}:*"
 }
+
+resource "aws_lambda_function" "lambda_api_key_rotation" {
+  provider            = aws.src
+  filename         = "${path.module}/zip/api-key-rotation.zip"
+  function_name    = "${var.RESOURCE_PREFIX}-api-key-rotation"
+  role             = "${var.LAMBDA_API_KEY_ROTATION_ROLE_ARN}"
+  handler          = "index.handler"
+  memory_size      = 512
+  source_code_hash = "${data.archive_file.lambda_api_key_rotation_function.output_base64sha256}"
+  runtime          = "nodejs12.x"
+  timeout          = "900"
+  layers           = ["${aws_lambda_layer_version.lambda-common-layer.arn}"]
+  environment {
+    variables = {
+      "InvokeLambdaFunction"         = "${var.RESOURCE_PREFIX}-invoke-api-key-rotation"
+      "CustomersTableName" = "${var.CUSTOMER_TABLE_NAME}"
+
+    }
+  }
+}
+
+resource "aws_lambda_function" "lambda_invoke_api_key_rotation" {
+  provider            = aws.src
+  filename         = "${path.module}/zip/invoke-api-key-rotation.zip"
+  function_name    = "${var.RESOURCE_PREFIX}-invoke-api-key-rotation"
+  role             = "${var.LAMBDA_INVOKE_API_KEY_ROTATION_ROLE_ARN}"
+  handler          = "index.handler"
+  memory_size      = 512
+  source_code_hash = "${data.archive_file.lambda_invoke_api_key_rotation_function.output_base64sha256}"
+  runtime          = "nodejs12.x"
+  timeout          = "900"
+  layers           = ["${aws_lambda_layer_version.lambda-common-layer.arn}"]
+  environment {
+    variables = {
+      "CustomersTableName" = "${var.CUSTOMER_TABLE_NAME}"
+
+    }
+  }
+}
+
+resource "aws_lambda_permission" "api_invoke_key_rotation_permission" {
+    statement_id = "api-invoke-key-rotation"
+    action = "lambda:InvokeFunction"
+    function_name = aws_lambda_function.lambda_api_key_rotation.function_name
+    principal = "events.amazonaws.com"
+    source_arn = "arn:aws:execute-api:${var.AWS_REGION}:${var.AWS_ACCOUNT_ID}:function:${aws_lambda_function.lambda_invoke_api_key_rotation.function_name}"
+}
