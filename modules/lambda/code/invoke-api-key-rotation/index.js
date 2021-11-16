@@ -6,6 +6,7 @@ exports.handler = async (event) => {
     let api_date
     let identityId = event.Id
     let userId     = event.UserPoolId
+    let apiKeyVal = event.api_data.id
     let current_date = new Date()
     if ('lastUpdatedDate' in event.api_data) {
         api_date = event.api_data.lastUpdatedDate;
@@ -16,6 +17,7 @@ exports.handler = async (event) => {
     ApiDate.setDate(ApiDate.getDate() + event.ApiKeyDuration);
     
     if (ApiDate < current_date && event.KeyRotation) {
+        await customersController.deletePreviousApiKey(apiKeyVal)
         await customersController.renewApiKey(identityId,userId,true)
     }
     const response = {
