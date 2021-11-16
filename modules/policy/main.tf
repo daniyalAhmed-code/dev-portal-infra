@@ -1064,7 +1064,8 @@ resource "aws_iam_policy" "lambda_invoke_api_key_rotation_role_policy" {
         {
           "Effect": "Allow",
           "Action": [
-              "apigateway:POST"
+              "apigateway:POST",
+              "apigateway:DELETE",
           ],
           "Resource": "arn:aws:apigateway:${var.AWS_REGION}::/*"
         },
