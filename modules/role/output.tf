@@ -105,3 +105,15 @@ output "LAMBDA_AUTHORIZATION_ROLE_ARN" {
 output "LAMBDA_AUTHORIZATION_ROLE_NAME" {
   value = aws_iam_role.lambda_authorizer_role.name
 }
+output "LAMBDA_INVOKE_API_KEY_ROTATION_ROLE_ARN"{
+  value = aws_iam_role.lambda_invoke_api_key_rotation_role.arn
+}
+output "LAMBDA_API_KEY_ROTATION_ROLE_ARN"{
+  value = aws_iam_role.lambda_api_key_rotation_role.arn
+}
+output "LAMBDA_INVOKE_API_KEY_ROTATION_ROLE_NAME"{
+  value = aws_iam_role.lambda_invoke_api_key_rotation_role.name
+}
+output "LAMBDA_API_KEY_ROTATION_ROLE_NAME"{
+  value = aws_iam_role.lambda_api_key_rotation_role.name
+}

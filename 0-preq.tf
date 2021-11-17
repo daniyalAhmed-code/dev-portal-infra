@@ -26,7 +26,7 @@ locals {
   REGISTERED_GROUP_NAME = "${local.RESOURCE_PREFIX}-registered-group"
   ADMIN_GROUP_NAME      = "${local.RESOURCE_PREFIX}-admin-group"
 
-  global_waf_id   = data.terraform_remote_state.vap-platform-infra.outputs.global_waf_id
+  # global_waf_id   = data.terraform_remote_state.vap-platform-infra.outputs.global_waf_id
 }
 
 data "aws_caller_identity" "current" {}
@@ -35,8 +35,8 @@ data "aws_region" "current" {}
 data "terraform_remote_state" "vap-platform-infra" {
   backend = "s3"
   config = {
-    bucket = "vap-aws-terraform-remote-state-centralized"
-    region = "eu-central-1"
-    key    = "vap-platform-infra/eu-central-1/${var.ENV}/terraform.tfstate"
+    bucket                      = "dani-dev-terraform-remote-state-centralised"
+    key                         = "vap-platform-infra/us-east-1/{{ENV}}/terraform.tfstate"
+    region                      = "us-east-1"
   }
 }

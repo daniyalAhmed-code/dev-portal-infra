@@ -313,25 +313,26 @@ module "visibility_post" {
     EOF
   }
 }
-module "visibility_ANY" {
-  source                          = "./methods"
-  METHOD_VALUE                    = ""
-  API_GATEWAY_ID                  = aws_api_gateway_rest_api.api-gateway.id
-  RESOURCE_ID                     = aws_api_gateway_resource.admin_catalog_visibility_resource.id
-  INTEGRATION_RESPONSE_PARAMETERS = local.integration_response_parameters
-  METHOD_RESPONSE_PARAMETERS      = local.method_response_parameters
-  AUTHORIZATION                   = var.AUTHORIZATION
-  CURRENT_ACCOUNT_ID              = var.CURRENT_ACCOUNT_ID
-  AWS_REGION                      = var.AWS_REGION
-  HTTP_METHOD                     = "ANY"
-  LAMBDA_INVOKE_ARN               = var.BACKEND_LAMBDA_INVOKE_ARN
-  FUNCTION_NAME                   = var.BACKEND_LAMBDA_NAME
 
-  REQUEST_TEMPLATES = {
-    "application/json" = <<EOF
-    EOF
-  }
-}
+# module "visibility_ANY" {
+#   source                          = "./methods"
+#   METHOD_VALUE                    = ""
+#   API_GATEWAY_ID                  = aws_api_gateway_rest_api.api-gateway.id
+#   RESOURCE_ID                     = aws_api_gateway_resource.admin_catalog_visibility_resource.id
+#   INTEGRATION_RESPONSE_PARAMETERS = local.integration_response_parameters
+#   METHOD_RESPONSE_PARAMETERS      = local.method_response_parameters
+#   AUTHORIZATION                   = var.AUTHORIZATION
+#   CURRENT_ACCOUNT_ID              = var.CURRENT_ACCOUNT_ID
+#   AWS_REGION                      = var.AWS_REGION
+#   HTTP_METHOD                     = "ANY"
+#   LAMBDA_INVOKE_ARN               = var.BACKEND_LAMBDA_INVOKE_ARN
+#   FUNCTION_NAME                   = var.BACKEND_LAMBDA_NAME
+
+#   REQUEST_TEMPLATES = {
+#     "application/json" = <<EOF
+#     EOF
+#   }
+# }
 
 
 

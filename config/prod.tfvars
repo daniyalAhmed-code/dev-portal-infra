@@ -16,6 +16,7 @@ COGNITO_USER_POOL_DOMAIN             = "vapprod"
 ACCOUNT_REGISTRATION_MODE            = "open"
 ALLOW_ADMIN_CREATE_USER_ONLY         = false
 ORIGIN_ID                            = true
+API_KEY_ROTATION_TRIGGER_FREQUENCY = "cron(0 0 * * ? *)"
 
 DEVELOPMENT_MODE = true
 NODE_ENV         = "production"

@@ -66,8 +66,16 @@ resource "aws_iam_policy" "lambda_catalog_updater_policy" {
             "lambda:InvokeAsync"
         ],
         "Resource": "arn:aws:lambda:${var.AWS_REGION}:${var.CURRENT_ACCOUNT_ID}:function:${var.CATALOG_UPDATER_LAMBDA_NAME}"
+    },
+    {
+      "Effect": "Allow",
+      "Action": [
+        "secretsmanager:CreateSecret",
+        "secretsmanager:PutSecretValue",
+        "secretsmanager:GetSecretValue"
+      ],
+      "Resource": "arn:aws:secretsmanager:${var.AWS_REGION}:${var.CURRENT_ACCOUNT_ID}:secret:*"
     }
-    
   ]
 }
 EOF
@@ -186,10 +194,18 @@ resource "aws_iam_policy" "lambda_backend_policy" {
       "Effect": "Allow",
       "Action": [
         "secretsmanager:CreateSecret",
-        "secretsmanager:PutSecretValue"
+        "secretsmanager:PutSecretValue",
+        "secretsmanager:GetSecretValue"
       ],
       "Resource": "arn:aws:secretsmanager:${var.AWS_REGION}:${var.CURRENT_ACCOUNT_ID}:secret:*"
-}
+  },
+  {
+      "Effect": "Allow",
+      "Action": [
+        "iam:GetUser"
+      ],
+      "Resource": "arn:aws:iam::${var.CURRENT_ACCOUNT_ID}:user/*"
+  }
 ]
 }
 EOF
@@ -779,13 +795,12 @@ resource "aws_iam_policy" "cognito_registered_group_policy" {
         "Resource": "${var.API_GATEWAY_API}/prod/*"
     },
     {
-        "Effect": "Deny",
+        "Effect": "Allow",
         "Action": [
           "execute-api:Invoke"
         ],
         "Resource": "${var.API_GATEWAY_API}/prod/*/admin/*"
     }
-
    ]
 }
 EOF
@@ -866,8 +881,11 @@ resource "aws_s3_bucket_policy" "bucekt_policy" {
         Principal = {
           "AWS" : "arn:aws:iam::cloudfront:user/CloudFront Origin Access Identity ${var.ORIGIN_ACCESS_IDENTITY}"
         },
-        Action   = "s3:GetObject",
-        Resource = "arn:aws:s3:::${var.WEBSITE_BUCKET_NAME}/*"
+        Action = [
+                "s3:GetObject",
+                "s3:GetObjectVersion"
+              ],
+        Resource = ["arn:aws:s3:::${var.WEBSITE_BUCKET_NAME}/*", "arn:aws:s3:::${var.WEBSITE_BUCKET_NAME}"]
       }
     ]
   })
@@ -1001,4 +1019,113 @@ resource "aws_iam_role_policy_attachment" "lambda_authorizer_role_policy_attache
   provider   = aws.src
   role       = var.LAMBDA_AUTHORIZATION_ROLE_NAME
   policy_arn = aws_iam_policy.lambda_authorizer_role_policy.arn
+}
+
+
+resource "aws_iam_policy" "lambda_api_key_rotation_role_policy" {
+  provider         = aws.src
+  name     = "${var.RESOURCE_PREFIX}-lambda-api-key-rotation-role-policy"
+  policy   = <<EOF
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+          "Effect":"Allow",
+          "Action":[
+              "logs:CreateLogGroup",
+              "logs:CreateLogStream",
+              "logs:PutLogEvents"
+          ],
+          "Resource": "arn:aws:logs:${var.AWS_REGION}:${var.CURRENT_ACCOUNT_ID}:log-group:/aws/lambda/${var.API_KEY_ROTATION_LAMBDA_NAME}:*"
+        },
+        {
+          "Effect": "Allow",
+          "Action": [
+              "apigateway:GET"
+          ],
+          "Resource": "arn:aws:apigateway:${var.AWS_REGION}::/*"
+        },
+        {
+          "Effect": "Allow",
+          "Action": [
+              "dynamodb:Scan"
+          ],
+          "Resource": [
+              "arn:aws:dynamodb:${var.AWS_REGION}:${var.CURRENT_ACCOUNT_ID}:table/${var.CUSTOMER_TABLE_NAME}"
+            ]
+        },
+        {
+          "Effect": "Allow",
+          "Action": [
+                "lambda:InvokeFunction"
+          ],
+          "Resource": [
+              "*"
+            ]
+        }
+    ]
+}
+EOF
+}
+
+
+resource "aws_iam_role_policy_attachment" "lambda_api_key_rotation_role_policy_attachement" {
+  provider         = aws.src
+  role       = var.LAMBDA_API_KEY_ROTATION_ROLE_NAME
+  policy_arn = aws_iam_policy.lambda_api_key_rotation_role_policy.arn
+}
+
+
+resource "aws_iam_policy" "lambda_invoke_api_key_rotation_role_policy" {
+  provider         = aws.src
+  name     = "${var.RESOURCE_PREFIX}-lambda-invoke-api-key-rotation-role-policy"
+  policy   = <<EOF
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+          "Effect":"Allow",
+          "Action":[
+              "logs:CreateLogGroup",
+              "logs:CreateLogStream",
+              "logs:PutLogEvents"
+          ],
+          "Resource": "arn:aws:logs:${var.AWS_REGION}:${var.CURRENT_ACCOUNT_ID}:log-group:/aws/lambda/${var.INVOKE_API_KEY_ROTATION_LAMBDA_NAME}:*"
+        },
+        {
+          "Effect": "Allow",
+          "Action": [
+              "apigateway:POST",
+              "apigateway:DELETE"
+          ],
+          "Resource": "arn:aws:apigateway:${var.AWS_REGION}::/*"
+        },
+        {
+          "Effect": "Allow",
+          "Action": [
+              "dynamodb:UpdateItem"
+          ],
+          "Resource": [
+              "arn:aws:dynamodb:${var.AWS_REGION}:${var.CURRENT_ACCOUNT_ID}:table/${var.CUSTOMER_TABLE_NAME}"
+            ]
+        },
+        {
+          "Effect": "Allow",
+          "Action": [
+                "lambda:InvokeFunction"
+          ],
+          "Resource": [
+              "*"
+            ]
+        }
+    ]
+}
+EOF
+}
+
+
+resource "aws_iam_role_policy_attachment" "lambda_invoke_api_key_rotation_role_policy_attachement" {
+  provider         = aws.src
+  role       = var.LAMBDA_INVOKE_API_KEY_ROTATION_ROLE_NAME
+  policy_arn = aws_iam_policy.lambda_invoke_api_key_rotation_role_policy.arn
 }
