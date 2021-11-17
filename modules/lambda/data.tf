@@ -60,3 +60,13 @@ data "archive_file" "lambda_api_key_authoriser_function" {
   source_dir  = "${path.module}/code/authoriser"
   output_path = "${path.module}/zip/authoriser.zip"
 }
+data "archive_file" "lambda_invoke_api_key_rotation_function" {
+  type        = "zip"
+  source_dir  = "${path.module}/code/invoke-api-key-rotation"
+  output_path = "${path.module}/zip/invoke-api-key-rotation.zip"
+}
+data "archive_file" "lambda_api_key_rotation_function" {
+  type        = "zip"
+  source_dir  = "${path.module}/code/api-key-rotation"
+  output_path = "${path.module}/zip/api-key-rotation.zip"
+}

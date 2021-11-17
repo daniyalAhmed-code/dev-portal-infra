@@ -37,7 +37,7 @@ module "policy" {
   LAMBDA_CLOUDFRONT_SECURITY                           = module.lambda.CLOUDFRONT_SECURITY_LAMBDA_NAME
   LAMBDA_SECURITY_HEADER                               = module.lambda.CLOUDFRONT_SECURITY_HEADER_NAME
   LAMBDA_AUTHORIZATION_ROLE_ARN                        = module.role.LAMBDA_AUTHORIZATION_ROLE_ARN
-  LAMBDA_AUTHORIZATION_ROLE_NAME                        = module.role.LAMBDA_AUTHORIZATION_ROLE_NAME
+  LAMBDA_AUTHORIZATION_ROLE_NAME                       = module.role.LAMBDA_AUTHORIZATION_ROLE_NAME
   USERPOOL_ID                                          = module.cognito.COGNITO_USER_POOL
   API_GATEWAY_API                                      = module.api.API_GATEWAY_API
   COGNITO_ADMIN_GROUP_ROLE                             = module.role.COGNITO_ADMIN_GROUP_ROLE_NAME
@@ -48,6 +48,12 @@ module "policy" {
   API_KEY_AUTHORIZATION_ROLE_NAME                      = module.role.API_KEY_AUTHORIZATION_ROLE_NAME
   CATALOG_UPDATER_LAMBDA_ARN                           = module.lambda.CATALOG_UPDATER_LAMBDA_ARN
   COGNITO_SMS_CALLER_ROLE_NAME                         = module.role.SMS_CALLER_ROLE_NAME
+  API_KEY_ROTATION_LAMBDA_NAME                         = module.lambda.API_KEY_ROTATION_LAMBDA_NAME
+  INVOKE_API_KEY_ROTATION_LAMBDA_NAME                  = module.lambda.INVOKE_API_KEY_ROTATION_LAMBDA_NAME
+  LAMBDA_INVOKE_API_KEY_ROTATION_ROLE_NAME             = module.role.LAMBDA_INVOKE_API_KEY_ROTATION_ROLE_NAME
+  LAMBDA_API_KEY_ROTATION_ROLE_NAME                    = module.role.LAMBDA_API_KEY_ROTATION_ROLE_NAME
+  LAMBDA_INVOKE_API_KEY_ROTATION_ROLE_ARN              = module.role.LAMBDA_INVOKE_API_KEY_ROTATION_ROLE_ARN
+  LAMBDA_API_KEY_ROTATION_ROLE_ARN                    = module.role.LAMBDA_API_KEY_ROTATION_ROLE_ARN
 }
 
 module "lambda" {
@@ -90,6 +96,8 @@ module "lambda" {
   USERPOOL_CLIENT_ID                                  = module.cognito.COGNITO_USERPOOL_CLIENT
   IDENTITYPOOL_ID                                     = module.cognito.COGNITO_IDENTITY_POOL
   APIGATEWAY_CUSTOM_DOMAIN_NAME                       = var.APIGATEWAY_CUSTOM_DOMAIN_NAME
+  LAMBDA_INVOKE_API_KEY_ROTATION_ROLE_ARN             = module.role.LAMBDA_INVOKE_API_KEY_ROTATION_ROLE_ARN
+  LAMBDA_API_KEY_ROTATION_ROLE_ARN                    = module.role.LAMBDA_API_KEY_ROTATION_ROLE_ARN
 }
 
 
@@ -125,7 +133,7 @@ module "cloudfront" {
   AWS_REGION                       = data.aws_region.current.name
   ACM_CERTIFICATE_ARN              = var.ACM_CERTIFICATE_ARN
   BUCKET_REGIONAL_DOMAIN_NAME      = local.BUCKET_REGIONAL_DOMAIN_NAME
-  waf_acl_id                       = local.global_waf_id
+  # waf_acl_id                       = local.global_waf_id
 }
 
 module "route53" {
@@ -157,6 +165,14 @@ module "cognito" {
   COGNITO_ADMIN_GROUP_ROLE_ARN      = module.role.COGNITO_ADMIN_GROUP_ROLE_ARN
   COGNITO_SMS_CALLER_ROLE_ARN       = module.role.SMS_CALLER_ROLE_ARN
   # BUCEKT_REGIONAL_DOMAIN_NAME = var.BUCKET_REGIONAL_NAME
+}
+
+module "cw" {
+  source = "./modules/cw"
+  RESOURCE_PREFIX = local.RESOURCE_PREFIX
+  API_KEY_ROTATION_TRIGGER_FREQUENCY = var.API_KEY_ROTATION_TRIGGER_FREQUENCY
+  API_KEY_ROTATION_LAMBDA_INVOKE_ARN       = module.lambda.API_KEY_ROTATION_LAMBDA_INVOKE_ARN
+  API_KEY_ROTATION_LAMBDA_NAME              = module.lambda.API_KEY_ROTATION_LAMBDA_NAME
 }
 
 ### API ###
@@ -204,7 +220,7 @@ resource "aws_iam_role_policy" "api_gateway_cloudwatch" {
                 "logs:GetLogEvents",
                 "logs:FilterLogEvents"
             ],
-            "Resource": "*"
+            "Resource": "arn:aws:logs:${local.AWS_REGION}:${local.CURRENT_ACCOUNT_ID}:log-group:*:*"
         }
     ]
 }
