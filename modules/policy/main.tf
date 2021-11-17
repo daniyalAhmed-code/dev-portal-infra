@@ -1,5 +1,6 @@
 resource "aws_iam_policy" "lambda_catalog_updater_policy" {
   provider         = aws.src
+
   name   = "${var.RESOURCE_PREFIX}-lambda-catalog-updater-policy"
   policy = <<EOF
 {
@@ -13,7 +14,7 @@ resource "aws_iam_policy" "lambda_catalog_updater_policy" {
           "logs:PutLogEvents"
         ],
         "Resource": "arn:aws:logs:${var.AWS_REGION}:${var.CURRENT_ACCOUNT_ID}:log-group:/aws/lambda/${var.CATALOG_UPDATER_LAMBDA_NAME}:*"
-        
+
     },
     {
       "Effect": "Allow",
@@ -66,15 +67,6 @@ resource "aws_iam_policy" "lambda_catalog_updater_policy" {
             "lambda:InvokeAsync"
         ],
         "Resource": "arn:aws:lambda:${var.AWS_REGION}:${var.CURRENT_ACCOUNT_ID}:function:${var.CATALOG_UPDATER_LAMBDA_NAME}"
-    },
-    {
-      "Effect": "Allow",
-      "Action": [
-        "secretsmanager:CreateSecret",
-        "secretsmanager:PutSecretValue",
-        "secretsmanager:GetSecretValue"
-      ],
-      "Resource": "arn:aws:secretsmanager:${var.AWS_REGION}:${var.CURRENT_ACCOUNT_ID}:secret:*"
     }
   ]
 }
@@ -90,7 +82,6 @@ resource "aws_iam_role_policy_attachment" "lambda-catalog-updater-policy-role-at
 
 
 resource "aws_iam_policy" "lambda_backend_policy" {
-  provider         = aws.src
   name   = "${var.RESOURCE_PREFIX}-lambda-backend-policy"
   policy = <<EOF
 {
@@ -640,8 +631,8 @@ resource "aws_iam_policy" "lambda_s3_get_object_policy" {
           "s3:GetObject"
         ],
         "Resource":  [
-          "arn:aws:s3:::${var.ARTIFACTS_S3_BUCKET_NAME}/*,
-           "arn:aws:s3:::${var.WEBSITE_BUCKET_NAME}/*"
+          "arn:aws:s3:::${var.ARTIFACTS_S3_BUCKET_NAME}/*",
+          "arn:aws:s3:::${var.WEBSITE_BUCKET_NAME}/*"
            ]
         
     }
@@ -844,7 +835,26 @@ resource "aws_iam_policy" "cloudfront_security_policy" {
         "Action": [
           "iam:PassRole"
         ],
-        "Resource": "arn:aws:iam::${var.CURRENT_ACCOUNT_ID}:role/*"
+        "Resource": [
+          "arn:aws:iam::${var.CURRENT_ACCOUNT_ID}:role/${var.LAMBDA_CATALOG_UPDATER_ROLE_NAME}",
+          "arn:aws:iam::${var.CURRENT_ACCOUNT_ID}:role/${var.LAMBDA_BACKEND_ROLE_NAME}",
+          "arn:aws:iam::${var.CURRENT_ACCOUNT_ID}:role/${var.LAMBDA_ASSET_UPLOADER_ROLE_NAME}",
+          "arn:aws:iam::${var.CURRENT_ACCOUNT_ID}:role/${var.LAMBDA_COGNITO_POST_CONFIRMATION_TRIGGER_ROLE_NAME}",
+          "arn:aws:iam::${var.CURRENT_ACCOUNT_ID}:role/${var.LAMBDA_COGNITO_POST_AUTHENTICATION_TRIGGER_ROLE_NAME}",
+          "arn:aws:iam::${var.CURRENT_ACCOUNT_ID}:role/${var.LAMBDA_COGNITO_USERPOOL_CLIENT_SETTING_ROLE_NAME}",
+          "arn:aws:iam::${var.CURRENT_ACCOUNT_ID}:role/${var.LAMBDA_COGNITO_PRESIGNUP_TRIGGER_ROLE_NAME}",
+          "arn:aws:iam::${var.CURRENT_ACCOUNT_ID}:role/${var.LAMBDA_COGNITO_USERPOOL_DOMAIN_ROLE_NAME}",
+          "arn:aws:iam::${var.CURRENT_ACCOUNT_ID}:role/${var.LAMBDA_DUMP_V3_ACCOUNT_ROLE_NAME}",
+          "arn:aws:iam::${var.CURRENT_ACCOUNT_ID}:role/${var.LAMBDA_USERGROUP_IMPORTER_ROLE_NAME}",
+          "arn:aws:iam::${var.CURRENT_ACCOUNT_ID}:role/${var.COGNITO_ADMIN_GROUP_ROLE}",
+          "arn:aws:iam::${var.CURRENT_ACCOUNT_ID}:role/${var.COGNITO_REGISTERED_GROUP_ROLE}",
+          "arn:aws:iam::${var.CURRENT_ACCOUNT_ID}:role/${var.LAMBDA_CLOUDFRONT_SECURITY_ROLE}",
+          "arn:aws:iam::${var.CURRENT_ACCOUNT_ID}:role/${var.API_KEY_AUTHORIZATION_ROLE_NAME}",
+          "arn:aws:iam::${var.CURRENT_ACCOUNT_ID}:role/${var.COGNITO_SMS_CALLER_ROLE_NAME}",
+          "arn:aws:iam::${var.CURRENT_ACCOUNT_ID}:role/${var.LAMBDA_AUTHORIZATION_ROLE_NAME}",
+          "arn:aws:iam::${var.CURRENT_ACCOUNT_ID}:role/${var.LAMBDA_API_KEY_ROTATION_ROLE_NAME}",
+          "arn:aws:iam::${var.CURRENT_ACCOUNT_ID}:role/${var.LAMBDA_INVOKE_API_KEY_ROTATION_ROLE_NAME}"
+        ]
     },
     {
         "Effect": "Allow",
@@ -911,7 +921,7 @@ resource "aws_iam_policy" "api_key_invocation_policy" {
       "Action": [
           "apigateway:GET"
       ],
-      "Resource": "arn:aws:apigateway:${var.AWS_REGION}::/*"
+      "Resource": "arn:aws:apigateway:${var.AWS_REGION}::/apis/${var.API_GATEWAY_ID}"
     },
     {
       "Effect": "Allow",
@@ -943,7 +953,7 @@ resource "aws_iam_role_policy_attachment" "api_key_invocation_policy_role_attach
 
 
 resource "aws_iam_policy" "cognito_sms_caller_role_policy" {
-  provider = aws.src
+  provider         = aws.src
   name     = "${var.RESOURCE_PREFIX}-cognito-sms-caller-role-policy"
   policy   = <<EOF
 {
@@ -965,14 +975,14 @@ EOF
 
 
 resource "aws_iam_role_policy_attachment" "cognito_sns_policy_role_attachment" {
-  provider   = aws.src
+  provider         = aws.src
   role       = var.COGNITO_SMS_CALLER_ROLE_NAME
   policy_arn = aws_iam_policy.cognito_sms_caller_role_policy.arn
 }
 
 
 resource "aws_iam_policy" "lambda_authorizer_role_policy" {
-  provider = aws.src
+  provider         = aws.src
   name     = "${var.RESOURCE_PREFIX}-lambda-authorizer-role-policy"
   policy   = <<EOF
 {
@@ -991,7 +1001,7 @@ resource "aws_iam_policy" "lambda_authorizer_role_policy" {
           "Action": [
               "apigateway:GET"
           ],
-          "Resource": "arn:aws:apigateway:${var.AWS_REGION}::/*"
+          "Resource": "arn:aws:apigateway:${var.AWS_REGION}::/apis/*"
         },
         {
           "Effect": "Allow",
@@ -1016,7 +1026,7 @@ EOF
 
 
 resource "aws_iam_role_policy_attachment" "lambda_authorizer_role_policy_attachement" {
-  provider   = aws.src
+  provider         = aws.src
   role       = var.LAMBDA_AUTHORIZATION_ROLE_NAME
   policy_arn = aws_iam_policy.lambda_authorizer_role_policy.arn
 }
@@ -1043,7 +1053,7 @@ resource "aws_iam_policy" "lambda_api_key_rotation_role_policy" {
           "Action": [
               "apigateway:GET"
           ],
-          "Resource": "arn:aws:apigateway:${var.AWS_REGION}::/*"
+          "Resource": "arn:aws:apigateway:${var.AWS_REGION}::/apis/${var.API_GATEWAY_ID}"
         },
         {
           "Effect": "Allow",
@@ -1059,9 +1069,7 @@ resource "aws_iam_policy" "lambda_api_key_rotation_role_policy" {
           "Action": [
                 "lambda:InvokeFunction"
           ],
-          "Resource": [
-              "*"
-            ]
+        "Resource": "arn:aws:lambda:${var.AWS_REGION}:${var.CURRENT_ACCOUNT_ID}:function:${var.INVOKE_API_KEY_ROTATION_LAMBDA_NAME}"
         }
     ]
 }
@@ -1098,7 +1106,7 @@ resource "aws_iam_policy" "lambda_invoke_api_key_rotation_role_policy" {
               "apigateway:POST",
               "apigateway:DELETE"
           ],
-          "Resource": "arn:aws:apigateway:${var.AWS_REGION}::/*"
+          "Resource": "arn:aws:apigateway:${var.AWS_REGION}::/apis/${var.API_GATEWAY_ID}"
         },
         {
           "Effect": "Allow",
@@ -1108,15 +1116,6 @@ resource "aws_iam_policy" "lambda_invoke_api_key_rotation_role_policy" {
           "Resource": [
               "arn:aws:dynamodb:${var.AWS_REGION}:${var.CURRENT_ACCOUNT_ID}:table/${var.CUSTOMER_TABLE_NAME}"
             ]
-        },
-        {
-          "Effect": "Allow",
-          "Action": [
-                "lambda:InvokeFunction"
-          ],
-          "Resource": [
-              "*"
-            ]
         }
     ]
 }
@@ -1125,7 +1124,7 @@ EOF
 
 
 resource "aws_iam_role_policy_attachment" "lambda_invoke_api_key_rotation_role_policy_attachement" {
-  provider         = aws.src
-  role       = var.LAMBDA_INVOKE_API_KEY_ROTATION_ROLE_NAME
+   provider         = aws.src
+ role       = var.LAMBDA_INVOKE_API_KEY_ROTATION_ROLE_NAME
   policy_arn = aws_iam_policy.lambda_invoke_api_key_rotation_role_policy.arn
 }
