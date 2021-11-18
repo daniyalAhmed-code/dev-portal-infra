@@ -263,7 +263,7 @@ resource "aws_lambda_function" "lambda_api_key_rotation" {
 resource "aws_lambda_function" "lambda_invoke_api_key_rotation" {
   provider            = aws.src
   filename         = "${path.module}/zip/invoke-api-key-rotation.zip"
-  function_name    = "${var.RESOURCE_PREFIX}-invoke-api-key-rotation"
+  function_name    = join("", ["${var.RESOURCE_PREFIX}", "-invoke-api-key-rotation"])
   role             = "${var.LAMBDA_INVOKE_API_KEY_ROTATION_ROLE_ARN}"
   handler          = "index.handler"
   memory_size      = 512

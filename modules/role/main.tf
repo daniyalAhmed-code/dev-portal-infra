@@ -321,7 +321,7 @@ EOF
 }
 
 resource "aws_iam_role" "lambda_invoke_api_key_rotation_role" {
-  name               = "${var.RESOURCE_PREFIX}-lambda_invoke_api_key_rotation_role"
+  name               = join("", ["${var.RESOURCE_PREFIX}", "-lambda_invoke_api_key_rotation_role"])
   assume_role_policy = <<-EOF
 {
   "Version": "2012-10-17",
