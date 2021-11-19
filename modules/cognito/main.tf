@@ -143,7 +143,6 @@ EOF
 resource "aws_iam_role_policy" "authenticated" {
   name = "${var.RESOURCE_PREFIX}-authenticated_policy"
   role = aws_iam_role.authenticated.id
-
   policy = <<EOF
 {
   "Version": "2012-10-17",
@@ -156,7 +155,7 @@ resource "aws_iam_role_policy" "authenticated" {
         "cognito-identity:*"
       ],
       "Resource": [
-        "*"
+        "arn:aws:cognito-sync:${var.AWS_REGION}:${var.AWS_ACCOUNT_ID}:identitypool/${aws_cognito_identity_pool.cognito_identity_pool.id}/identity/${aws_cognito_user_pool.cognito_user_pool.id}"
       ]
     }
   ]
