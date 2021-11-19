@@ -67,6 +67,16 @@ resource "aws_iam_policy" "lambda_catalog_updater_policy" {
             "lambda:InvokeAsync"
         ],
         "Resource": "arn:aws:lambda:${var.AWS_REGION}:${var.CURRENT_ACCOUNT_ID}:function:${var.CATALOG_UPDATER_LAMBDA_NAME}"
+    },
+    {
+    "Effect": "Allow",
+    "Action": [
+        "kms:Decrypt",
+        "kms:Encrypt"
+    ],
+    "Resource": [
+        "*"
+    ]
     }
   ]
 }
@@ -196,7 +206,17 @@ resource "aws_iam_policy" "lambda_backend_policy" {
         "iam:GetUser"
       ],
       "Resource": "arn:aws:iam::${var.CURRENT_ACCOUNT_ID}:user/*"
-  }
+  },
+    {
+    "Effect": "Allow",
+    "Action": [
+        "kms:Decrypt",
+        "kms:Encrypt"
+    ],
+    "Resource": [
+        "*"
+    ]
+    }
 ]
 }
 EOF
@@ -297,7 +317,17 @@ resource "aws_iam_policy" "lambda_asset_uploader_policy" {
             "arn:aws:s3:::${var.ARTIFACTS_S3_BUCKET_NAME}/*",
             "arn:aws:s3:::${var.ARTIFACTS_S3_BUCKET_NAME}"
          ]
-      }
+      },
+    {
+    "Effect": "Allow",
+    "Action": [
+        "kms:Decrypt",
+        "kms:Encrypt"
+    ],
+    "Resource": [
+        "*"
+    ]
+    }
    ]
 }
 EOF
@@ -343,6 +373,16 @@ resource "aws_iam_policy" "lambda_cognito_post_confirmation_trigger_policy" {
         ],
         "Resource": "${var.COGNITO_USER_POOL}"
         
+    },
+    {
+    "Effect": "Allow",
+    "Action": [
+        "kms:Decrypt",
+        "kms:Encrypt"
+    ],
+    "Resource": [
+        "*"
+    ]
     }
    ]
 }
@@ -397,6 +437,16 @@ resource "aws_iam_policy" "lambda_cognito_post_authentication_trigger_policy" {
         ],
         "Resource": "${var.COGNITO_USER_POOL}"
         
+    },
+    {
+    "Effect": "Allow",
+    "Action": [
+        "kms:Decrypt",
+        "kms:Encrypt"
+    ],
+    "Resource": [
+        "*"
+    ]
     }
    ]
 }
@@ -441,6 +491,16 @@ resource "aws_iam_policy" "lambda_cognito_userpool_client_setting_policy" {
         ],
         "Resource": "${var.COGNITO_USER_POOL}"
         
+    },
+    {
+    "Effect": "Allow",
+    "Action": [
+        "kms:Decrypt",
+        "kms:Encrypt"
+    ],
+    "Resource": [
+        "*"
+    ]
     }
    ]
 }
@@ -469,6 +529,16 @@ resource "aws_iam_policy" "lambda_cognito_presignup_trigger_policy" {
           "logs:PutLogEvents"
         ],
         "Resource": "arn:aws:logs:${var.AWS_REGION}:${var.CURRENT_ACCOUNT_ID}:log-group:/aws/lambda/${var.COGNITO_USERPOOL_CLIENT_SETTINGS_NAME}:*"
+    },
+    {
+    "Effect": "Allow",
+    "Action": [
+        "kms:Decrypt",
+        "kms:Encrypt"
+    ],
+    "Resource": [
+        "*"
+    ]
     }
    ]
 }
@@ -512,6 +582,16 @@ resource "aws_iam_policy" "manage_user_pool_domain" {
         ],
         "Resource": "arn:aws:cognito-idp:${var.AWS_REGION}:${var.CURRENT_ACCOUNT_ID}:userpool/${var.USERPOOL_ID}"
         
+    },
+    {
+    "Effect": "Allow",
+    "Action": [
+        "kms:Decrypt",
+        "kms:Encrypt"
+    ],
+    "Resource": [
+        "*"
+    ]
     }
    ]
 }
@@ -544,6 +624,16 @@ resource "aws_iam_policy" "read_customer_table_policy" {
         ],
         "Resource": "${var.CUSTOMER_TABLE_ARN}"
         
+    },
+    {
+    "Effect": "Allow",
+    "Action": [
+        "kms:Decrypt",
+        "kms:Encrypt"
+    ],
+    "Resource": [
+        "*"
+    ]
     }
    ]
 }
@@ -566,6 +656,16 @@ resource "aws_iam_policy" "list_user_pool_policy" {
         ],
         "Resource": "${var.COGNITO_USER_POOL}"
         
+    },
+    {
+    "Effect": "Allow",
+    "Action": [
+        "kms:Decrypt",
+        "kms:Encrypt"
+    ],
+    "Resource": [
+        "*"
+    ]
     }
    ]
 }
@@ -606,6 +706,16 @@ resource "aws_iam_policy" "write_cloudwatch_logs_policy" {
         ],
         "Resource": "arn:aws:logs:${var.AWS_REGION}:${var.CURRENT_ACCOUNT_ID}:*"
         
+    },
+    {
+    "Effect": "Allow",
+    "Action": [
+        "kms:Decrypt",
+        "kms:Encrypt"
+    ],
+    "Resource": [
+        "*"
+    ]
     }
    ]
 }
@@ -635,6 +745,16 @@ resource "aws_iam_policy" "lambda_s3_get_object_policy" {
           "arn:aws:s3:::${var.WEBSITE_BUCKET_NAME}/*"
            ]
         
+    },
+    {
+    "Effect": "Allow",
+    "Action": [
+        "kms:Decrypt",
+        "kms:Encrypt"
+    ],
+    "Resource": [
+        "*"
+    ]
     }
    ]
 }
@@ -689,6 +809,16 @@ resource "aws_iam_policy" "update_cognito_user_list_policy" {
         ],
         "Resource":"${var.COGNITO_USER_POOL}"
         
+    },
+    {
+    "Effect": "Allow",
+    "Action": [
+        "kms:Decrypt",
+        "kms:Encrypt"
+    ],
+    "Resource": [
+        "*"
+    ]
     }
    ]
 }
@@ -756,6 +886,16 @@ resource "aws_iam_policy" "cognito_admin_group_policy" {
           "execute-api:Invoke"
         ],
         "Resource": "${var.API_GATEWAY_API}/prod/*/*"
+    },
+    {
+    "Effect": "Allow",
+    "Action": [
+        "kms:Decrypt",
+        "kms:Encrypt"
+    ],
+    "Resource": [
+        "*"
+    ]
     }
    ]
 }
@@ -791,6 +931,16 @@ resource "aws_iam_policy" "cognito_registered_group_policy" {
           "execute-api:Invoke"
         ],
         "Resource": "${var.API_GATEWAY_API}/prod/*/admin/*"
+    },
+    {
+    "Effect": "Allow",
+    "Action": [
+        "kms:Decrypt",
+        "kms:Encrypt"
+    ],
+    "Resource": [
+        "*"
+    ]
     }
    ]
 }
@@ -864,6 +1014,16 @@ resource "aws_iam_policy" "cloudfront_security_policy" {
           "s3:PutObject"
         ],
         "Resource": ["arn:aws:s3:::${var.ARTIFACTS_S3_BUCKET_NAME}/*", "arn:aws:s3:::${var.ARTIFACTS_S3_BUCKET_NAME}"]
+    },
+    {
+    "Effect": "Allow",
+    "Action": [
+        "kms:Decrypt",
+        "kms:Encrypt"
+    ],
+    "Resource": [
+        "*"
+    ]
     }
 
    ]
@@ -939,6 +1099,16 @@ resource "aws_iam_policy" "api_key_invocation_policy" {
           "cognito-idp:AdminGetUser"
       ],
       "Resource": "${var.COGNITO_USER_POOL}"
+    },
+    {
+    "Effect": "Allow",
+    "Action": [
+        "kms:Decrypt",
+        "kms:Encrypt"
+    ],
+    "Resource": [
+        "*"
+    ]
     }
   ]
 }
@@ -967,7 +1137,17 @@ resource "aws_iam_policy" "cognito_sms_caller_role_policy" {
           "Resource": [
               "*"
           ]
-        }
+        },
+    {
+    "Effect": "Allow",
+    "Action": [
+        "kms:Decrypt",
+        "kms:Encrypt"
+    ],
+    "Resource": [
+        "*"
+    ]
+    }
     ]
 }
 EOF
@@ -1018,8 +1198,17 @@ resource "aws_iam_policy" "lambda_authorizer_role_policy" {
               "cognito-idp:AdminGetUser"
             ],
           "Resource": "${var.COGNITO_USER_POOL}"
-        }
+        },
+    {
+    "Effect": "Allow",
+    "Action": [
+        "kms:Decrypt",
+        "kms:Encrypt"
+    ],
+    "Resource": [
+        "*"
     ]
+    }
 }
 EOF
 }
@@ -1070,7 +1259,17 @@ resource "aws_iam_policy" "lambda_api_key_rotation_role_policy" {
                 "lambda:InvokeFunction"
           ],
         "Resource": "arn:aws:lambda:${var.AWS_REGION}:${var.CURRENT_ACCOUNT_ID}:function:${var.INVOKE_API_KEY_ROTATION_LAMBDA_NAME}"
-        }
+        },
+    {
+    "Effect": "Allow",
+    "Action": [
+        "kms:Decrypt",
+        "kms:Encrypt"
+    ],
+    "Resource": [
+        "*"
+    ]
+    }
     ]
 }
 EOF
@@ -1116,7 +1315,17 @@ resource "aws_iam_policy" "lambda_invoke_api_key_rotation_role_policy" {
           "Resource": [
               "arn:aws:dynamodb:${var.AWS_REGION}:${var.CURRENT_ACCOUNT_ID}:table/${var.CUSTOMER_TABLE_NAME}"
             ]
-        }
+        },
+    {
+    "Effect": "Allow",
+    "Action": [
+        "kms:Decrypt",
+        "kms:Encrypt"
+    ],
+    "Resource": [
+        "*"
+    ]
+    }
     ]
 }
 EOF
