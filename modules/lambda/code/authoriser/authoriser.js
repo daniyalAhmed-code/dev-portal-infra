@@ -2,6 +2,7 @@
 
 const AWS = require('aws-sdk');
 const AuthPolicy = require('aws-auth-policy');
+const { v4: uuidv4 } = require('uuid');
 
 const log4js = require('log4js');
 const logger = log4js.getLogger();
@@ -68,6 +69,10 @@ exports.handler = async (event, context, callback) => {
         return deny(awsAccountId, apiOptions);
 
     let username = apisResponse.Items[0].Username;
+    let email    = apisResponse.Items[0].EmailAddress;
+    let mnoLocation = apisResponse.Items[0].MnoLocation;
+    let mno = apisResponse.Items[0].Mno;
+    
     let cognitoResponse = await cognito.adminGetUser({
         UserPoolId: userPoolId,
         Username: username
@@ -75,7 +80,7 @@ exports.handler = async (event, context, callback) => {
     
     
     console.log(cognitoResponse);
-    
+    await saveApiDetails(event,username,email,mno,mnoLocation)
     if (!apisResponse.Items[0].hasOwnProperty("ApiKeyDuration")) {
         console.log("ApiKeyDuration not present");
         return generate_api_gateway_response(awsAccountId, apiOptions, username, userId);
@@ -88,7 +93,6 @@ exports.handler = async (event, context, callback) => {
     } else {
         api_date = apiKey.createdDate;
     }
-    
     let ApiDate = new Date(api_date);
     ApiDate.setDate(ApiDate.getDate() + apisResponse.Items[0].ApiKeyDuration);
     
@@ -111,4 +115,54 @@ function generate_api_gateway_response(awsAccountId, apiOptions, username, userI
     };
     
     return generated;
+}
+
+
+
+async function saveApiDetails(event,username,email,mno,mnoLocation){
+    console.log("in save api details")
+    let request_id = uuidv4();
+    let data = {}
+    data['RequestType'] = event.requestContext.httpMethod
+    
+    if(!event.hasOwnProperty("headers")) 
+      data['Headers'] = {}
+    else  
+      data['Headers'] = event.headers
+    
+    if(!event.hasOwnProperty("multiValueHeaders"))
+      data['MultiValueHeaders'] = {}
+    else
+      data['MultiValueHeaders'] = event.multiValueHeaders
+  
+    if(!event.hasOwnProperty("queryStringParameters"))
+      data['QueryStringParameters'] = {}  
+    else   
+      data['QueryStringParameters'] = event.queryStringParameters
+    
+    if(!event.hasOwnProperty("body"))
+      data["Body"] = {}
+    else
+      data['Body'] = event.body
+  
+    if(!event.hasOwnProperty("path"))
+      data['ApiPath'] = {}  
+    else
+      data['ApiPath'] = event.path
+    
+    data['UserName'] = username
+    data['EmailAddress'] = email
+    data['Mno'] = mno
+    data['MnoLocation'] = mnoLocation
+    let request_time = process.hrtime()
+    let item = {
+      RequestId: request_id,
+      Username_RequestTime: data['UserName']+"_"+request_time[0]+"_"+request_time[1]
+    };
+    const params = {
+      TableName: process.env.CustomerRequestLogTable,
+      Item: Object.assign(item, data)
+    };
+    let respData = await dynamodb.put(params).promise();
+    console.log(respData)
 }
