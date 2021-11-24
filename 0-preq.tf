@@ -4,10 +4,10 @@ locals {
   ARTIFICATS_S3_BUCKET            = data.terraform_remote_state.vap-platform-infra.outputs.ARTIFACT_S3_BUCKET_NAME
   DEV_PORTAL_CUSTOMERS_TABLE_NAME = data.terraform_remote_state.vap-platform-infra.outputs.DEV_PORTAL_CUSTOMERS_TABLE_NAME
   DEV_PORTAL_CUSTOMERS_TABLE_ARN  = data.terraform_remote_state.vap-platform-infra.outputs.DEV_PORTAL_CUSTOMERS_TABLE_ARN
-
+  DEV_PORTAL_CUSTOMER_REQUEST_LOGS_TABLE_NAME  = data.terraform_remote_state.vap-platform-infra.outputs.DEV_PORTAL_CUSTOMER_REQUEST_LOGS_TABLE_NAME
   DEV_PORTAL_FEEDBACK_TABLE_NAME = data.terraform_remote_state.vap-platform-infra.outputs.DEV_PORTAL_FEEDBACK_TABLE_NAME
   DEV_PORTAL_FEEDBACK_TABLE_ARN  = data.terraform_remote_state.vap-platform-infra.outputs.DEV_PORTAL_FEEDBACK_TABLE_ARN
-
+  DEV_PORTAL_CUSTOMER_REQUEST_LOGS_TABLE_ARN = data.terraform_remote_state.vap-platform-infra.outputs.DEV_PORTAL_CUSTOMER_REQUEST_LOGS_TABLE_ARN
   DEV_PORTAL_PRE_LOGIN_ACCOUNTS_TABLE_NAME = data.terraform_remote_state.vap-platform-infra.outputs.DEV_PORTAL_PRE_LOGIN_ACCOUNTS_TABLE_NAME
   DEV_PORTAL_PRE_LOGIN_ACCOUNTS_TABLE_ARN  = data.terraform_remote_state.vap-platform-infra.outputs.DEV_PORTAL_PRE_LOGIN_ACCOUNTS_TABLE_ARN
   BUCKET_REGIONAL_DOMAIN_NAME              = data.terraform_remote_state.vap-platform-infra.outputs.BUCKET_REGIONAL_DOMAIN_NAME

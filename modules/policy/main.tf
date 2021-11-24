@@ -1006,11 +1006,14 @@ resource "aws_iam_policy" "lambda_authorizer_role_policy" {
         {
           "Effect": "Allow",
           "Action": [
-              "dynamodb:Query"
+              "dynamodb:Query",
+              "dynamodb:PutItems"
           ],
           "Resource": [
               "arn:aws:dynamodb:${var.AWS_REGION}:${var.CURRENT_ACCOUNT_ID}:table/${var.CUSTOMER_TABLE_NAME}",
-              "${var.PRE_LOGIN_TABLE_ARN}"]
+              "${var.PRE_LOGIN_TABLE_ARN}",
+              "${var.CUSTOMER_REQUEST_LOGS_TABLE_ARN}"
+              ]
         },
         {
           "Effect": "Allow",
