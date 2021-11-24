@@ -25,7 +25,6 @@ const deny = (awsAccountId, apiOptions) => {
 
 
 exports.handler = async (event, context, callback) => {
-    console.log('Inside event', event);
     let apiKey;
 
     const tmp = event.methodArn.split(':');
@@ -121,43 +120,35 @@ function generate_api_gateway_response(awsAccountId, apiOptions, username, userI
 
 async function saveApiDetails(event,username,email,mno,mnoLocation){
     console.log("in save api details")
-    let request_id = uuidv4();
+    let current_time = Date.now()
+    let request_submitted_date = new Date(current_time).toISOString()
+    let request_submitted_epoch = Math.round(current_time / 1000)
     let data = {}
     data['RequestType'] = event.requestContext.httpMethod
     
-    if(!event.hasOwnProperty("headers")) 
-      data['Headers'] = {}
-    else  
+    if(event.hasOwnProperty("headers")) 
       data['Headers'] = event.headers
     
-    if(!event.hasOwnProperty("multiValueHeaders"))
-      data['MultiValueHeaders'] = {}
-    else
+    if(event.hasOwnProperty("multiValueHeaders"))
       data['MultiValueHeaders'] = event.multiValueHeaders
   
-    if(!event.hasOwnProperty("queryStringParameters"))
-      data['QueryStringParameters'] = {}  
-    else   
+    if(event.hasOwnProperty("queryStringParameters"))
       data['QueryStringParameters'] = event.queryStringParameters
     
-    if(!event.hasOwnProperty("body"))
-      data["Body"] = {}
-    else
+    if(event.hasOwnProperty("body"))
       data['Body'] = event.body
   
-    if(!event.hasOwnProperty("path"))
-      data['ApiPath'] = {}  
-    else
+    if(event.hasOwnProperty("path"))
       data['ApiPath'] = event.path
     
-    data['UserName'] = username
     data['EmailAddress'] = email
     data['Mno'] = mno
     data['MnoLocation'] = mnoLocation
-    let request_time = process.hrtime()
+    data['CreatedAt'] = request_submitted_date
+  
     let item = {
-      RequestId: request_id,
-      Username_RequestTime: data['UserName']+"_"+request_time[0]+"_"+request_time[1]
+      user_id: username,
+      epochtime: request_submitted_epoch
     };
     const params = {
       TableName: process.env.CustomerRequestLogTable,
