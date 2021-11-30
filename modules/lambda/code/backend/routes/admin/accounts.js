@@ -128,7 +128,7 @@ exports.post = async (req, res) => {
     targetCallBackAuth,
     targetMno,
     targetMfa,
-    targetKeyRotationEnabled,
+    
     targetCallBackUrl
   } = req.body
   let body = await schema.validate(req.body);
@@ -159,7 +159,6 @@ exports.post = async (req, res) => {
     targetCallBackAuth,
     targetMno,
     targetMfa,
-    targetKeyRotationEnabled,
     targetCallBackUrl,
     inviterUserSub: util.getCognitoIdentitySub(req),
     inviterUserId
@@ -185,15 +184,15 @@ exports.put = async (req, res) => {
       'string.pattern.base': "last name cannot have space in between",
       'any.required': `"last name" is a required field`
     }),
-    CallBackAuthType: Joi.string().valid("apiKey","basicAuth","privateCertificate"),
+    Type: Joi.string().valid("apiKey","basicAuth","privateCertificate"),
     Mfa: Joi.boolean().required(),
     CallBackUrl: Joi.string().required().messages({
       'string.empty': `"callback url" cannot be an empty field`
     }),
     isValidateCallBackAuth:Joi.boolean().default(true),
-    CallBackAuth: Joi.when('CallBackAuthType', {is : "apiKey", then: Joi.string().required()})
-    .when('CallBackAuthType', {is : "basicAuth", then: Joi.object().keys({username:Joi.string().required(),password:Joi.string().required()})})
-    .when('CallBackAuthType', {is : "privateCertificate", then: Joi.string().required()})
+    CallBackAuth: Joi.when('Type', {is : "apiKey", then: Joi.string().required()})
+    .when('Type', {is : "basicAuth", then: Joi.object().keys({username:Joi.string().required(),password:Joi.string().required()})})
+    .when('Type', {is : "privateCertificate", then: Joi.string().required()})
     .when("isValidateCallBackAuth", {is : false, then: Joi.string().optional()}),
 
     Mno: Joi.string().required(),
