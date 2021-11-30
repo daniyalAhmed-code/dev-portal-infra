@@ -128,6 +128,7 @@ exports.post = async (req, res) => {
     targetCallBackAuth,
     targetMno,
     targetMfa,
+    targetKeyRotationEnabled,
     targetCallBackUrl
   } = req.body
   let body = await schema.validate(req.body);
@@ -158,6 +159,7 @@ exports.post = async (req, res) => {
     targetCallBackAuth,
     targetMno,
     targetMfa,
+    targetKeyRotationEnabled,
     targetCallBackUrl,
     inviterUserSub: util.getCognitoIdentitySub(req),
     inviterUserId
@@ -183,15 +185,15 @@ exports.put = async (req, res) => {
       'string.pattern.base': "last name cannot have space in between",
       'any.required': `"last name" is a required field`
     }),
-    Type: Joi.string().valid("apiKey","basicAuth","privateCertificate"),
+    CallBackAuthType: Joi.string().valid("apiKey","basicAuth","privateCertificate"),
     Mfa: Joi.boolean().required(),
     CallBackUrl: Joi.string().required().messages({
       'string.empty': `"callback url" cannot be an empty field`
     }),
     isValidateCallBackAuth:Joi.boolean().default(true),
-    CallBackAuth: Joi.when('Type', {is : "apiKey", then: Joi.string().required()})
-    .when('Type', {is : "basicAuth", then: Joi.object().keys({username:Joi.string().required(),password:Joi.string().required()})})
-    .when('Type', {is : "privateCertificate", then: Joi.string().required()})
+    CallBackAuth: Joi.when('CallBackAuthType', {is : "apiKey", then: Joi.string().required()})
+    .when('CallBackAuthType', {is : "basicAuth", then: Joi.object().keys({username:Joi.string().required(),password:Joi.string().required()})})
+    .when('CallBackAuthType', {is : "privateCertificate", then: Joi.string().required()})
     .when("isValidateCallBackAuth", {is : false, then: Joi.string().optional()}),
 
     Mno: Joi.string().required(),
@@ -275,4 +277,40 @@ exports.get_current_user_profile = async (req, res) => {
   return res.status(200).json({
     "user_details" :user
 })
+
+}
+exports.generate_new_api_key = async (req, res) => {
+  let userPoolId = process.env.UserPoolId
+  let userId = req.params.userId
+  let user = await customersController.getAccountDetails(userId)
+  if (user == null)
+  {
+    return res.status(404).json({
+      message: "Account does not exists"
+    })
+  }
+  const data = await new Promise((resolve, reject) => {customersController.getApiKeyForCustomer(userId, reject, resolve) });
+
+  let apiKeyVal = data.items[0].id
+  // Remove previous allocations of userId
+  let usagePlanId = await new Promise((resolve, reject) => {customersController.getUsagePlansForCustomer(userId, reject, resolve) });
+  usagePlanId = usagePlanId.items[0].id
+
+  await new Promise((resolve, reject) => {customersController.unsubscribe(userId, usagePlanId, reject, resolve)})
+
+  await customersController.deletePreviousApiKey(apiKeyVal)
+
+  //Allocate new API key to UsagePlan and subscribe it 
+  await customersController.renewApiKey(userId, userPoolId, true)
+
+  let subscribeToUseagePlan = await new Promise((resolve, reject) => {
+    customersController.subscribe(userId, usagePlanId, reject, resolve)
+  })
+  
+  console.log(subscribeToUseagePlan)  
+  
+  return res.status(200).json({
+    "user_details" :subscribeToUseagePlan
+})
+
 }
