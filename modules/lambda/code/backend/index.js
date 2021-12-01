@@ -62,6 +62,7 @@ app.get('/admin/accounts/:userId', wrapError(require('./routes/admin/accounts').
 app.get('/admin/accounts/callbackauth/:userId', wrapError(require('./routes/admin/accounts').get_callback_auth_by_user_id))
 app.put('/admin/accounts/resendInvite', wrapError(require('./routes/accounts/resendInvite').put))
 app.get('/admin/accounts/current/getUserProfile', wrapError(require('./routes/admin/accounts').get_current_user_profile))
+app.get('/admin/accounts/current/getUserProfileImage', wrapError(require('./routes/admin/accounts').get_current_user_profile))
 
 // Not ready for prime time just yet.
 // app.put('/admin/accounts/:userId/approveRequest', wrapError(require('./routes/accounts/approveRequest').put))
