@@ -1032,8 +1032,9 @@ resource "aws_iam_role_policy_attachment" "lambda_authorizer_role_policy_attache
 }
 
 
+
 resource "aws_iam_policy" "lambda_api_key_rotation_role_policy" {
-  provider         = aws.src
+  
   name     = "${var.RESOURCE_PREFIX}-lambda-api-key-rotation-role-policy"
   policy   = <<EOF
 {
@@ -1053,7 +1054,7 @@ resource "aws_iam_policy" "lambda_api_key_rotation_role_policy" {
           "Action": [
               "apigateway:GET"
           ],
-          "Resource": "arn:aws:apigateway:${var.AWS_REGION}::/apis/${var.API_GATEWAY_ID}"
+          "Resource": "arn:aws:apigateway:${var.AWS_REGION}::/*"
         },
         {
           "Effect": "Allow",
@@ -1069,7 +1070,9 @@ resource "aws_iam_policy" "lambda_api_key_rotation_role_policy" {
           "Action": [
                 "lambda:InvokeFunction"
           ],
-        "Resource": "arn:aws:lambda:${var.AWS_REGION}:${var.CURRENT_ACCOUNT_ID}:function:${var.INVOKE_API_KEY_ROTATION_LAMBDA_NAME}"
+          "Resource": [
+              "*"
+            ]
         }
     ]
 }
@@ -1078,14 +1081,13 @@ EOF
 
 
 resource "aws_iam_role_policy_attachment" "lambda_api_key_rotation_role_policy_attachement" {
-  provider         = aws.src
   role       = var.LAMBDA_API_KEY_ROTATION_ROLE_NAME
-  policy_arn = aws_iam_policy.lambda_api_key_rotation_role_policy.arn
+  policy_arn = aws_iam_policy.lambda_authorizer_role_policy.arn
 }
 
 
 resource "aws_iam_policy" "lambda_invoke_api_key_rotation_role_policy" {
-  provider         = aws.src
+  
   name     = "${var.RESOURCE_PREFIX}-lambda-invoke-api-key-rotation-role-policy"
   policy   = <<EOF
 {
@@ -1103,10 +1105,9 @@ resource "aws_iam_policy" "lambda_invoke_api_key_rotation_role_policy" {
         {
           "Effect": "Allow",
           "Action": [
-              "apigateway:POST",
-              "apigateway:DELETE"
+              "apigateway:POST"
           ],
-          "Resource": "arn:aws:apigateway:${var.AWS_REGION}::/apis/${var.API_GATEWAY_ID}"
+          "Resource": "arn:aws:apigateway:${var.AWS_REGION}::/*"
         },
         {
           "Effect": "Allow",
@@ -1116,6 +1117,15 @@ resource "aws_iam_policy" "lambda_invoke_api_key_rotation_role_policy" {
           "Resource": [
               "arn:aws:dynamodb:${var.AWS_REGION}:${var.CURRENT_ACCOUNT_ID}:table/${var.CUSTOMER_TABLE_NAME}"
             ]
+        },
+        {
+          "Effect": "Allow",
+          "Action": [
+                "lambda:InvokeFunction"
+          ],
+          "Resource": [
+              "*"
+            ]
         }
     ]
 }
@@ -1124,7 +1134,6 @@ EOF
 
 
 resource "aws_iam_role_policy_attachment" "lambda_invoke_api_key_rotation_role_policy_attachement" {
-   provider         = aws.src
- role       = var.LAMBDA_INVOKE_API_KEY_ROTATION_ROLE_NAME
-  policy_arn = aws_iam_policy.lambda_invoke_api_key_rotation_role_policy.arn
+  role       = var.LAMBDA_INVOKE_API_KEY_ROTATION_ROLE_NAME
+  policy_arn = aws_iam_policy.lambda_authorizer_role_policy.arn
 }

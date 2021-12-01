@@ -93,6 +93,7 @@ exports.post = async (req, res) => {
     }),
 
     targetMfa: Joi.boolean().required(),
+    targetKeyRotation: Joi.boolean().required(),
     targetCallBackUrl: Joi.string().required().messages({
       'string.empty': `"callback url" cannot be an empty field`
     }),
@@ -128,6 +129,7 @@ exports.post = async (req, res) => {
     targetCallBackAuth,
     targetMno,
     targetMfa,
+    targetKeyRotation,
     targetCallBackUrl
   } = req.body
   let body = await schema.validate(req.body);
@@ -158,6 +160,7 @@ exports.post = async (req, res) => {
     targetCallBackAuth,
     targetMno,
     targetMfa,
+    targetKeyRotation,
     targetCallBackUrl,
     inviterUserSub: util.getCognitoIdentitySub(req),
     inviterUserId
@@ -185,6 +188,8 @@ exports.put = async (req, res) => {
     }),
     Type: Joi.string().valid("apiKey","basicAuth","privateCertificate"),
     Mfa: Joi.boolean().required(),
+    KeyRotation: Joi.boolean().required(),
+
     CallBackUrl: Joi.string().required().messages({
       'string.empty': `"callback url" cannot be an empty field`
     }),
