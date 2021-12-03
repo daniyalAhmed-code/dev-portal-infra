@@ -18,14 +18,25 @@ exports.handler = async (event) => {
     let ApiDate = new Date(api_date);
     ApiDate.setDate(ApiDate.getDate() + event.ApiKeyDuration);
 
-    if (ApiDate < current_date && event.KeyRotation) {
-        await customersController.deletePreviousApiKey(apiKeyVal)
-        await customersController.renewApiKey(identityId, userId, true)
-    }
-    
+    if (ApiDate < current_date && event.KeyRotation){
+        
+        let usagePlanId = await new Promise((resolve, reject) => {customersController.getUsagePlansForCustomer(userId, reject, resolve) });
+        if(usagePlanId.items.hasOwnProperty("id")){
+                usagePlanId = usagePlanId.items[0].id
+                await new Promise((resolve, reject) => {customersController.unsubscribe(userId, reject, resolve) });
+                await customersController.deletePreviousApiKey(event.value)
+                await customersController.renewApiKey(identityId, userId, true);
+                await new Promise((resolve, reject) => {customersController.subscribe(userId, reject, resolve) });
+            }
+            else{
+                await customersController.deletePreviousApiKey(event.value)
+                await customersController.renewApiKey(identityId, userId, true);
+            }
+        }
+        
     const response = {
-        statusCode: 200,
-        body: JSON.stringify(event),
+        statusCode: 200
     };
+    
     return response;
 }; 

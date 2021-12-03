@@ -278,10 +278,13 @@ exports.get_current_user_profile = async (req, res) => {
 })
 
 }
+
+
 exports.generate_new_api_key = async (req, res) => {
   let userPoolId = process.env.UserPoolId
   let userId = req.params.userId
   let user = await customersController.getAccountDetails(userId)
+  let newApi = null
   if (user == null)
   {
     return res.status(404).json({
@@ -293,23 +296,25 @@ exports.generate_new_api_key = async (req, res) => {
   let apiKeyVal = data.items[0].id
   // Remove previous allocations of userId
   let usagePlanId = await new Promise((resolve, reject) => {customersController.getUsagePlansForCustomer(userId, reject, resolve) });
-  usagePlanId = usagePlanId.items[0].id
-
-  await new Promise((resolve, reject) => {customersController.unsubscribe(userId, usagePlanId, reject, resolve)})
-
-  await customersController.deletePreviousApiKey(apiKeyVal)
-
-  //Allocate new API key to UsagePlan and subscribe it 
-  await customersController.renewApiKey(userId, userPoolId, true)
-
-  let subscribeToUseagePlan = await new Promise((resolve, reject) => {
-    customersController.subscribe(userId, usagePlanId, reject, resolve)
-  })
-  
-  console.log(subscribeToUseagePlan)  
-  
+  if(usagePlanId.items.hasOwnProperty("id")){
+    usagePlanId = usagePlanId.items[0].id
+    await new Promise((resolve, reject) => {customersController.unsubscribe(userId, usagePlanId, reject, resolve)})
+    await customersController.deletePreviousApiKey(apiKeyVal)
+    newApi = await customersController.renewApiKey(userId, userPoolId, true)
+    await new Promise((resolve, reject) => { customersController.subscribe(userId, usagePlanId, reject, resolve) })
+  }
+  else{
+    console.log("in unsubscribed user call")
+    await customersController.deletePreviousApiKey(apiKeyVal)
+    newApi = await customersController.renewApiKey(userId, userPoolId, true)
+    
+  }
   return res.status(200).json({
-    "user_details" :subscribeToUseagePlan
+    "user_api_details" :{
+      "id":newApi.id,
+      "name":newApi.name,
+      "enabled":newApi.enabled
+    }
 })
 
 }
