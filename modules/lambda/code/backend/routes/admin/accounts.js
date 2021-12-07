@@ -4,6 +4,8 @@
 const customersController = require('dev-portal-common/customers-controller')
 const util = require('../../util')
 const Joi = require('joi');
+const AWS = require('aws-sdk')
+const S3 = new AWS.S3();
 
 exports.get = async (req, res) => {
   console.log('GET /admin/accounts')
@@ -281,3 +283,50 @@ exports.get_current_user_profile = async (req, res) => {
     "user_details" :user
 })
 }
+
+//add user profile image
+exports.update_profile_image = async (req, res) => {
+  let userId = req.params.userId 
+  console.log("FILES")
+  console.log(req)
+  console.log(req.files.file.data)
+
+  const params = {
+    Bucket: process.env.WEBSITE_BUCKET_NAME,
+    Key: `ProfilePicture/${userId}.png`, // File name you want to save as in S3
+    Body: req.files.file.data
+};
+  
+  S3.upload(params, function(err, data) {
+    if (err) {
+        throw err;
+    }
+    res.send({
+        "response_code": 200,
+        "response_message": "Success",
+        "response_data": data
+    });
+  });
+ 
+//get user profile image
+
+}
+
+
+exports.get_profile_image = async (req, res) => {
+  let userId = req.params.userId
+  console.log("In Get")
+  var params = {
+    Bucket: process.env.WEBSITE_BUCKET_NAME,
+    Key: `ProfilePictures/${userId}.png`
+   };
+  
+   let data =  S3.getObject(params, (err, rest) => {
+    if (err) throw err;
+
+    const b64 = Buffer.from(rest.Body).toString('base64');
+    // CHANGE THIS IF THE IMAGE YOU ARE WORKING WITH IS .jpg OR WHATEVER
+    const mimeType = 'image/png'; // e.g., image/png
+    
+    res.send(`<img src="data:${mimeType};base64,${b64}" />`);
+  });
