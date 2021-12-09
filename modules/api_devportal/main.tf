@@ -2,6 +2,10 @@
 resource "aws_api_gateway_rest_api" "api-gateway" {
   name        = "${var.RESOURCE_PREFIX}-backend-api"
   description = "API to trigger lambda function."
+  binary_media_types = [
+    "image/png",
+    "application/octet-stream"
+  ]
 }
 
 resource "aws_api_gateway_base_path_mapping" "api-gateway-base-path-mapping" {
