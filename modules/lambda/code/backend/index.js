@@ -9,6 +9,7 @@ const cors = require('cors')
 const awsServerlessExpressMiddleware = require('aws-serverless-express/middleware')
 const awsServerlessExpress = require('aws-serverless-express')
 const util = require('./util')
+const fileUpload = require('express-fileupload');
 
 const app = express()
 
@@ -19,6 +20,7 @@ app.use(cors())
 app.use(bodyParser.json({ limit: '10mb' }))
 app.use(bodyParser.urlencoded({ limit: '10mb', extended: true }))
 app.use(awsServerlessExpressMiddleware.eventContext())
+app.use(fileUpload());
 
 function wrapError (func) {
   return async (req, res) => {
@@ -63,7 +65,7 @@ app.get('/admin/accounts/callbackauth/:userId', wrapError(require('./routes/admi
 app.put('/admin/accounts/resendInvite', wrapError(require('./routes/accounts/resendInvite').put))
 app.get('/admin/accounts/current/getUserProfile', wrapError(require('./routes/admin/accounts').get_current_user_profile))
 app.post('/admin/accounts/userprofile/:userId',  wrapError(require('./routes/admin/accounts').update_profile_image))
-app.get('/admin/accounts/user/:userId',  wrapError(require('./routes/admin/accounts').get_profile_image))
+app.get('/admin/accounts/userprofile/:userId',  wrapError(require('./routes/admin/accounts').get_profile_image))
 
 // Not ready for prime time just yet.
 // app.put('/admin/accounts/:userId/approveRequest', wrapError(require('./routes/accounts/approveRequest').put))
