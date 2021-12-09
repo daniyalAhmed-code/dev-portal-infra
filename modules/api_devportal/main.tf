@@ -4,7 +4,9 @@ resource "aws_api_gateway_rest_api" "api-gateway" {
   description = "API to trigger lambda function."
   binary_media_types = [
     "image/png",
-    "application/octet-stream"
+    "application/octet-stream",
+    "multipart/form-data",
+    "image/jpeg"
   ]
 }
 
