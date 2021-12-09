@@ -328,7 +328,7 @@ exports.update_profile_image = async (req, res) => {
         "response_data": data
     });
   });
- 
+}
 //get user profile image
 exports.get_profile_image = async (req, res) => {
   let userId = req.params.userId
@@ -356,5 +356,4 @@ exports.get_profile_image = async (req, res) => {
     res.send(`<img src="data:${mimeType};base64,${b64}" />`);
   });
 
-}
 }
