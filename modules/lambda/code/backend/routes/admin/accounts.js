@@ -91,9 +91,9 @@ exports.post = async (req, res) => {
       'string.pattern.base': "valid patterns are (123) 456-7890,(123)456-7890,123-456-7890,123.456.7890,1234567890,+31636363634,075-63546725",
       'any.required': `"phone number" is a required field`
     }),
-
+    targetKeyRotationEnabled: Joi.boolean(),
     targetMfa: Joi.boolean().required(),
-    targetKeyRotation: Joi.boolean().required(),
+    targetProfileImage: Joi.string().required(),
     targetCallBackUrl: Joi.string().required().messages({
       'string.empty': `"callback url" cannot be an empty field`
     }),
@@ -129,9 +129,12 @@ exports.post = async (req, res) => {
     targetCallBackAuth,
     targetMno,
     targetMfa,
-    targetKeyRotation,
+    targetProfileImage,
+    targetKeyRotationEnabled,
     targetCallBackUrl
   } = req.body
+
+  
   let body = await schema.validate(req.body);
   console.log(body.error)
 
@@ -160,7 +163,8 @@ exports.post = async (req, res) => {
     targetCallBackAuth,
     targetMno,
     targetMfa,
-    targetKeyRotation,
+    targetKeyRotationEnabled,
+    targetProfileImage,
     targetCallBackUrl,
     inviterUserSub: util.getCognitoIdentitySub(req),
     inviterUserId
@@ -186,17 +190,17 @@ exports.put = async (req, res) => {
       'string.pattern.base': "last name cannot have space in between",
       'any.required': `"last name" is a required field`
     }),
-    Type: Joi.string().valid("apiKey","basicAuth","privateCertificate"),
+    CallbackAuthType: Joi.string().valid("apiKey","basicAuth","privateCertificate"),
     Mfa: Joi.boolean().required(),
-    KeyRotation: Joi.boolean().required(),
-
+    KeyRotationEnabled: Joi.boolean(),
+    ProfileImage: Joi.boolean(),
     CallBackUrl: Joi.string().required().messages({
       'string.empty': `"callback url" cannot be an empty field`
     }),
     isValidateCallBackAuth:Joi.boolean().default(true),
-    CallBackAuth: Joi.when('Type', {is : "apiKey", then: Joi.string().required()})
-    .when('Type', {is : "basicAuth", then: Joi.object().keys({username:Joi.string().required(),password:Joi.string().required()})})
-    .when('Type', {is : "privateCertificate", then: Joi.string().required()})
+    CallBackAuth: Joi.when('CallbackAuthType', {is : "apiKey", then: Joi.string().required()})
+    .when('CallbackAuthType', {is : "basicAuth", then: Joi.object().keys({username:Joi.string().required(),password:Joi.string().required()})})
+    .when('CallbackAuthType', {is : "privateCertificate", then: Joi.string().required()})
     .when("isValidateCallBackAuth", {is : false, then: Joi.string().optional()}),
 
     Mno: Joi.string().required(),
@@ -220,7 +224,12 @@ exports.put = async (req, res) => {
       message: "Account doesnot Exists"
     })
   }
-
+  
+  if(!req.body.hasOwnProperty('KeyRotationEnabled'))
+  {
+    req.body.KeyRotationEnabled = false
+  }
+  
   if (!req.body.CallBackAuth) {
     req.body.isValidateCallBackAuth = false
     req.body.CallBackAuth = "NONE"
