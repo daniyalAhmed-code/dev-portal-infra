@@ -319,3 +319,715 @@ resource "aws_lambda_permission" "lambda_authorizer_all_api_gateway_perm" {
   principal     = "apigateway.amazonaws.com"
   source_arn    = "arn:aws:execute-api:${var.AWS_REGION}:${var.AWS_ACCOUNT_ID}:*"
 }
+
+
+
+resource "aws_lambda_function" "lambda_sigin_function" {
+  provider            = aws.src
+  filename         = "${path.module}/zip/signin.zip"
+  function_name    = "${var.RESOURCE_PREFIX}-signin"
+  role             = "${var.LAMBDA_BACKEND_ROLE_ARN}"
+  handler          = "index.handler"
+  source_code_hash = "${data.archive_file.lambda_backend_lambda_function.output_base64sha256}"
+  runtime          = "nodejs12.x"
+  timeout          = "20"
+  layers           = ["${aws_lambda_layer_version.lambda-common-layer.arn}"]
+  environment {
+    variables = {
+      "NODE_ENV"                  = "${var.NODE_ENV}"
+      "WEBSITE_BUCKET_NAME"       = "${var.WEBSITE_BUCKET_NAME}"
+      "StaticBucketName"          = "${var.ARTIFACTS_S3_BUCKET_NAME}"
+      "CustomersTableName"        = "${var.CUSTOMER_TABLE_NAME}"
+      "PreLoginAccountsTableName" = "${var.PRE_LOGIN_ACCOUNT_TABLE_NAME}"
+      "FeedbackTableName"         = "${var.FEEDBACK_TABLE_NAME}"
+      "FeedbackSnsTopicArn"       = "${var.FEEDBACK_SNS_TOPIC_ARN}"
+      "UserPoolId"                = "${var.USERPOOL_ID}"
+      "AdminsGroupName"           = "${var.ADMIN_GROUP_NAME}"
+      "RegisteredGroupName"       = "${var.REGISTERED_GROUP_NAME}"
+      "DevelopmentMode"           = "${var.DEVELOPMENT_MODE}"
+      "CatalogUpdaterFunctionArn" = aws_lambda_function.lambda_catalog_updater_lambda_function.arn
+    }
+  }
+}
+
+
+
+
+
+resource "aws_lambda_function" "lambda_catalog_function" {
+  provider            = aws.src
+  filename         = "${path.module}/zip/get-catalog.zip"
+  function_name    = "${var.RESOURCE_PREFIX}-get-catalog"
+  role             = "${var.LAMBDA_BACKEND_ROLE_ARN}"
+  handler          = "index.handler"
+  source_code_hash = "${data.archive_file.lambda_backend_lambda_function.output_base64sha256}"
+  runtime          = "nodejs12.x"
+  timeout          = "20"
+  layers           = ["${aws_lambda_layer_version.lambda-common-layer.arn}"]
+  environment {
+    variables = {
+      "NODE_ENV"                  = "${var.NODE_ENV}"
+      "WEBSITE_BUCKET_NAME"       = "${var.WEBSITE_BUCKET_NAME}"
+      "StaticBucketName"          = "${var.ARTIFACTS_S3_BUCKET_NAME}"
+      "CustomersTableName"        = "${var.CUSTOMER_TABLE_NAME}"
+      "PreLoginAccountsTableName" = "${var.PRE_LOGIN_ACCOUNT_TABLE_NAME}"
+      "FeedbackTableName"         = "${var.FEEDBACK_TABLE_NAME}"
+      "FeedbackSnsTopicArn"       = "${var.FEEDBACK_SNS_TOPIC_ARN}"
+      "UserPoolId"                = "${var.USERPOOL_ID}"
+      "AdminsGroupName"           = "${var.ADMIN_GROUP_NAME}"
+      "RegisteredGroupName"       = "${var.REGISTERED_GROUP_NAME}"
+      "DevelopmentMode"           = "${var.DEVELOPMENT_MODE}"
+      "CatalogUpdaterFunctionArn" = aws_lambda_function.lambda_catalog_updater_lambda_function.arn
+    }
+  }
+}
+
+resource "aws_lambda_function" "lambda_get_apikey_function" {
+  provider            = aws.src
+  filename         = "${path.module}/zip/get-apikey.zip"
+  function_name    = "${var.RESOURCE_PREFIX}-get-apikey"
+  role             = "${var.LAMBDA_BACKEND_ROLE_ARN}"
+  handler          = "index.handler"
+  source_code_hash = "${data.archive_file.lambda_backend_lambda_function.output_base64sha256}"
+  runtime          = "nodejs12.x"
+  timeout          = "20"
+  layers           = ["${aws_lambda_layer_version.lambda-common-layer.arn}"]
+  environment {
+    variables = {
+      "NODE_ENV"                  = "${var.NODE_ENV}"
+      "WEBSITE_BUCKET_NAME"       = "${var.WEBSITE_BUCKET_NAME}"
+      "StaticBucketName"          = "${var.ARTIFACTS_S3_BUCKET_NAME}"
+      "CustomersTableName"        = "${var.CUSTOMER_TABLE_NAME}"
+      "PreLoginAccountsTableName" = "${var.PRE_LOGIN_ACCOUNT_TABLE_NAME}"
+      "FeedbackTableName"         = "${var.FEEDBACK_TABLE_NAME}"
+      "FeedbackSnsTopicArn"       = "${var.FEEDBACK_SNS_TOPIC_ARN}"
+      "UserPoolId"                = "${var.USERPOOL_ID}"
+      "AdminsGroupName"           = "${var.ADMIN_GROUP_NAME}"
+      "RegisteredGroupName"       = "${var.REGISTERED_GROUP_NAME}"
+      "DevelopmentMode"           = "${var.DEVELOPMENT_MODE}"
+      "CatalogUpdaterFunctionArn" = aws_lambda_function.lambda_catalog_updater_lambda_function.arn
+    }
+  }
+}
+
+
+resource "aws_lambda_function" "lambda_get_subscription_function" {
+  provider            = aws.src
+  filename         = "${path.module}/zip/get-subscription.zip"
+  function_name    = "${var.RESOURCE_PREFIX}-get-subscription"
+  role             = "${var.LAMBDA_BACKEND_ROLE_ARN}"
+  handler          = "index.handler"
+  source_code_hash = "${data.archive_file.lambda_backend_lambda_function.output_base64sha256}"
+  runtime          = "nodejs12.x"
+  timeout          = "20"
+  layers           = ["${aws_lambda_layer_version.lambda-common-layer.arn}"]
+  environment {
+    variables = {
+      "NODE_ENV"                  = "${var.NODE_ENV}"
+      "WEBSITE_BUCKET_NAME"       = "${var.WEBSITE_BUCKET_NAME}"
+      "StaticBucketName"          = "${var.ARTIFACTS_S3_BUCKET_NAME}"
+      "CustomersTableName"        = "${var.CUSTOMER_TABLE_NAME}"
+      "PreLoginAccountsTableName" = "${var.PRE_LOGIN_ACCOUNT_TABLE_NAME}"
+      "FeedbackTableName"         = "${var.FEEDBACK_TABLE_NAME}"
+      "FeedbackSnsTopicArn"       = "${var.FEEDBACK_SNS_TOPIC_ARN}"
+      "UserPoolId"                = "${var.USERPOOL_ID}"
+      "AdminsGroupName"           = "${var.ADMIN_GROUP_NAME}"
+      "RegisteredGroupName"       = "${var.REGISTERED_GROUP_NAME}"
+      "DevelopmentMode"           = "${var.DEVELOPMENT_MODE}"
+      "CatalogUpdaterFunctionArn" = aws_lambda_function.lambda_catalog_updater_lambda_function.arn
+    }
+  }
+}
+
+resource "aws_lambda_function" "lambda_update_subscription_usageplan_function" {
+  provider            = aws.src
+  filename         = "${path.module}/zip/update-subscription-usageplan.zip"
+  function_name    = "${var.RESOURCE_PREFIX}-update-subscription-usageplan"
+  role             = "${var.LAMBDA_BACKEND_ROLE_ARN}"
+  handler          = "index.handler"
+  source_code_hash = "${data.archive_file.lambda_backend_lambda_function.output_base64sha256}"
+  runtime          = "nodejs12.x"
+  timeout          = "20"
+  layers           = ["${aws_lambda_layer_version.lambda-common-layer.arn}"]
+  environment {
+    variables = {
+      "NODE_ENV"                  = "${var.NODE_ENV}"
+      "WEBSITE_BUCKET_NAME"       = "${var.WEBSITE_BUCKET_NAME}"
+      "StaticBucketName"          = "${var.ARTIFACTS_S3_BUCKET_NAME}"
+      "CustomersTableName"        = "${var.CUSTOMER_TABLE_NAME}"
+      "PreLoginAccountsTableName" = "${var.PRE_LOGIN_ACCOUNT_TABLE_NAME}"
+      "FeedbackTableName"         = "${var.FEEDBACK_TABLE_NAME}"
+      "FeedbackSnsTopicArn"       = "${var.FEEDBACK_SNS_TOPIC_ARN}"
+      "UserPoolId"                = "${var.USERPOOL_ID}"
+      "AdminsGroupName"           = "${var.ADMIN_GROUP_NAME}"
+      "RegisteredGroupName"       = "${var.REGISTERED_GROUP_NAME}"
+      "DevelopmentMode"           = "${var.DEVELOPMENT_MODE}"
+      "CatalogUpdaterFunctionArn" = aws_lambda_function.lambda_catalog_updater_lambda_function.arn
+    }
+  }
+}
+
+
+resource "aws_lambda_function" "lambda_delete_subscription_usageplan_function" {
+  provider            = aws.src
+  filename         = "${path.module}/zip/delete-subscription-usageplan.zip"
+  function_name    = "${var.RESOURCE_PREFIX}-delete-subscription-usageplan"
+  role             = "${var.LAMBDA_BACKEND_ROLE_ARN}"
+  handler          = "index.handler"
+  source_code_hash = "${data.archive_file.lambda_backend_lambda_function.output_base64sha256}"
+  runtime          = "nodejs12.x"
+  timeout          = "20"
+  layers           = ["${aws_lambda_layer_version.lambda-common-layer.arn}"]
+  environment {
+    variables = {
+      "NODE_ENV"                  = "${var.NODE_ENV}"
+      "WEBSITE_BUCKET_NAME"       = "${var.WEBSITE_BUCKET_NAME}"
+      "StaticBucketName"          = "${var.ARTIFACTS_S3_BUCKET_NAME}"
+      "CustomersTableName"        = "${var.CUSTOMER_TABLE_NAME}"
+      "PreLoginAccountsTableName" = "${var.PRE_LOGIN_ACCOUNT_TABLE_NAME}"
+      "FeedbackTableName"         = "${var.FEEDBACK_TABLE_NAME}"
+      "FeedbackSnsTopicArn"       = "${var.FEEDBACK_SNS_TOPIC_ARN}"
+      "UserPoolId"                = "${var.USERPOOL_ID}"
+      "AdminsGroupName"           = "${var.ADMIN_GROUP_NAME}"
+      "RegisteredGroupName"       = "${var.REGISTERED_GROUP_NAME}"
+      "DevelopmentMode"           = "${var.DEVELOPMENT_MODE}"
+      "CatalogUpdaterFunctionArn" = aws_lambda_function.lambda_catalog_updater_lambda_function.arn
+    }
+  }
+}
+
+resource "aws_lambda_function" "lambda_get_subscription_usageplan_function" {
+  provider            = aws.src
+  filename         = "${path.module}/zip/get-subscription-usageplan.zip"
+  function_name    = "${var.RESOURCE_PREFIX}-get-subscription-usageplan"
+  role             = "${var.LAMBDA_BACKEND_ROLE_ARN}"
+  handler          = "index.handler"
+  source_code_hash = "${data.archive_file.lambda_backend_lambda_function.output_base64sha256}"
+  runtime          = "nodejs12.x"
+  timeout          = "20"
+  layers           = ["${aws_lambda_layer_version.lambda-common-layer.arn}"]
+  environment {
+    variables = {
+      "NODE_ENV"                  = "${var.NODE_ENV}"
+      "WEBSITE_BUCKET_NAME"       = "${var.WEBSITE_BUCKET_NAME}"
+      "StaticBucketName"          = "${var.ARTIFACTS_S3_BUCKET_NAME}"
+      "CustomersTableName"        = "${var.CUSTOMER_TABLE_NAME}"
+      "PreLoginAccountsTableName" = "${var.PRE_LOGIN_ACCOUNT_TABLE_NAME}"
+      "FeedbackTableName"         = "${var.FEEDBACK_TABLE_NAME}"
+      "FeedbackSnsTopicArn"       = "${var.FEEDBACK_SNS_TOPIC_ARN}"
+      "UserPoolId"                = "${var.USERPOOL_ID}"
+      "AdminsGroupName"           = "${var.ADMIN_GROUP_NAME}"
+      "RegisteredGroupName"       = "${var.REGISTERED_GROUP_NAME}"
+      "DevelopmentMode"           = "${var.DEVELOPMENT_MODE}"
+      "CatalogUpdaterFunctionArn" = aws_lambda_function.lambda_catalog_updater_lambda_function.arn
+    }
+  }
+}
+
+
+resource "aws_lambda_function" "lambda_get_feedback_function" {
+  provider            = aws.src
+  filename         = "${path.module}/zip/get-feedback.zip"
+  function_name    = "${var.RESOURCE_PREFIX}-get-feedback"
+  role             = "${var.LAMBDA_BACKEND_ROLE_ARN}"
+  handler          = "index.handler"
+  source_code_hash = "${data.archive_file.lambda_backend_lambda_function.output_base64sha256}"
+  runtime          = "nodejs12.x"
+  timeout          = "20"
+  layers           = ["${aws_lambda_layer_version.lambda-common-layer.arn}"]
+  environment {
+    variables = {
+      "NODE_ENV"                  = "${var.NODE_ENV}"
+      "WEBSITE_BUCKET_NAME"       = "${var.WEBSITE_BUCKET_NAME}"
+      "StaticBucketName"          = "${var.ARTIFACTS_S3_BUCKET_NAME}"
+      "CustomersTableName"        = "${var.CUSTOMER_TABLE_NAME}"
+      "PreLoginAccountsTableName" = "${var.PRE_LOGIN_ACCOUNT_TABLE_NAME}"
+      "FeedbackTableName"         = "${var.FEEDBACK_TABLE_NAME}"
+      "FeedbackSnsTopicArn"       = "${var.FEEDBACK_SNS_TOPIC_ARN}"
+      "UserPoolId"                = "${var.USERPOOL_ID}"
+      "AdminsGroupName"           = "${var.ADMIN_GROUP_NAME}"
+      "RegisteredGroupName"       = "${var.REGISTERED_GROUP_NAME}"
+      "DevelopmentMode"           = "${var.DEVELOPMENT_MODE}"
+      "CatalogUpdaterFunctionArn" = aws_lambda_function.lambda_catalog_updater_lambda_function.arn
+    }
+  }
+}
+
+resource "aws_lambda_function" "lambda_post_feedback_function" {
+  provider            = aws.src
+  filename         = "${path.module}/zip/post-feedback.zip"
+  function_name    = "${var.RESOURCE_PREFIX}-post-feedback"
+  role             = "${var.LAMBDA_BACKEND_ROLE_ARN}"
+  handler          = "index.handler"
+  source_code_hash = "${data.archive_file.lambda_backend_lambda_function.output_base64sha256}"
+  runtime          = "nodejs12.x"
+  timeout          = "20"
+  layers           = ["${aws_lambda_layer_version.lambda-common-layer.arn}"]
+  environment {
+    variables = {
+      "NODE_ENV"                  = "${var.NODE_ENV}"
+      "WEBSITE_BUCKET_NAME"       = "${var.WEBSITE_BUCKET_NAME}"
+      "StaticBucketName"          = "${var.ARTIFACTS_S3_BUCKET_NAME}"
+      "CustomersTableName"        = "${var.CUSTOMER_TABLE_NAME}"
+      "PreLoginAccountsTableName" = "${var.PRE_LOGIN_ACCOUNT_TABLE_NAME}"
+      "FeedbackTableName"         = "${var.FEEDBACK_TABLE_NAME}"
+      "FeedbackSnsTopicArn"       = "${var.FEEDBACK_SNS_TOPIC_ARN}"
+      "UserPoolId"                = "${var.USERPOOL_ID}"
+      "AdminsGroupName"           = "${var.ADMIN_GROUP_NAME}"
+      "RegisteredGroupName"       = "${var.REGISTERED_GROUP_NAME}"
+      "DevelopmentMode"           = "${var.DEVELOPMENT_MODE}"
+      "CatalogUpdaterFunctionArn" = aws_lambda_function.lambda_catalog_updater_lambda_function.arn
+    }
+  }
+}
+
+resource "aws_lambda_function" "lambda_get_sdk_function" {
+  provider            = aws.src
+  filename         = "${path.module}/zip/get-sdk.zip"
+  function_name    = "${var.RESOURCE_PREFIX}-get-sdk"
+  role             = "${var.LAMBDA_BACKEND_ROLE_ARN}"
+  handler          = "index.handler"
+  source_code_hash = "${data.archive_file.lambda_backend_lambda_function.output_base64sha256}"
+  runtime          = "nodejs12.x"
+  timeout          = "20"
+  layers           = ["${aws_lambda_layer_version.lambda-common-layer.arn}"]
+  environment {
+    variables = {
+      "NODE_ENV"                  = "${var.NODE_ENV}"
+      "WEBSITE_BUCKET_NAME"       = "${var.WEBSITE_BUCKET_NAME}"
+      "StaticBucketName"          = "${var.ARTIFACTS_S3_BUCKET_NAME}"
+      "CustomersTableName"        = "${var.CUSTOMER_TABLE_NAME}"
+      "PreLoginAccountsTableName" = "${var.PRE_LOGIN_ACCOUNT_TABLE_NAME}"
+      "FeedbackTableName"         = "${var.FEEDBACK_TABLE_NAME}"
+      "FeedbackSnsTopicArn"       = "${var.FEEDBACK_SNS_TOPIC_ARN}"
+      "UserPoolId"                = "${var.USERPOOL_ID}"
+      "AdminsGroupName"           = "${var.ADMIN_GROUP_NAME}"
+      "RegisteredGroupName"       = "${var.REGISTERED_GROUP_NAME}"
+      "DevelopmentMode"           = "${var.DEVELOPMENT_MODE}"
+      "CatalogUpdaterFunctionArn" = aws_lambda_function.lambda_catalog_updater_lambda_function.arn
+    }
+  }
+}
+
+resource "aws_lambda_function" "lambda_export_api_function" {
+  provider            = aws.src
+  filename         = "${path.module}/zip/export-api.zip"
+  function_name    = "${var.RESOURCE_PREFIX}-export-api"
+  role             = "${var.LAMBDA_BACKEND_ROLE_ARN}"
+  handler          = "index.handler"
+  source_code_hash = "${data.archive_file.lambda_backend_lambda_function.output_base64sha256}"
+  runtime          = "nodejs12.x"
+  timeout          = "20"
+  layers           = ["${aws_lambda_layer_version.lambda-common-layer.arn}"]
+  environment {
+    variables = {
+      "NODE_ENV"                  = "${var.NODE_ENV}"
+      "WEBSITE_BUCKET_NAME"       = "${var.WEBSITE_BUCKET_NAME}"
+      "StaticBucketName"          = "${var.ARTIFACTS_S3_BUCKET_NAME}"
+      "CustomersTableName"        = "${var.CUSTOMER_TABLE_NAME}"
+      "PreLoginAccountsTableName" = "${var.PRE_LOGIN_ACCOUNT_TABLE_NAME}"
+      "FeedbackTableName"         = "${var.FEEDBACK_TABLE_NAME}"
+      "FeedbackSnsTopicArn"       = "${var.FEEDBACK_SNS_TOPIC_ARN}"
+      "UserPoolId"                = "${var.USERPOOL_ID}"
+      "AdminsGroupName"           = "${var.ADMIN_GROUP_NAME}"
+      "RegisteredGroupName"       = "${var.REGISTERED_GROUP_NAME}"
+      "DevelopmentMode"           = "${var.DEVELOPMENT_MODE}"
+      "CatalogUpdaterFunctionArn" = aws_lambda_function.lambda_catalog_updater_lambda_function.arn
+    }
+  }
+}
+
+resource "aws_lambda_function" "lambda_update_sdkgeneration_in_catalog_function" {
+  provider            = aws.src
+  filename         = "${path.module}/zip/update-sdkgeneration-in-catalog.zip"
+  function_name    = "${var.RESOURCE_PREFIX}-update-sdkgeneration-in-catalog"
+  role             = "${var.LAMBDA_BACKEND_ROLE_ARN}"
+  handler          = "index.handler"
+  source_code_hash = "${data.archive_file.lambda_backend_lambda_function.output_base64sha256}"
+  runtime          = "nodejs12.x"
+  timeout          = "20"
+  layers           = ["${aws_lambda_layer_version.lambda-common-layer.arn}"]
+  environment {
+    variables = {
+      "NODE_ENV"                  = "${var.NODE_ENV}"
+      "WEBSITE_BUCKET_NAME"       = "${var.WEBSITE_BUCKET_NAME}"
+      "StaticBucketName"          = "${var.ARTIFACTS_S3_BUCKET_NAME}"
+      "CustomersTableName"        = "${var.CUSTOMER_TABLE_NAME}"
+      "PreLoginAccountsTableName" = "${var.PRE_LOGIN_ACCOUNT_TABLE_NAME}"
+      "FeedbackTableName"         = "${var.FEEDBACK_TABLE_NAME}"
+      "FeedbackSnsTopicArn"       = "${var.FEEDBACK_SNS_TOPIC_ARN}"
+      "UserPoolId"                = "${var.USERPOOL_ID}"
+      "AdminsGroupName"           = "${var.ADMIN_GROUP_NAME}"
+      "RegisteredGroupName"       = "${var.REGISTERED_GROUP_NAME}"
+      "DevelopmentMode"           = "${var.DEVELOPMENT_MODE}"
+      "CatalogUpdaterFunctionArn" = aws_lambda_function.lambda_catalog_updater_lambda_function.arn
+    }
+  }
+}
+
+resource "aws_lambda_function" "lambda_delete_sdkgeneration_from_catalog_function" {
+  provider            = aws.src
+  filename         = "${path.module}/zip/delete-sdkgeneration-from-catalog.zip"
+  function_name    = "${var.RESOURCE_PREFIX}-delete-sdkgeneration-from-catalog"
+  role             = "${var.LAMBDA_BACKEND_ROLE_ARN}"
+  handler          = "index.handler"
+  source_code_hash = "${data.archive_file.lambda_backend_lambda_function.output_base64sha256}"
+  runtime          = "nodejs12.x"
+  timeout          = "20"
+  layers           = ["${aws_lambda_layer_version.lambda-common-layer.arn}"]
+  environment {
+    variables = {
+      "NODE_ENV"                  = "${var.NODE_ENV}"
+      "WEBSITE_BUCKET_NAME"       = "${var.WEBSITE_BUCKET_NAME}"
+      "StaticBucketName"          = "${var.ARTIFACTS_S3_BUCKET_NAME}"
+      "CustomersTableName"        = "${var.CUSTOMER_TABLE_NAME}"
+      "PreLoginAccountsTableName" = "${var.PRE_LOGIN_ACCOUNT_TABLE_NAME}"
+      "FeedbackTableName"         = "${var.FEEDBACK_TABLE_NAME}"
+      "FeedbackSnsTopicArn"       = "${var.FEEDBACK_SNS_TOPIC_ARN}"
+      "UserPoolId"                = "${var.USERPOOL_ID}"
+      "AdminsGroupName"           = "${var.ADMIN_GROUP_NAME}"
+      "RegisteredGroupName"       = "${var.REGISTERED_GROUP_NAME}"
+      "DevelopmentMode"           = "${var.DEVELOPMENT_MODE}"
+      "CatalogUpdaterFunctionArn" = aws_lambda_function.lambda_catalog_updater_lambda_function.arn
+    }
+  }
+}
+resource "aws_lambda_function" "lambda_get_all_catalogs_function" {
+  provider            = aws.src
+  filename         = "${path.module}/zip/get-all-catalogs.zip"
+  function_name    = "${var.RESOURCE_PREFIX}-get-all-catalogs"
+  role             = "${var.LAMBDA_BACKEND_ROLE_ARN}"
+  handler          = "index.handler"
+  source_code_hash = "${data.archive_file.lambda_backend_lambda_function.output_base64sha256}"
+  runtime          = "nodejs12.x"
+  timeout          = "20"
+  layers           = ["${aws_lambda_layer_version.lambda-common-layer.arn}"]
+  environment {
+    variables = {
+      "NODE_ENV"                  = "${var.NODE_ENV}"
+      "WEBSITE_BUCKET_NAME"       = "${var.WEBSITE_BUCKET_NAME}"
+      "StaticBucketName"          = "${var.ARTIFACTS_S3_BUCKET_NAME}"
+      "CustomersTableName"        = "${var.CUSTOMER_TABLE_NAME}"
+      "PreLoginAccountsTableName" = "${var.PRE_LOGIN_ACCOUNT_TABLE_NAME}"
+      "FeedbackTableName"         = "${var.FEEDBACK_TABLE_NAME}"
+      "FeedbackSnsTopicArn"       = "${var.FEEDBACK_SNS_TOPIC_ARN}"
+      "UserPoolId"                = "${var.USERPOOL_ID}"
+      "AdminsGroupName"           = "${var.ADMIN_GROUP_NAME}"
+      "RegisteredGroupName"       = "${var.REGISTERED_GROUP_NAME}"
+      "DevelopmentMode"           = "${var.DEVELOPMENT_MODE}"
+      "CatalogUpdaterFunctionArn" = aws_lambda_function.lambda_catalog_updater_lambda_function.arn
+    }
+  }
+}
+
+resource "aws_lambda_function" "lambda_add_new_api_to_catalog_function" {
+  provider            = aws.src
+  filename         = "${path.module}/zip/update-catalog.zip"
+  function_name    = "${var.RESOURCE_PREFIX}-update-catalog"
+  role             = "${var.LAMBDA_BACKEND_ROLE_ARN}"
+  handler          = "index.handler"
+  source_code_hash = "${data.archive_file.lambda_backend_lambda_function.output_base64sha256}"
+  runtime          = "nodejs12.x"
+  timeout          = "20"
+  layers           = ["${aws_lambda_layer_version.lambda-common-layer.arn}"]
+  environment {
+    variables = {
+      "NODE_ENV"                  = "${var.NODE_ENV}"
+      "WEBSITE_BUCKET_NAME"       = "${var.WEBSITE_BUCKET_NAME}"
+      "StaticBucketName"          = "${var.ARTIFACTS_S3_BUCKET_NAME}"
+      "CustomersTableName"        = "${var.CUSTOMER_TABLE_NAME}"
+      "PreLoginAccountsTableName" = "${var.PRE_LOGIN_ACCOUNT_TABLE_NAME}"
+      "FeedbackTableName"         = "${var.FEEDBACK_TABLE_NAME}"
+      "FeedbackSnsTopicArn"       = "${var.FEEDBACK_SNS_TOPIC_ARN}"
+      "UserPoolId"                = "${var.USERPOOL_ID}"
+      "AdminsGroupName"           = "${var.ADMIN_GROUP_NAME}"
+      "RegisteredGroupName"       = "${var.REGISTERED_GROUP_NAME}"
+      "DevelopmentMode"           = "${var.DEVELOPMENT_MODE}"
+      "CatalogUpdaterFunctionArn" = aws_lambda_function.lambda_catalog_updater_lambda_function.arn
+    }
+  }
+}
+
+resource "aws_lambda_function" "lambda_delete_api_from_catalog_function" {
+  provider            = aws.src
+  filename         = "${path.module}/zip/delete-api-from-catalog.zip"
+  function_name    = "${var.RESOURCE_PREFIX}-delete-api-from-catalog"
+  role             = "${var.LAMBDA_BACKEND_ROLE_ARN}"
+  handler          = "index.handler"
+  source_code_hash = "${data.archive_file.lambda_backend_lambda_function.output_base64sha256}"
+  runtime          = "nodejs12.x"
+  timeout          = "20"
+  layers           = ["${aws_lambda_layer_version.lambda-common-layer.arn}"]
+  environment {
+    variables = {
+      "NODE_ENV"                  = "${var.NODE_ENV}"
+      "WEBSITE_BUCKET_NAME"       = "${var.WEBSITE_BUCKET_NAME}"
+      "StaticBucketName"          = "${var.ARTIFACTS_S3_BUCKET_NAME}"
+      "CustomersTableName"        = "${var.CUSTOMER_TABLE_NAME}"
+      "PreLoginAccountsTableName" = "${var.PRE_LOGIN_ACCOUNT_TABLE_NAME}"
+      "FeedbackTableName"         = "${var.FEEDBACK_TABLE_NAME}"
+      "FeedbackSnsTopicArn"       = "${var.FEEDBACK_SNS_TOPIC_ARN}"
+      "UserPoolId"                = "${var.USERPOOL_ID}"
+      "AdminsGroupName"           = "${var.ADMIN_GROUP_NAME}"
+      "RegisteredGroupName"       = "${var.REGISTERED_GROUP_NAME}"
+      "DevelopmentMode"           = "${var.DEVELOPMENT_MODE}"
+      "CatalogUpdaterFunctionArn" = aws_lambda_function.lambda_catalog_updater_lambda_function.arn
+    }
+  }
+}
+
+resource "aws_lambda_function" "lambda_get_all_accounts_function" {
+  provider            = aws.src
+  filename         = "${path.module}/zip/get-accounts.zip"
+  function_name    = "${var.RESOURCE_PREFIX}-get-accounts"
+  role             = "${var.LAMBDA_BACKEND_ROLE_ARN}"
+  handler          = "index.handler"
+  source_code_hash = "${data.archive_file.lambda_backend_lambda_function.output_base64sha256}"
+  runtime          = "nodejs12.x"
+  timeout          = "20"
+  layers           = ["${aws_lambda_layer_version.lambda-common-layer.arn}"]
+  environment {
+    variables = {
+      "NODE_ENV"                  = "${var.NODE_ENV}"
+      "WEBSITE_BUCKET_NAME"       = "${var.WEBSITE_BUCKET_NAME}"
+      "StaticBucketName"          = "${var.ARTIFACTS_S3_BUCKET_NAME}"
+      "CustomersTableName"        = "${var.CUSTOMER_TABLE_NAME}"
+      "PreLoginAccountsTableName" = "${var.PRE_LOGIN_ACCOUNT_TABLE_NAME}"
+      "FeedbackTableName"         = "${var.FEEDBACK_TABLE_NAME}"
+      "FeedbackSnsTopicArn"       = "${var.FEEDBACK_SNS_TOPIC_ARN}"
+      "UserPoolId"                = "${var.USERPOOL_ID}"
+      "AdminsGroupName"           = "${var.ADMIN_GROUP_NAME}"
+      "RegisteredGroupName"       = "${var.REGISTERED_GROUP_NAME}"
+      "DevelopmentMode"           = "${var.DEVELOPMENT_MODE}"
+      "CatalogUpdaterFunctionArn" = aws_lambda_function.lambda_catalog_updater_lambda_function.arn
+    }
+  }
+}
+
+resource "aws_lambda_function" "lambda_create_new_account_function" {
+  provider            = aws.src
+  filename         = "${path.module}/zip/create-new-account.zip"
+  function_name    = "${var.RESOURCE_PREFIX}-create-new-account"
+  role             = "${var.LAMBDA_BACKEND_ROLE_ARN}"
+  handler          = "index.handler"
+  source_code_hash = "${data.archive_file.lambda_backend_lambda_function.output_base64sha256}"
+  runtime          = "nodejs12.x"
+  timeout          = "20"
+  layers           = ["${aws_lambda_layer_version.lambda-common-layer.arn}"]
+  environment {
+    variables = {
+      "NODE_ENV"                  = "${var.NODE_ENV}"
+      "WEBSITE_BUCKET_NAME"       = "${var.WEBSITE_BUCKET_NAME}"
+      "StaticBucketName"          = "${var.ARTIFACTS_S3_BUCKET_NAME}"
+      "CustomersTableName"        = "${var.CUSTOMER_TABLE_NAME}"
+      "PreLoginAccountsTableName" = "${var.PRE_LOGIN_ACCOUNT_TABLE_NAME}"
+      "FeedbackTableName"         = "${var.FEEDBACK_TABLE_NAME}"
+      "FeedbackSnsTopicArn"       = "${var.FEEDBACK_SNS_TOPIC_ARN}"
+      "UserPoolId"                = "${var.USERPOOL_ID}"
+      "AdminsGroupName"           = "${var.ADMIN_GROUP_NAME}"
+      "RegisteredGroupName"       = "${var.REGISTERED_GROUP_NAME}"
+      "DevelopmentMode"           = "${var.DEVELOPMENT_MODE}"
+      "CatalogUpdaterFunctionArn" = aws_lambda_function.lambda_catalog_updater_lambda_function.arn
+    }
+  }
+}
+
+resource "aws_lambda_function" "lambda_promote_user_to_admin_function" {
+  provider            = aws.src
+  filename         = "${path.module}/zip/promote-user-to-admin.zip"
+  function_name    = "${var.RESOURCE_PREFIX}-promote-user-to-admin"
+  role             = "${var.LAMBDA_BACKEND_ROLE_ARN}"
+  handler          = "index.handler"
+  source_code_hash = "${data.archive_file.lambda_backend_lambda_function.output_base64sha256}"
+  runtime          = "nodejs12.x"
+  timeout          = "20"
+  layers           = ["${aws_lambda_layer_version.lambda-common-layer.arn}"]
+  environment {
+    variables = {
+      "NODE_ENV"                  = "${var.NODE_ENV}"
+      "WEBSITE_BUCKET_NAME"       = "${var.WEBSITE_BUCKET_NAME}"
+      "StaticBucketName"          = "${var.ARTIFACTS_S3_BUCKET_NAME}"
+      "CustomersTableName"        = "${var.CUSTOMER_TABLE_NAME}"
+      "PreLoginAccountsTableName" = "${var.PRE_LOGIN_ACCOUNT_TABLE_NAME}"
+      "FeedbackTableName"         = "${var.FEEDBACK_TABLE_NAME}"
+      "FeedbackSnsTopicArn"       = "${var.FEEDBACK_SNS_TOPIC_ARN}"
+      "UserPoolId"                = "${var.USERPOOL_ID}"
+      "AdminsGroupName"           = "${var.ADMIN_GROUP_NAME}"
+      "RegisteredGroupName"       = "${var.REGISTERED_GROUP_NAME}"
+      "DevelopmentMode"           = "${var.DEVELOPMENT_MODE}"
+      "CatalogUpdaterFunctionArn" = aws_lambda_function.lambda_catalog_updater_lambda_function.arn
+    }
+  }
+}
+
+resource "aws_lambda_function" "lambda_delete_user_function" {
+  provider            = aws.src
+  filename         = "${path.module}/zip/delete-account.zip"
+  function_name    = "${var.RESOURCE_PREFIX}-delete-account"
+  role             = "${var.LAMBDA_BACKEND_ROLE_ARN}"
+  handler          = "index.handler"
+  source_code_hash = "${data.archive_file.lambda_backend_lambda_function.output_base64sha256}"
+  runtime          = "nodejs12.x"
+  timeout          = "20"
+  layers           = ["${aws_lambda_layer_version.lambda-common-layer.arn}"]
+  environment {
+    variables = {
+      "NODE_ENV"                  = "${var.NODE_ENV}"
+      "WEBSITE_BUCKET_NAME"       = "${var.WEBSITE_BUCKET_NAME}"
+      "StaticBucketName"          = "${var.ARTIFACTS_S3_BUCKET_NAME}"
+      "CustomersTableName"        = "${var.CUSTOMER_TABLE_NAME}"
+      "PreLoginAccountsTableName" = "${var.PRE_LOGIN_ACCOUNT_TABLE_NAME}"
+      "FeedbackTableName"         = "${var.FEEDBACK_TABLE_NAME}"
+      "FeedbackSnsTopicArn"       = "${var.FEEDBACK_SNS_TOPIC_ARN}"
+      "UserPoolId"                = "${var.USERPOOL_ID}"
+      "AdminsGroupName"           = "${var.ADMIN_GROUP_NAME}"
+      "RegisteredGroupName"       = "${var.REGISTERED_GROUP_NAME}"
+      "DevelopmentMode"           = "${var.DEVELOPMENT_MODE}"
+      "CatalogUpdaterFunctionArn" = aws_lambda_function.lambda_catalog_updater_lambda_function.arn
+    }
+  }
+}
+
+
+resource "aws_lambda_function" "lambda_get_user_callbackauth_function" {
+  provider            = aws.src
+  filename         = "${path.module}/zip/get-user-callbackauth.zip"
+  function_name    = "${var.RESOURCE_PREFIX}-get-user-callbackauth"
+  role             = "${var.LAMBDA_BACKEND_ROLE_ARN}"
+  handler          = "index.handler"
+  source_code_hash = "${data.archive_file.lambda_backend_lambda_function.output_base64sha256}"
+  runtime          = "nodejs12.x"
+  timeout          = "20"
+  layers           = ["${aws_lambda_layer_version.lambda-common-layer.arn}"]
+  environment {
+    variables = {
+      "NODE_ENV"                  = "${var.NODE_ENV}"
+      "WEBSITE_BUCKET_NAME"       = "${var.WEBSITE_BUCKET_NAME}"
+      "StaticBucketName"          = "${var.ARTIFACTS_S3_BUCKET_NAME}"
+      "CustomersTableName"        = "${var.CUSTOMER_TABLE_NAME}"
+      "PreLoginAccountsTableName" = "${var.PRE_LOGIN_ACCOUNT_TABLE_NAME}"
+      "FeedbackTableName"         = "${var.FEEDBACK_TABLE_NAME}"
+      "FeedbackSnsTopicArn"       = "${var.FEEDBACK_SNS_TOPIC_ARN}"
+      "UserPoolId"                = "${var.USERPOOL_ID}"
+      "AdminsGroupName"           = "${var.ADMIN_GROUP_NAME}"
+      "RegisteredGroupName"       = "${var.REGISTERED_GROUP_NAME}"
+      "DevelopmentMode"           = "${var.DEVELOPMENT_MODE}"
+      "CatalogUpdaterFunctionArn" = aws_lambda_function.lambda_catalog_updater_lambda_function.arn
+    }
+  }
+}
+
+resource "aws_lambda_function" "lambda_resend_invite_function" {
+  provider            = aws.src
+  filename         = "${path.module}/zip/resend-invite.zip"
+  function_name    = "${var.RESOURCE_PREFIX}-resend-invite"
+  role             = "${var.LAMBDA_BACKEND_ROLE_ARN}"
+  handler          = "index.handler"
+  source_code_hash = "${data.archive_file.lambda_backend_lambda_function.output_base64sha256}"
+  runtime          = "nodejs12.x"
+  timeout          = "20"
+  layers           = ["${aws_lambda_layer_version.lambda-common-layer.arn}"]
+  environment {
+    variables = {
+      "NODE_ENV"                  = "${var.NODE_ENV}"
+      "WEBSITE_BUCKET_NAME"       = "${var.WEBSITE_BUCKET_NAME}"
+      "StaticBucketName"          = "${var.ARTIFACTS_S3_BUCKET_NAME}"
+      "CustomersTableName"        = "${var.CUSTOMER_TABLE_NAME}"
+      "PreLoginAccountsTableName" = "${var.PRE_LOGIN_ACCOUNT_TABLE_NAME}"
+      "FeedbackTableName"         = "${var.FEEDBACK_TABLE_NAME}"
+      "FeedbackSnsTopicArn"       = "${var.FEEDBACK_SNS_TOPIC_ARN}"
+      "UserPoolId"                = "${var.USERPOOL_ID}"
+      "AdminsGroupName"           = "${var.ADMIN_GROUP_NAME}"
+      "RegisteredGroupName"       = "${var.REGISTERED_GROUP_NAME}"
+      "DevelopmentMode"           = "${var.DEVELOPMENT_MODE}"
+      "CatalogUpdaterFunctionArn" = aws_lambda_function.lambda_catalog_updater_lambda_function.arn
+    }
+  }
+}
+
+
+resource "aws_lambda_function" "lambda_get_current_user_profile_function" {
+  provider            = aws.src
+  filename         = "${path.module}/zip/get-current-user-profile.zip"
+  function_name    = "${var.RESOURCE_PREFIX}-get-current-user-profile"
+  role             = "${var.LAMBDA_BACKEND_ROLE_ARN}"
+  handler          = "index.handler"
+  source_code_hash = "${data.archive_file.lambda_backend_lambda_function.output_base64sha256}"
+  runtime          = "nodejs12.x"
+  timeout          = "20"
+  layers           = ["${aws_lambda_layer_version.lambda-common-layer.arn}"]
+  environment {
+    variables = {
+      "NODE_ENV"                  = "${var.NODE_ENV}"
+      "WEBSITE_BUCKET_NAME"       = "${var.WEBSITE_BUCKET_NAME}"
+      "StaticBucketName"          = "${var.ARTIFACTS_S3_BUCKET_NAME}"
+      "CustomersTableName"        = "${var.CUSTOMER_TABLE_NAME}"
+      "PreLoginAccountsTableName" = "${var.PRE_LOGIN_ACCOUNT_TABLE_NAME}"
+      "FeedbackTableName"         = "${var.FEEDBACK_TABLE_NAME}"
+      "FeedbackSnsTopicArn"       = "${var.FEEDBACK_SNS_TOPIC_ARN}"
+      "UserPoolId"                = "${var.USERPOOL_ID}"
+      "AdminsGroupName"           = "${var.ADMIN_GROUP_NAME}"
+      "RegisteredGroupName"       = "${var.REGISTERED_GROUP_NAME}"
+      "DevelopmentMode"           = "${var.DEVELOPMENT_MODE}"
+      "CatalogUpdaterFunctionArn" = aws_lambda_function.lambda_catalog_updater_lambda_function.arn
+    }
+  }
+}
+
+
+resource "aws_lambda_function" "lambda_get_update_user_profile_image_function" {
+  provider            = aws.src
+  filename         = "${path.module}/zip/update-profile-image.zip"
+  function_name    = "${var.RESOURCE_PREFIX}-update-profile-image"
+  role             = "${var.LAMBDA_BACKEND_ROLE_ARN}"
+  handler          = "index.handler"
+  source_code_hash = "${data.archive_file.lambda_backend_lambda_function.output_base64sha256}"
+  runtime          = "nodejs12.x"
+  timeout          = "20"
+  layers           = ["${aws_lambda_layer_version.lambda-common-layer.arn}"]
+  environment {
+    variables = {
+      "NODE_ENV"                  = "${var.NODE_ENV}"
+      "WEBSITE_BUCKET_NAME"       = "${var.WEBSITE_BUCKET_NAME}"
+      "StaticBucketName"          = "${var.ARTIFACTS_S3_BUCKET_NAME}"
+      "CustomersTableName"        = "${var.CUSTOMER_TABLE_NAME}"
+      "PreLoginAccountsTableName" = "${var.PRE_LOGIN_ACCOUNT_TABLE_NAME}"
+      "FeedbackTableName"         = "${var.FEEDBACK_TABLE_NAME}"
+      "FeedbackSnsTopicArn"       = "${var.FEEDBACK_SNS_TOPIC_ARN}"
+      "UserPoolId"                = "${var.USERPOOL_ID}"
+      "AdminsGroupName"           = "${var.ADMIN_GROUP_NAME}"
+      "RegisteredGroupName"       = "${var.REGISTERED_GROUP_NAME}"
+      "DevelopmentMode"           = "${var.DEVELOPMENT_MODE}"
+      "CatalogUpdaterFunctionArn" = aws_lambda_function.lambda_catalog_updater_lambda_function.arn
+    }
+  }
+}
+
+
+resource "aws_lambda_function" "lambda_get_user_profile_image_function" {
+  provider            = aws.src
+  filename         = "${path.module}/zip/get-profile-image.zip"
+  function_name    = "${var.RESOURCE_PREFIX}-get-profile-image"
+  role             = "${var.LAMBDA_BACKEND_ROLE_ARN}"
+  handler          = "index.handler"
+  source_code_hash = "${data.archive_file.lambda_backend_lambda_function.output_base64sha256}"
+  runtime          = "nodejs12.x"
+  timeout          = "20"
+  layers           = ["${aws_lambda_layer_version.lambda-common-layer.arn}"]
+  environment {
+    variables = {
+      "NODE_ENV"                  = "${var.NODE_ENV}"
+      "WEBSITE_BUCKET_NAME"       = "${var.WEBSITE_BUCKET_NAME}"
+      "StaticBucketName"          = "${var.ARTIFACTS_S3_BUCKET_NAME}"
+      "CustomersTableName"        = "${var.CUSTOMER_TABLE_NAME}"
+      "PreLoginAccountsTableName" = "${var.PRE_LOGIN_ACCOUNT_TABLE_NAME}"
+      "FeedbackTableName"         = "${var.FEEDBACK_TABLE_NAME}"
+      "FeedbackSnsTopicArn"       = "${var.FEEDBACK_SNS_TOPIC_ARN}"
+      "UserPoolId"                = "${var.USERPOOL_ID}"
+      "AdminsGroupName"           = "${var.ADMIN_GROUP_NAME}"
+      "RegisteredGroupName"       = "${var.REGISTERED_GROUP_NAME}"
+      "DevelopmentMode"           = "${var.DEVELOPMENT_MODE}"
+      "CatalogUpdaterFunctionArn" = aws_lambda_function.lambda_catalog_updater_lambda_function.arn
+    }
+  }
+}
