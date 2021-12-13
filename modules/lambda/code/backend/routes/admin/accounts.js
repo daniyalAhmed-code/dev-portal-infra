@@ -4,6 +4,8 @@
 const customersController = require('dev-portal-common/customers-controller')
 const util = require('../../util')
 const Joi = require('joi');
+const AWS = require('aws-sdk')
+const S3 = new AWS.S3();
 
 exports.get = async (req, res) => {
   console.log('GET /admin/accounts')
@@ -280,4 +282,78 @@ exports.get_current_user_profile = async (req, res) => {
   return res.status(200).json({
     "user_details" :user
 })
+}
+
+//add user profile image
+exports.update_profile_image = async (req, res) => {
+  let userId = req.params.userId
+
+  let data = await customersController.getAccountDetails(userId)
+  if (data == null) {
+    return res.status(404).json({
+      message: "Account doesnot Exists"
+    })
+  }
+
+  let ext = req.files.file.name.split('.')[1]
+  const S3 = new AWS.S3();
+  console.log(req.files.file)
+  
+  let path =  `ProfilePicture/${userId}.`+ext
+  let mimeType = req.files.file.mimetype
+  
+  let imageDetails =  {"ProfilePicture":path,"MimeType":mimeType}
+  
+  
+  const params = {
+    Bucket: process.env.WEBSITE_BUCKET_NAME,
+    Key: `ProfilePicture/${userId}.`+ext, // File name you want to save as in S3
+    Body: req.files.file.data,
+    ContentType: req.files.file.mimetype
+};
+  let body = Object.assign(data, imageDetails)
+
+  await customersController.updateProfileImageLocation(
+    userId,
+    body
+  )
+
+  S3.upload(params, function(err, data) {
+    if (err) {
+        throw err;
+    }
+    res.send({
+        "response_code": 200,
+        "response_message": "Success",
+        "response_data": data
+    });
+  });
+}
+//get user profile image
+exports.get_profile_image = async (req, res) => {
+  let userId = req.params.userId
+  let _userdata = await customersController.getAccountDetails(userId)
+  if (_userdata == null) {
+    return res.status(404).json({
+      message: "Account doesnot Exists"
+    })
+  }
+  
+  let profilePath = _userdata.Items[0].ProfilePath
+  let mimeType  = _userdata.Items[0].MimeType
+  
+  var params = {
+    Bucket: process.env.WEBSITE_BUCKET_NAME,
+    Key: profilePath
+   };
+  
+   let data =  S3.getObject(params, (err, rest) => {
+    if (err) throw err;
+
+    const b64 = Buffer.from(rest.Body).toString('base64');
+    // CHANGE THIS IF THE IMAGE YOU ARE WORKING WITH IS .jpg OR WHATEVER
+
+    res.send(`<img src="data:${mimeType};base64,${b64}" />`);
+  });
+
 }
