@@ -5,7 +5,7 @@ resource "aws_api_gateway_rest_api" "api-gateway" {
 }
 
 resource "aws_api_gateway_base_path_mapping" "api-gateway-base-path-mapping" {
-  count       = var.APIGATEWAY_CUSTOM_DOMAIN_NAME != null ? 1 : 0
+  count       = var.APIGATEWAY_CUSTOM_DOMAIN_NAME != "" ? 1 : 0
   api_id      = "${aws_api_gateway_rest_api.api-gateway.id}"
   stage_name  = "${aws_api_gateway_deployment.api-gateway-deployment.stage_name}"
   domain_name = var.APIGATEWAY_CUSTOM_DOMAIN_NAME
@@ -255,12 +255,73 @@ resource "aws_api_gateway_resource" "admin_catalog_resource" {
   path_part   = "catalog"
 }
 
+resource "aws_api_gateway_resource" "admin_account_resource" {
+  rest_api_id = aws_api_gateway_rest_api.api-gateway.id
+  parent_id   = aws_api_gateway_resource.admin_resource.id
+  path_part   = "accounts"
+}
+
+resource "aws_api_gateway_resource" "admin_account_callback_auth_resource" {
+  rest_api_id = aws_api_gateway_rest_api.api-gateway.id
+  parent_id   = aws_api_gateway_resource.admin_resource.id
+  path_part   = "callbackAuth"
+}
+
+resource "aws_api_gateway_resource" "admin_account_userid_resource" {
+  rest_api_id = aws_api_gateway_rest_api.api-gateway.id
+  parent_id   = aws_api_gateway_resource.admin_account_resource.id
+  path_part   = "{userId}"
+}
+
+resource "aws_api_gateway_resource" "admin_account_resend_invite_resource" {
+  rest_api_id = aws_api_gateway_rest_api.api-gateway.id
+  parent_id   = aws_api_gateway_resource.admin_account_resource.id
+  path_part   = "resendInvite"
+}
+
+resource "aws_api_gateway_resource" "admin_account_current_resource" {
+  rest_api_id = aws_api_gateway_rest_api.api-gateway.id
+  parent_id   = aws_api_gateway_resource.admin_account_resource.id
+  path_part   = "current"
+}
+
+resource "aws_api_gateway_resource" "admin_account_user_profile_resource" {
+  rest_api_id = aws_api_gateway_rest_api.api-gateway.id
+  parent_id   = aws_api_gateway_resource.admin_account_current_resource.id
+  path_part   = "getUserProfile"
+}
+
+
+
+
+resource "aws_api_gateway_resource" "admin_account_profile_image_resource" {
+  rest_api_id = aws_api_gateway_rest_api.api-gateway.id
+  parent_id   = aws_api_gateway_resource.admin_resource.id
+  path_part   = "profileImage"
+}
+
+resource "aws_api_gateway_resource" "admin_account_profile_image_user_id_resource" {
+  rest_api_id = aws_api_gateway_rest_api.api-gateway.id
+  parent_id   = aws_api_gateway_resource.admin_account_profile_image_resource.id
+  path_part   = "{userId}"
+}
+
+
+
+resource "aws_api_gateway_resource" "promote_to_admin_resource" {
+  rest_api_id = aws_api_gateway_rest_api.api-gateway.id
+  parent_id   = aws_api_gateway_resource.admin_account_userid_resource.id
+  path_part   = "promoteToAdmin"
+}
+
+
 resource "aws_api_gateway_resource" "admin_catalog_visibility_resource" {
   rest_api_id = aws_api_gateway_rest_api.api-gateway.id
   parent_id   = aws_api_gateway_resource.admin_catalog_resource.id
   path_part   = "visibility"
 }
 
+//visibility here
 
 module "visibility_resource_OPTION" {
   source                          = "./methods"
@@ -378,6 +439,459 @@ module "proxy_resource_OPTION" {
 }
 
 //proxy api ends
+
+//NEW APIS
+
+//SIGN IN 
+resource "aws_api_gateway_resource" "sigin_resource" {
+  rest_api_id = aws_api_gateway_rest_api.api-gateway.id
+  parent_id   = aws_api_gateway_rest_api.api-gateway.root_resource_id
+  path_part   = "signin"
+}
+
+module "siginin_resource_OPTION" {
+  source                          = "./methods"
+  METHOD_VALUE                    = ""
+  API_GATEWAY_ID                  = aws_api_gateway_rest_api.api-gateway.id
+  RESOURCE_ID                     = aws_api_gateway_resource.sigin_resource.id
+  INTEGRATION_RESPONSE_PARAMETERS = local.integration_response_parameters
+  METHOD_RESPONSE_PARAMETERS      = local.method_response_parameters
+  HTTP_METHOD                     = "OPTIONS"
+  AUTHORIZATION                   = "NONE"
+  CURRENT_ACCOUNT_ID              = var.CURRENT_ACCOUNT_ID
+  AWS_REGION                      = var.AWS_REGION
+}
+
+module "signin_post" {
+  source                          = "./methods"
+  METHOD_VALUE                    = ""
+  API_GATEWAY_ID                  = aws_api_gateway_rest_api.api-gateway.id
+  RESOURCE_ID                     = aws_api_gateway_resource.sigin_resource.id
+  INTEGRATION_RESPONSE_PARAMETERS = local.integration_response_parameters
+  METHOD_RESPONSE_PARAMETERS      = local.method_response_parameters
+  HTTP_METHOD                     = "POST"
+  AUTHORIZATION                   = "NONE"
+  CURRENT_ACCOUNT_ID              = var.CURRENT_ACCOUNT_ID
+  AWS_REGION                      = var.AWS_REGION
+}
+
+
+//APIKEY
+resource "aws_api_gateway_resource" "apikey_resource" {
+  rest_api_id = aws_api_gateway_rest_api.api-gateway.id
+  parent_id   = aws_api_gateway_rest_api.api-gateway.root_resource_id
+  path_part   = "apikey"
+}
+
+module "apiKey_resource_OPTION" {
+  source                          = "./methods"
+  METHOD_VALUE                    = ""
+  API_GATEWAY_ID                  = aws_api_gateway_rest_api.api-gateway.id
+  RESOURCE_ID                     = aws_api_gateway_resource.apikey_resource.id
+  INTEGRATION_RESPONSE_PARAMETERS = local.integration_response_parameters
+  METHOD_RESPONSE_PARAMETERS      = local.method_response_parameters
+  HTTP_METHOD                     = "OPTIONS"
+  AUTHORIZATION                   = "NONE"
+  CURRENT_ACCOUNT_ID              = var.CURRENT_ACCOUNT_ID
+  AWS_REGION                      = var.AWS_REGION
+}
+
+module "apikey_get" {
+  source                          = "./methods"
+  METHOD_VALUE                    = ""
+  API_GATEWAY_ID                  = aws_api_gateway_rest_api.api-gateway.id
+  RESOURCE_ID                     = aws_api_gateway_resource.apikey_resource.id
+  INTEGRATION_RESPONSE_PARAMETERS = local.integration_response_parameters
+  METHOD_RESPONSE_PARAMETERS      = local.method_response_parameters
+  HTTP_METHOD                     = "GET"
+  AUTHORIZATION                   = "NONE"
+  CURRENT_ACCOUNT_ID              = var.CURRENT_ACCOUNT_ID
+  AWS_REGION                      = var.AWS_REGION
+}
+
+
+//Subscription
+
+resource "aws_api_gateway_resource" "subscription_resource" {
+  rest_api_id = aws_api_gateway_rest_api.api-gateway.id
+  parent_id   = aws_api_gateway_rest_api.api-gateway.root_resource_id
+  path_part   = "subscription"
+}
+
+resource "aws_api_gateway_resource" "usageplan_resource" {
+  rest_api_id = aws_api_gateway_rest_api.api-gateway.id
+  parent_id   = aws_api_gateway_resource.subscription_resource.id
+  path_part   = "{usageplanId}"
+}
+
+resource "aws_api_gateway_resource" "usage_resource" {
+  rest_api_id = aws_api_gateway_rest_api.api-gateway.id
+  parent_id   = aws_api_gateway_resource.usageplan_resource.id
+  path_part   = "usage"
+}
+
+
+
+module "usagePlanId_put" {
+  source                          = "./methods"
+  METHOD_VALUE                    = ""
+  API_GATEWAY_ID                  = aws_api_gateway_rest_api.api-gateway.id
+  RESOURCE_ID                     = aws_api_gateway_resource.usageplan_resource.id
+  INTEGRATION_RESPONSE_PARAMETERS = local.integration_response_parameters
+  METHOD_RESPONSE_PARAMETERS      = local.method_response_parameters
+  HTTP_METHOD                     = "PUT"
+  AUTHORIZATION                   = "NONE"
+  CURRENT_ACCOUNT_ID              = var.CURRENT_ACCOUNT_ID
+  AWS_REGION                      = var.AWS_REGION
+}
+
+module "usagePlanId_delete" {
+  source                          = "./methods"
+  METHOD_VALUE                    = ""
+  API_GATEWAY_ID                  = aws_api_gateway_rest_api.api-gateway.id
+  RESOURCE_ID                     = aws_api_gateway_resource.usageplan_resource.id
+  INTEGRATION_RESPONSE_PARAMETERS = local.integration_response_parameters
+  METHOD_RESPONSE_PARAMETERS      = local.method_response_parameters
+  HTTP_METHOD                     = "DELETE"
+  AUTHORIZATION                   = "NONE"
+  CURRENT_ACCOUNT_ID              = var.CURRENT_ACCOUNT_ID
+  AWS_REGION                      = var.AWS_REGION
+}
+
+module "usage_get" {
+  source                          = "./methods"
+  METHOD_VALUE                    = ""
+  API_GATEWAY_ID                  = aws_api_gateway_rest_api.api-gateway.id
+  RESOURCE_ID                     = aws_api_gateway_resource.usage_resource.id
+  INTEGRATION_RESPONSE_PARAMETERS = local.integration_response_parameters
+  METHOD_RESPONSE_PARAMETERS      = local.method_response_parameters
+  HTTP_METHOD                     = "GET"
+  AUTHORIZATION                   = "NONE"
+  CURRENT_ACCOUNT_ID              = var.CURRENT_ACCOUNT_ID
+  AWS_REGION                      = var.AWS_REGION
+}
+
+//CATALOG
+
+resource "aws_api_gateway_resource" "catalog_id_resource" {
+  rest_api_id = aws_api_gateway_rest_api.api-gateway.id
+  parent_id  = aws_api_gateway_resource.catalog_resource.id
+  path_part   = "{id}"
+}
+resource "aws_api_gateway_resource" "catalog_id_sdk_resource" {
+  rest_api_id = aws_api_gateway_rest_api.api-gateway.id
+  parent_id  = aws_api_gateway_resource.catalog_id_resource.id
+  path_part   = "sdk"
+}
+resource "aws_api_gateway_resource" "catalog_id_export_resource" {
+  rest_api_id = aws_api_gateway_rest_api.api-gateway.id
+  parent_id  = aws_api_gateway_resource.catalog_id_resource.id
+  path_part   = "export"
+}
+
+module "sdk_get" {
+  source                          = "./methods"
+  METHOD_VALUE                    = ""
+  API_GATEWAY_ID                  = aws_api_gateway_rest_api.api-gateway.id
+  RESOURCE_ID                     = aws_api_gateway_resource.catalog_id_sdk_resource.id
+  INTEGRATION_RESPONSE_PARAMETERS = local.integration_response_parameters
+  METHOD_RESPONSE_PARAMETERS      = local.method_response_parameters
+  HTTP_METHOD                     = "GET"
+  AUTHORIZATION                   = "NONE"
+  CURRENT_ACCOUNT_ID              = var.CURRENT_ACCOUNT_ID
+  AWS_REGION                      = var.AWS_REGION
+}
+module "export_get" {
+  source                          = "./methods"
+  METHOD_VALUE                    = ""
+  API_GATEWAY_ID                  = aws_api_gateway_rest_api.api-gateway.id
+  RESOURCE_ID                     = aws_api_gateway_resource.catalog_id_export_resource.id
+  INTEGRATION_RESPONSE_PARAMETERS = local.integration_response_parameters
+  METHOD_RESPONSE_PARAMETERS      = local.method_response_parameters
+  HTTP_METHOD                     = "GET"
+  AUTHORIZATION                   = "NONE"
+  CURRENT_ACCOUNT_ID              = var.CURRENT_ACCOUNT_ID
+  AWS_REGION                      = var.AWS_REGION
+}
+
+resource "aws_api_gateway_resource" "admin_catalog_visibility_id_resource" {
+  rest_api_id = aws_api_gateway_rest_api.api-gateway.id
+  parent_id   = aws_api_gateway_resource.admin_catalog_visibility_resource.id
+  path_part   = "{id}"
+}
+resource "aws_api_gateway_resource" "admin_catalog_visibility_id_sdkGeneration_resource" {
+  rest_api_id = aws_api_gateway_rest_api.api-gateway.id
+  parent_id   = aws_api_gateway_resource.admin_catalog_visibility_resource.id
+  path_part   = "sdkGeneration"
+}
+
+module "visibility_delete" {
+  source                          = "./methods"
+  METHOD_VALUE                    = ""
+  API_GATEWAY_ID                  = aws_api_gateway_rest_api.api-gateway.id
+  RESOURCE_ID                     = aws_api_gateway_resource.admin_catalog_visibility_id_resource.id
+  INTEGRATION_RESPONSE_PARAMETERS = local.integration_response_parameters
+  METHOD_RESPONSE_PARAMETERS      = local.method_response_parameters
+  AUTHORIZATION                   = var.AUTHORIZATION
+  HTTP_METHOD                     = "DELETE"
+  LAMBDA_INVOKE_ARN               = var.BACKEND_LAMBDA_INVOKE_ARN
+  FUNCTION_NAME                   = var.BACKEND_LAMBDA_NAME
+  CURRENT_ACCOUNT_ID              = var.CURRENT_ACCOUNT_ID
+  AWS_REGION                      = var.AWS_REGION
+
+  REQUEST_TEMPLATES = {
+    "application/json" = <<EOF
+    EOF
+  }
+}
+
+module "sdkGeneration_put" {
+  source                          = "./methods"
+  METHOD_VALUE                    = ""
+  API_GATEWAY_ID                  = aws_api_gateway_rest_api.api-gateway.id
+  RESOURCE_ID                     = aws_api_gateway_resource.admin_catalog_visibility_id_sdkGeneration_resource.id
+  INTEGRATION_RESPONSE_PARAMETERS = local.integration_response_parameters
+  METHOD_RESPONSE_PARAMETERS      = local.method_response_parameters
+  AUTHORIZATION                   = var.AUTHORIZATION
+  HTTP_METHOD                     = "PUT"
+  LAMBDA_INVOKE_ARN               = var.BACKEND_LAMBDA_INVOKE_ARN
+  FUNCTION_NAME                   = var.BACKEND_LAMBDA_NAME
+  CURRENT_ACCOUNT_ID              = var.CURRENT_ACCOUNT_ID
+  AWS_REGION                      = var.AWS_REGION
+
+  REQUEST_TEMPLATES = {
+    "application/json" = <<EOF
+    EOF
+  }
+}
+module "sdkGeneration_delete" {
+  source                          = "./methods"
+  METHOD_VALUE                    = ""
+  API_GATEWAY_ID                  = aws_api_gateway_rest_api.api-gateway.id
+  RESOURCE_ID                     = aws_api_gateway_resource.admin_catalog_visibility_id_sdkGeneration_resource.id
+  INTEGRATION_RESPONSE_PARAMETERS = local.integration_response_parameters
+  METHOD_RESPONSE_PARAMETERS      = local.method_response_parameters
+  AUTHORIZATION                   = var.AUTHORIZATION
+  HTTP_METHOD                     = "DELETE"
+  LAMBDA_INVOKE_ARN               = var.BACKEND_LAMBDA_INVOKE_ARN
+  FUNCTION_NAME                   = var.BACKEND_LAMBDA_NAME
+  CURRENT_ACCOUNT_ID              = var.CURRENT_ACCOUNT_ID
+  AWS_REGION                      = var.AWS_REGION
+
+  REQUEST_TEMPLATES = {
+    "application/json" = <<EOF
+    EOF
+  }
+}
+
+// Admin/account
+
+
+module "account_get" {
+  source                          = "./methods"
+  METHOD_VALUE                    = ""
+  API_GATEWAY_ID                  = aws_api_gateway_rest_api.api-gateway.id
+  RESOURCE_ID                     = aws_api_gateway_resource.admin_account_resource.id
+  INTEGRATION_RESPONSE_PARAMETERS = local.integration_response_parameters
+  METHOD_RESPONSE_PARAMETERS      = local.method_response_parameters
+  AUTHORIZATION                   = var.AUTHORIZATION
+  HTTP_METHOD                     = "GET"
+  LAMBDA_INVOKE_ARN               = var.BACKEND_LAMBDA_INVOKE_ARN
+  FUNCTION_NAME                   = var.BACKEND_LAMBDA_NAME
+  CURRENT_ACCOUNT_ID              = var.CURRENT_ACCOUNT_ID
+  AWS_REGION                      = var.AWS_REGION
+
+  REQUEST_TEMPLATES = {
+    "application/json" = <<EOF
+    EOF
+  }
+}
+
+module "account_post" {
+  source                          = "./methods"
+  METHOD_VALUE                    = ""
+  API_GATEWAY_ID                  = aws_api_gateway_rest_api.api-gateway.id
+  RESOURCE_ID                     = aws_api_gateway_resource.admin_account_resource.id
+  INTEGRATION_RESPONSE_PARAMETERS = local.integration_response_parameters
+  METHOD_RESPONSE_PARAMETERS      = local.method_response_parameters
+  AUTHORIZATION                   = var.AUTHORIZATION
+  HTTP_METHOD                     = "POST"
+  LAMBDA_INVOKE_ARN               = var.BACKEND_LAMBDA_INVOKE_ARN
+  FUNCTION_NAME                   = var.BACKEND_LAMBDA_NAME
+  CURRENT_ACCOUNT_ID              = var.CURRENT_ACCOUNT_ID
+  AWS_REGION                      = var.AWS_REGION
+
+  REQUEST_TEMPLATES = {
+    "application/json" = <<EOF
+    EOF
+  }
+}
+
+module "account_userid_get" {
+  source                          = "./methods"
+  METHOD_VALUE                    = ""
+  API_GATEWAY_ID                  = aws_api_gateway_rest_api.api-gateway.id
+  RESOURCE_ID                     = aws_api_gateway_resource.admin_account_userid_resource.id
+  INTEGRATION_RESPONSE_PARAMETERS = local.integration_response_parameters
+  METHOD_RESPONSE_PARAMETERS      = local.method_response_parameters
+  AUTHORIZATION                   = var.AUTHORIZATION
+  HTTP_METHOD                     = "GET"
+  LAMBDA_INVOKE_ARN               = var.BACKEND_LAMBDA_INVOKE_ARN
+  FUNCTION_NAME                   = var.BACKEND_LAMBDA_NAME
+  CURRENT_ACCOUNT_ID              = var.CURRENT_ACCOUNT_ID
+  AWS_REGION                      = var.AWS_REGION
+
+  REQUEST_TEMPLATES = {
+    "application/json" = <<EOF
+    EOF
+  }
+}
+
+
+module "account_userid_promote_to_admin" {
+  source                          = "./methods"
+  METHOD_VALUE                    = ""
+  API_GATEWAY_ID                  = aws_api_gateway_rest_api.api-gateway.id
+  RESOURCE_ID                     = aws_api_gateway_resource.promote_to_admin_resource.id
+  INTEGRATION_RESPONSE_PARAMETERS = local.integration_response_parameters
+  METHOD_RESPONSE_PARAMETERS      = local.method_response_parameters
+  AUTHORIZATION                   = var.AUTHORIZATION
+  HTTP_METHOD                     = "PUT"
+  LAMBDA_INVOKE_ARN               = var.BACKEND_LAMBDA_INVOKE_ARN
+  FUNCTION_NAME                   = var.BACKEND_LAMBDA_NAME
+  CURRENT_ACCOUNT_ID              = var.CURRENT_ACCOUNT_ID
+  AWS_REGION                      = var.AWS_REGION
+
+  REQUEST_TEMPLATES = {
+    "application/json" = <<EOF
+    EOF
+  }
+}
+
+module "account_userid_delete" {
+  source                          = "./methods"
+  METHOD_VALUE                    = ""
+  API_GATEWAY_ID                  = aws_api_gateway_rest_api.api-gateway.id
+  RESOURCE_ID                     = aws_api_gateway_resource.admin_account_userid_resource.id
+  INTEGRATION_RESPONSE_PARAMETERS = local.integration_response_parameters
+  METHOD_RESPONSE_PARAMETERS      = local.method_response_parameters
+  AUTHORIZATION                   = var.AUTHORIZATION
+  HTTP_METHOD                     = "DELETE"
+  LAMBDA_INVOKE_ARN               = var.BACKEND_LAMBDA_INVOKE_ARN
+  FUNCTION_NAME                   = var.BACKEND_LAMBDA_NAME
+  CURRENT_ACCOUNT_ID              = var.CURRENT_ACCOUNT_ID
+  AWS_REGION                      = var.AWS_REGION
+
+  REQUEST_TEMPLATES = {
+    "application/json" = <<EOF
+    EOF
+  }
+}
+
+//CallBackAuth
+
+module "account_callbackauth" {
+  source                          = "./methods"
+  METHOD_VALUE                    = ""
+  API_GATEWAY_ID                  = aws_api_gateway_rest_api.api-gateway.id
+  RESOURCE_ID                     = aws_api_gateway_resource.admin_account_callback_auth_resource.id
+  INTEGRATION_RESPONSE_PARAMETERS = local.integration_response_parameters
+  METHOD_RESPONSE_PARAMETERS      = local.method_response_parameters
+  AUTHORIZATION                   = var.AUTHORIZATION
+  HTTP_METHOD                     = "POST"
+  LAMBDA_INVOKE_ARN               = var.BACKEND_LAMBDA_INVOKE_ARN
+  FUNCTION_NAME                   = var.BACKEND_LAMBDA_NAME
+  CURRENT_ACCOUNT_ID              = var.CURRENT_ACCOUNT_ID
+  AWS_REGION                      = var.AWS_REGION
+
+  REQUEST_TEMPLATES = {
+    "application/json" = <<EOF
+    EOF
+  }
+}
+
+
+//resend invite
+
+module "resendInvite_post" {
+  source                          = "./methods"
+  METHOD_VALUE                    = ""
+  API_GATEWAY_ID                  = aws_api_gateway_rest_api.api-gateway.id
+  RESOURCE_ID                     = aws_api_gateway_resource.admin_account_resend_invite_resource.id
+  INTEGRATION_RESPONSE_PARAMETERS = local.integration_response_parameters
+  METHOD_RESPONSE_PARAMETERS      = local.method_response_parameters
+  AUTHORIZATION                   = var.AUTHORIZATION
+  HTTP_METHOD                     = "POST"
+  LAMBDA_INVOKE_ARN               = var.BACKEND_LAMBDA_INVOKE_ARN
+  FUNCTION_NAME                   = var.BACKEND_LAMBDA_NAME
+  CURRENT_ACCOUNT_ID              = var.CURRENT_ACCOUNT_ID
+  AWS_REGION                      = var.AWS_REGION
+
+  REQUEST_TEMPLATES = {
+    "application/json" = <<EOF
+    EOF
+  }
+}
+
+module "userProfile_get" {
+  source                          = "./methods"
+  METHOD_VALUE                    = ""
+  API_GATEWAY_ID                  = aws_api_gateway_rest_api.api-gateway.id
+  RESOURCE_ID                     = aws_api_gateway_resource.admin_account_user_profile_resource.id
+  INTEGRATION_RESPONSE_PARAMETERS = local.integration_response_parameters
+  METHOD_RESPONSE_PARAMETERS      = local.method_response_parameters
+  AUTHORIZATION                   = var.AUTHORIZATION
+  HTTP_METHOD                     = "POST"
+  LAMBDA_INVOKE_ARN               = var.BACKEND_LAMBDA_INVOKE_ARN
+  FUNCTION_NAME                   = var.BACKEND_LAMBDA_NAME
+  CURRENT_ACCOUNT_ID              = var.CURRENT_ACCOUNT_ID
+  AWS_REGION                      = var.AWS_REGION
+
+  REQUEST_TEMPLATES = {
+    "application/json" = <<EOF
+    EOF
+  }
+}
+
+module "profileImage_get" {
+  source                          = "./methods"
+  METHOD_VALUE                    = ""
+  API_GATEWAY_ID                  = aws_api_gateway_rest_api.api-gateway.id
+  RESOURCE_ID                     = aws_api_gateway_resource.admin_account_profile_image_user_id_resource.id
+  INTEGRATION_RESPONSE_PARAMETERS = local.integration_response_parameters
+  METHOD_RESPONSE_PARAMETERS      = local.method_response_parameters
+  AUTHORIZATION                   = var.AUTHORIZATION
+  HTTP_METHOD                     = "GET"
+  LAMBDA_INVOKE_ARN               = var.BACKEND_LAMBDA_INVOKE_ARN
+  FUNCTION_NAME                   = var.BACKEND_LAMBDA_NAME
+  CURRENT_ACCOUNT_ID              = var.CURRENT_ACCOUNT_ID
+  AWS_REGION                      = var.AWS_REGION
+
+  REQUEST_TEMPLATES = {
+    "application/json" = <<EOF
+    EOF
+  }
+}
+
+module "profileImage_put" {
+  source                          = "./methods"
+  METHOD_VALUE                    = ""
+  API_GATEWAY_ID                  = aws_api_gateway_rest_api.api-gateway.id
+  RESOURCE_ID                     = aws_api_gateway_resource.admin_account_profile_image_user_id_resource.id
+  INTEGRATION_RESPONSE_PARAMETERS = local.integration_response_parameters
+  METHOD_RESPONSE_PARAMETERS      = local.method_response_parameters
+  AUTHORIZATION                   = var.AUTHORIZATION
+  HTTP_METHOD                     = "PUT"
+  LAMBDA_INVOKE_ARN               = var.BACKEND_LAMBDA_INVOKE_ARN
+  FUNCTION_NAME                   = var.BACKEND_LAMBDA_NAME
+  CURRENT_ACCOUNT_ID              = var.CURRENT_ACCOUNT_ID
+  AWS_REGION                      = var.AWS_REGION
+
+  REQUEST_TEMPLATES = {
+    "application/json" = <<EOF
+    EOF
+  }
+}
 
 ### --- API Deployment Starts --- ###
 
