@@ -24,3 +24,5 @@ variable "AUTHORIZER_ID" {
 variable "REQUEST_PARAMETERS" {default = false}
 variable "CURRENT_ACCOUNT_ID"{}
 variable "AWS_REGION" {}
+
+variable "LAMBDA_URI" {default = null}
