@@ -72,28 +72,6 @@ const verifyJWT = async(token, pem, tokenIssuer) => {
 };
 
 const processAuthRequest = async(payload, awsAccountId, apiOptions) => {
-    // const { kid } = header;
-    // console.log("PAYLOAD")
-    // console.log(token)
-
-    // // Reject the jwt if it's not an 'Identity Token'
-    // if (token_use != 'id') {
-    //     logger.info("Provided Token is not and identity token, returning deny all policy");
-    //     return deny(awsAccountId, apiOptions);
-    // }
-
-    // //Get the kid from the token and retrieve corresponding PEM
-    // let pem = PEMS[kid];
-    // console.log(pem)
-    // console.log(tokenIssuer)
-    
-    // if (!pem) {
-    //     logger.info("Invalid Identity token, returning deny all policy");
-    //     return deny(awsAccountId, apiOptions);
-    // }
-
-    // //Verify the signature of the JWT token to ensure it's really coming from your User Pool
-    // const payload = await verifyJWT(token, pem, tokenIssuer);
     console.log(payload)
     logger.info('payload', payload);
     if (!payload) {
@@ -114,17 +92,22 @@ const processAuthRequest = async(payload, awsAccountId, apiOptions) => {
 
         if (payload['cognito:groups']) {
             let user_groups = payload['cognito:groups'];
-
+            console.log(user_groups)
             let tableName = `vap-dani-s-test-role-permission`;
             // GET the cuid from payload
             // if cuid == 'admin' tableName = `${process.env.STAGE}-admin-role-membership`
             // Get all APIs a user can execute
+            console.log(tableName)
             let apisResponse = await dynamodb.scan({ TableName: tableName }).promise();
+            console.log("api response below")
             console.log('apisResponse---', apisResponse);
             // Get list of all
             for (let ar of apisResponse.Items) {
+                console.log("in for loops")
                 if (user_groups.includes(ar.role)) {
+                    console.log("in user-group")
                     for (let api of ar.apis) {
+                        console.log("in api")
                         policy.allowMethod(AuthPolicy.HttpVerb[api.method], api.api);
                     }
                 }
@@ -132,26 +115,43 @@ const processAuthRequest = async(payload, awsAccountId, apiOptions) => {
 
         }
         else {
+            console.log("in else deny")
             return deny(awsAccountId, apiOptions);
         }
-
+        console.log("outside if else")
         // Get all the config
         let context = {};
 
         let iamPolicy = policy.build();
-
+        console.log(iamPolicy.policyDocument.Statement)
+        let customerTable = `${process.env.CustomersTableName}`
+        let customerParams = {
+            ProjectionExpression: "Id",
+            FilterExpression: "#username = :a",
+            ExpressionAttributeNames: {
+                "#username": "Username",
+            },
+            ExpressionAttributeValues: {
+                ":a": payload['cognito:username']
+           },
+            TableName: customerTable
+           };
+        let customerResponse = await dynamodb.scan(customerParams).promise()
+        console.log(customerResponse)
         // let pool = tokenIssuer.substring(tokenIssuer.lastIndexOf('/') + 1);
-        // try {
+        try {
+            context.cognitoIdentityId = customerResponse.Items[0].Id
+            context.Usersub = payload['cognito:username']
+            context.UserId = payload['cognito:username']
+           
+        }
+        catch (e) {
+            logger.error(e);
+        }
+        console.log(context)
 
-        //     context.pool = pool;
-        //     context.user = JSON.stringify(payload);
-        // }
-        // catch (e) {
-        //     logger.error(e);
-        // }
-
-        // iamPolicy.context = context;
-        console.timeEnd(`AUTHORIZER`);
+        iamPolicy.context = context;
+        console.log(iamPolicy);
         return iamPolicy;
     }
 };
@@ -159,8 +159,11 @@ const processAuthRequest = async(payload, awsAccountId, apiOptions) => {
 
 exports.handler = async (event, context, callback) => {
     console.log('Inside event', event);
+    console.log('Inside context', context);
+    
     let apiKey;
     let cognitoGroupName = []
+    let decoded
     const tmp = event.methodArn.split(':');
     const apiGatewayArnTmp = tmp[5].split('/');
     const awsAccountId = tmp[4];
@@ -170,22 +173,23 @@ exports.handler = async (event, context, callback) => {
         stage: apiGatewayArnTmp[1]
     };
     try {
-        const token = "eyJraWQiOiJzcUxRamthSGlsU2ttTlwvYmI1Qlh1VGZTYzJrdVpQM1NoZWhPYlJ4eGxaVT0iLCJhbGciOiJSUzI1NiJ9.eyJhdF9oYXNoIjoiX2FYRUFoN1J0bVlleVhKN0VtVUtUZyIsInN1YiI6IjBmNGE3ZTU3LTFmMWItNGZjMC1hNGVkLTc1MzgyYTA3YzQwMiIsImNvZ25pdG86Z3JvdXBzIjpbInZhcC1kYW5pLWRldi1yZWdpc3RlcmVkLWdyb3VwIiwidmFwLWRhbmktZGV2LWFkbWluLWdyb3VwIl0sImVtYWlsX3ZlcmlmaWVkIjp0cnVlLCJjb2duaXRvOnByZWZlcnJlZF9yb2xlIjoiYXJuOmF3czppYW06OjQ4OTk5NDA5NjcyMjpyb2xlXC92YXAtZGFuaS1kZXYtQ29nbml0b0FkbWluUm9sZS1yb2xlIiwiaXNzIjoiaHR0cHM6XC9cL2NvZ25pdG8taWRwLnVzLWVhc3QtMi5hbWF6b25hd3MuY29tXC91cy1lYXN0LTJfWG43WUptTHZVIiwiY29nbml0bzp1c2VybmFtZSI6IjBmNGE3ZTU3LTFmMWItNGZjMC1hNGVkLTc1MzgyYTA3YzQwMiIsImNvZ25pdG86cm9sZXMiOlsiYXJuOmF3czppYW06OjQ4OTk5NDA5NjcyMjpyb2xlXC92YXAtZGFuaS1kZXYtQ29nbml0b1JlZ2lzdGVyZWRSb2xlLXJvbGUiLCJhcm46YXdzOmlhbTo6NDg5OTk0MDk2NzIyOnJvbGVcL3ZhcC1kYW5pLWRldi1Db2duaXRvQWRtaW5Sb2xlLXJvbGUiXSwiYXVkIjoiN2JzZTVxaG5lZmlmajBjNXA5bGk3b3F1N2oiLCJldmVudF9pZCI6ImUxYmM5N2E2LTBhYjEtNDE5ZC1hNzU0LTkwNmNhNWY2YzY0MSIsInRva2VuX3VzZSI6ImlkIiwiYXV0aF90aW1lIjoxNjQwMjExMDQ0LCJleHAiOjE2NDAyMTQ2NDQsImlhdCI6MTY0MDIxMTA0NCwianRpIjoiMmFlZDIxZWYtY2FjYS00ZDY0LWEyMjEtMzQ4Nzg5YTkwY2U4IiwiZW1haWwiOiJkYW5peWFsQGV1cnVzdGVjaG5vbG9naWVzLmNvbSJ9.LxHbq2sBX3oRHf8sTF7Hpq8HMBaWwpysuuAp0UulqHknUJTyEo1gxrXa2Ut57Aw9EDH2saD-gXprQ0mAKbHUccUSWsiZZX3ktiCVEE-J8VQFWSoeT58kORUaXv9h9h4sUpIojidRbcgmw3sQIJJN2fU6efyA3U-oXaIMT8TtvzBJ6FjbWqFuptUlHT0KzfT61dW155KeZuTuZEn3T_duJuMrftX93itmiuGTKGhtbR_5xHp8opJt0aHRFwQ9sphijBBOtN6Pc_cj9MEYLDXoBXbaV-i1sjiipWStDHO062IEJvf3633mHme5ScJtq1JEHfpaKcf9QyCC-hzFOc82jQ" ;
+        const token = event.authorizationToken
         console.log(token)
-        const decoded = jwt.decode(token, {
+        decoded = jwt.decode(token, {
             complete: true
         });
         console.log(decoded)
         if (!decoded) {
             logger.info('denied due to decoded error');
+            console.log("denied due to decoded error")
             return deny(awsAccountId, apiOptions);
         }
-        return await processAuthRequest(decoded.payload, awsAccountId, apiOptions);
+        
     }
     catch (err) {
         logger.error(err);
     }
-    console.timeEnd(`AUTHORIZER`);
-    return deny(awsAccountId, apiOptions);
+    // console.log("main deny")
+    return await processAuthRequest(decoded.payload, awsAccountId, apiOptions);
+    // return deny(awsAccountId, apiOptions);
 }
- 
