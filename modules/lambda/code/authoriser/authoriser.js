@@ -150,7 +150,7 @@ const processAuthRequest = async(payload, awsAccountId, apiOptions) => {
             ExpressionAttributeValues: {
                 ":a": payload['cognito:username']
             },
-            TableName: "vap-dani-s-test-prelogin-account"
+            TableName: `${process.env.PreLoginTableName}`
             };
             customerResponse = await dynamodb.scan(customerPreloginParams).promise()
             console.log(customerResponse)
