@@ -89,7 +89,7 @@ const processAuthRequest = async(payload, awsAccountId, apiOptions) => {
         // Check the Cognito group entry for permissions.
         // precedence
         console.log(payload['cognito:groups'])
-
+        let UserPoolId = payload.iss.split('/')[3]
         if (payload['cognito:groups']) {
             let user_groups = payload['cognito:groups'];
             console.log(user_groups)
@@ -121,7 +121,7 @@ const processAuthRequest = async(payload, awsAccountId, apiOptions) => {
         console.log("outside if else")
         // Get all the config
         let context = {};
-
+        let cognitoIdentityId = ""
         let iamPolicy = policy.build();
         console.log(iamPolicy.policyDocument.Statement)
         let customerTable = `${process.env.CustomersTableName}`
@@ -136,13 +136,38 @@ const processAuthRequest = async(payload, awsAccountId, apiOptions) => {
            },
             TableName: customerTable
            };
+
         let customerResponse = await dynamodb.scan(customerParams).promise()
+        if (customerResponse.Count == 0){
+            console.log("in if block")
+            console.log(payload['cognito:username'])
+            let customerPreloginParams = {
+            ProjectionExpression: "UserId",
+            FilterExpression: "#username = :a",
+            ExpressionAttributeNames: {
+                "#username": "UserId",
+            },
+            ExpressionAttributeValues: {
+                ":a": payload['cognito:username']
+            },
+            TableName: "vap-dani-s-test-prelogin-account"
+            };
+            customerResponse = await dynamodb.scan(customerPreloginParams).promise()
+            console.log(customerResponse)
+            cognitoIdentityId = customerResponse.Items[0].UserId
+        }
+        else
+        {
+            cognitoIdentityId = customerResponse.Items[0].Id
+        }
+        console.log("outside lambda if")
         console.log(customerResponse)
         // let pool = tokenIssuer.substring(tokenIssuer.lastIndexOf('/') + 1);
         try {
-            context.cognitoIdentityId = customerResponse.Items[0].Id
+            context.cognitoIdentityId = cognitoIdentityId
             context.Usersub = payload['cognito:username']
             context.UserId = payload['cognito:username']
+            context.UserPoolId = UserPoolId
            
         }
         catch (e) {
@@ -174,7 +199,6 @@ exports.handler = async (event, context, callback) => {
     };
     try {
         const token = event.authorizationToken
-        console.log(token)
         decoded = jwt.decode(token, {
             complete: true
         });
