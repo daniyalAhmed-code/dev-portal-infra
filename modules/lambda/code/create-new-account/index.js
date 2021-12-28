@@ -2,7 +2,7 @@
 'use strict'
 
 const customersController = require('dev-portal-common/customers-controller')
-const util = require('./util')
+const util = require('dev-portal-common/util')
 const Joi = require('joi');
 const rh   =  require('dev-portal-common/responsehandler')
 
