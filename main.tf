@@ -12,6 +12,9 @@ module "policy" {
   }
   CLOUDFRONT_SECURITY_LAMBDA_QUALIFIED_ARN             = module.lambda.CLOUDFRONT_SECURITY_LAMBDA_QUALIFIED_ARN
   COGNITO_USER_POOL                                    = module.cognito.COGNITO_USERPOOL_ARN
+  MNO_COGNITO_USER_POOL                                = module.cognito.MNO_COGNITO_USERPOOL_ARN
+  THIRD_PARTY_COGNITO_USER_POOL                        = module.cognito.THIRD_PARTY_COGNITO_USERPOOL_ARN
+
   LAMBDA_CATALOG_UPDATER_ROLE_NAME                     = module.role.LAMBDA_CATALOG_UPDATER_ROLE_NAME
   LAMBDA_BACKEND_ROLE_NAME                             = module.role.LAMBDA_BACKEND_ROLE_NAME
   LAMBDA_ASSET_UPLOADER_ROLE_NAME                      = module.role.LAMBDA_ASSET_UPLOADER_ROLE_NAME

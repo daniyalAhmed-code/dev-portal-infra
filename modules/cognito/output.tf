@@ -13,6 +13,12 @@ output "COGNITO_IDENTITY_POOL" {
 output "COGNITO_USERPOOL_ARN" {
   value = aws_cognito_user_pool.cognito_user_pool.arn
 }
+output "MNO_COGNITO_USERPOOL_ARN" {
+  value = aws_cognito_user_pool.cognito_user_pool.arn
+}
+output "THIRD_PARTY_COGNITO_USERPOOL_ARN" {
+  value = aws_cognito_user_pool.cognito_user_pool.arn
+}
 output "COGNITO_USERPOOL_CLIENT" {
   value = aws_cognito_user_pool_client.cognito_user_pool_client.id
 }
