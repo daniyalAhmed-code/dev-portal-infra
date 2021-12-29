@@ -70,6 +70,7 @@ module "lambda" {
     aws.src    = aws
     aws.global = aws.global_region
   }
+  MNO_THIRD_PARTY_RESOURCE_TABLE_NAME                 =local.MNO_THIRD_PARTY_RESOURCE_TABLE_NAME
   ARTIFACTS_S3_BUCKET_NAME                            = local.ARTIFICATS_S3_BUCKET
   LAMBDA_CATALOG_UPDATER_ROLE_ARN                     = module.role.LAMBDA_CATALOG_UPDATER_ROLE_ARN
   LAMBDA_BACKEND_ROLE_ARN                             = module.role.LAMBDA_BACKEND_ROLE_ARN

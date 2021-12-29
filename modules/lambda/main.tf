@@ -338,6 +338,8 @@ resource "aws_lambda_function" "lambda_create_mno_third_party_resources_function
       "StaticBucketName"          = "${var.ARTIFACTS_S3_BUCKET_NAME}"
       "CustomersTableName"        = "${var.CUSTOMER_TABLE_NAME}"
       "PreLoginAccountsTableName" = "${var.PRE_LOGIN_ACCOUNT_TABLE_NAME}"
+      "MnoThirdPartyResourceTableName" = "${var.MNO_THIRD_PARTY_RESOURCE_TABLE_NAME}"
+      
       "FeedbackTableName"         = "${var.FEEDBACK_TABLE_NAME}"
       "FeedbackSnsTopicArn"       = "${var.FEEDBACK_SNS_TOPIC_ARN}"
       "MNO_UserPoolId"            = "${var.MNO_USERPOOL_ID}"

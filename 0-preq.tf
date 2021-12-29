@@ -15,6 +15,8 @@ locals {
   COGNITO_USER_POOL                        = "${local.RESOURCE_PREFIX}-user-pool"
   THIRD_PARTY_COGNITO_USER_POOL            = "${local.RESOURCE_PREFIX}-third-party-user-pool"
   MNO_COGNITO_USER_POOL                    = "${local.RESOURCE_PREFIX}-mno-user-pool"
+  MNO_THIRD_PARTY_RESOURCE_TABLE_NAME  = data.terraform_remote_state.vap-platform-infra.outputs.MNO_THIRD_PARTY_RESOURCE_TABLE_NAME
+  MNO_THIRD_PARTY_RESOURCE_TABLE_ARN  = data.terraform_remote_state.vap-platform-infra.outputs.MNO_THIRD_PARTY_RESOURCE_TABLE_ARN
 
   COGNITO_USER_POOL_CLIENT                 = "${local.RESOURCE_PREFIX}-user-pool-client"
   MNO_COGNITO_USER_POOL_CLIENT                 = "${local.RESOURCE_PREFIX}-mno-user-pool-client"
