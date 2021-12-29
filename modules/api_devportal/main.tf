@@ -59,6 +59,8 @@ module "root_resource" {
   INTEGRATION_RESPONSE_PARAMETERS = local.integration_response_parameters
   METHOD_RESPONSE_PARAMETERS      = local.method_response_parameters
   AUTHORIZATION                   = var.AUTHORIZATION
+  AUTHORIZER_ID = "${var.AUTHORIZATION == "CUSTOM" ? "${aws_api_gateway_authorizer.lambda_authorizer[0].id}" : ""}"
+  
   HTTP_METHOD                     = "ANY"
   CURRENT_ACCOUNT_ID              = var.CURRENT_ACCOUNT_ID
   AWS_REGION                      = var.AWS_REGION
@@ -147,6 +149,8 @@ module "catalog" {
   INTEGRATION_RESPONSE_PARAMETERS = local.integration_response_parameters
   METHOD_RESPONSE_PARAMETERS      = local.method_response_parameters
   AUTHORIZATION                   = var.AUTHORIZATION
+  AUTHORIZER_ID = "${var.AUTHORIZATION == "CUSTOM" ? "${aws_api_gateway_authorizer.lambda_authorizer[0].id}" : ""}"
+  
   HTTP_METHOD                     = "GET"
   LAMBDA_INVOKE_ARN               = var.BACKEND_LAMBDA_INVOKE_ARN
   FUNCTION_NAME                   = var.BACKEND_LAMBDA_NAME
@@ -190,7 +194,8 @@ module "feedback_get" {
   RESOURCE_ID                     = aws_api_gateway_resource.feedback_resource.id
   INTEGRATION_RESPONSE_PARAMETERS = local.integration_response_parameters
   METHOD_RESPONSE_PARAMETERS      = local.method_response_parameters
-  AUTHORIZATION                   = var.AUTHORIZATION
+  AUTHORIZATION = "${var.AUTHORIZATION}"
+  AUTHORIZER_ID = "${var.AUTHORIZATION == "CUSTOM" ? "${aws_api_gateway_authorizer.lambda_authorizer[0].id}" : ""}"
   HTTP_METHOD                     = "GET"
   LAMBDA_INVOKE_ARN               = var.BACKEND_LAMBDA_INVOKE_ARN
   FUNCTION_NAME                   = var.BACKEND_LAMBDA_NAME
@@ -210,7 +215,10 @@ module "feedback_post" {
   RESOURCE_ID                     = aws_api_gateway_resource.feedback_resource.id
   INTEGRATION_RESPONSE_PARAMETERS = local.integration_response_parameters
   METHOD_RESPONSE_PARAMETERS      = local.method_response_parameters
-  AUTHORIZATION                   = var.AUTHORIZATION
+  AUTHORIZATION = "${var.AUTHORIZATION}"
+  AUTHORIZER_ID = "${var.AUTHORIZATION == "CUSTOM" ? "${aws_api_gateway_authorizer.lambda_authorizer[0].id}" : ""}"
+  
+  
   HTTP_METHOD                     = "POST"
   LAMBDA_INVOKE_ARN               = var.BACKEND_LAMBDA_INVOKE_ARN
   FUNCTION_NAME                   = var.BACKEND_LAMBDA_NAME
@@ -231,7 +239,10 @@ module "feedback_delete" {
   RESOURCE_ID                     = aws_api_gateway_resource.feedback_resource.id
   INTEGRATION_RESPONSE_PARAMETERS = local.integration_response_parameters
   METHOD_RESPONSE_PARAMETERS      = local.method_response_parameters
-  AUTHORIZATION                   = var.AUTHORIZATION
+  AUTHORIZATION = "${var.AUTHORIZATION}"
+  AUTHORIZER_ID = "${var.AUTHORIZATION == "CUSTOM" ? "${aws_api_gateway_authorizer.lambda_authorizer[0].id}" : ""}"
+  
+  
   CURRENT_ACCOUNT_ID              = var.CURRENT_ACCOUNT_ID
   AWS_REGION                      = var.AWS_REGION
   HTTP_METHOD                     = "DELETE"
@@ -357,7 +368,10 @@ module "visibility_get" {
   RESOURCE_ID                     = aws_api_gateway_resource.admin_catalog_visibility_resource.id
   INTEGRATION_RESPONSE_PARAMETERS = local.integration_response_parameters
   METHOD_RESPONSE_PARAMETERS      = local.method_response_parameters
-  AUTHORIZATION                   = var.AUTHORIZATION
+  AUTHORIZATION = "${var.AUTHORIZATION}"
+  AUTHORIZER_ID = "${var.AUTHORIZATION == "CUSTOM" ? "${aws_api_gateway_authorizer.lambda_authorizer[0].id}" : ""}"
+  
+  
   HTTP_METHOD                     = "GET"
   LAMBDA_INVOKE_ARN               = var.BACKEND_LAMBDA_INVOKE_ARN
   FUNCTION_NAME                   = var.BACKEND_LAMBDA_NAME
@@ -378,7 +392,10 @@ module "visibility_post" {
   RESOURCE_ID                     = aws_api_gateway_resource.admin_catalog_visibility_resource.id
   INTEGRATION_RESPONSE_PARAMETERS = local.integration_response_parameters
   METHOD_RESPONSE_PARAMETERS      = local.method_response_parameters
-  AUTHORIZATION                   = var.AUTHORIZATION
+  AUTHORIZATION = "${var.AUTHORIZATION}"
+  AUTHORIZER_ID = "${var.AUTHORIZATION == "CUSTOM" ? "${aws_api_gateway_authorizer.lambda_authorizer[0].id}" : ""}"
+  
+  
   CURRENT_ACCOUNT_ID              = var.CURRENT_ACCOUNT_ID
   AWS_REGION                      = var.AWS_REGION
   HTTP_METHOD                     = "POST"
@@ -487,7 +504,10 @@ module "signin_post" {
   INTEGRATION_RESPONSE_PARAMETERS = local.integration_response_parameters
   METHOD_RESPONSE_PARAMETERS      = local.method_response_parameters
   HTTP_METHOD                     = "POST"
-  AUTHORIZATION                   = var.AUTHORIZATION
+  AUTHORIZATION = "${var.AUTHORIZATION}"
+  AUTHORIZER_ID = "${var.AUTHORIZATION == "CUSTOM" ? "${aws_api_gateway_authorizer.lambda_authorizer[0].id}" : ""}"
+  
+  
   CURRENT_ACCOUNT_ID              = var.CURRENT_ACCOUNT_ID
   AWS_REGION                      = var.AWS_REGION
   LAMBDA_URI                      = var.LAMBDA_SIGNIN_INVOKE_ARN
@@ -522,7 +542,10 @@ module "apikey_get" {
   INTEGRATION_RESPONSE_PARAMETERS = local.integration_response_parameters
   METHOD_RESPONSE_PARAMETERS      = local.method_response_parameters
   HTTP_METHOD                     = "GET"
-  AUTHORIZATION                   = var.AUTHORIZATION
+  AUTHORIZATION = "${var.AUTHORIZATION}"
+  AUTHORIZER_ID = "${var.AUTHORIZATION == "CUSTOM" ? "${aws_api_gateway_authorizer.lambda_authorizer[0].id}" : ""}"
+  
+  
   CURRENT_ACCOUNT_ID              = var.CURRENT_ACCOUNT_ID
   AWS_REGION                      = var.AWS_REGION
   LAMBDA_URI                      = var.LAMBDA_GET_APIKEY_INVOKE_ARN
@@ -570,7 +593,10 @@ module "subscription_get" {
   INTEGRATION_RESPONSE_PARAMETERS = local.integration_response_parameters
   METHOD_RESPONSE_PARAMETERS      = local.method_response_parameters
   HTTP_METHOD                     = "GET"
-  AUTHORIZATION                   = var.AUTHORIZATION
+  AUTHORIZATION = "${var.AUTHORIZATION}"
+  AUTHORIZER_ID = "${var.AUTHORIZATION == "CUSTOM" ? "${aws_api_gateway_authorizer.lambda_authorizer[0].id}" : ""}"
+  
+  
   CURRENT_ACCOUNT_ID              = var.CURRENT_ACCOUNT_ID
   AWS_REGION                      = var.AWS_REGION
   LAMBDA_URI                      = var.LAMBDA_GET_SUBSCRIPTION_INVOKE_ARN
@@ -601,8 +627,10 @@ module "usagePlanId_put" {
   INTEGRATION_RESPONSE_PARAMETERS = local.integration_response_parameters
   METHOD_RESPONSE_PARAMETERS      = local.method_response_parameters
   HTTP_METHOD                     = "PUT"
-  AUTHORIZATION                   = var.AUTHORIZATION
-
+  AUTHORIZATION = "${var.AUTHORIZATION}"
+  AUTHORIZER_ID = "${var.AUTHORIZATION == "CUSTOM" ? "${aws_api_gateway_authorizer.lambda_authorizer[0].id}" : ""}"
+  
+  
   CURRENT_ACCOUNT_ID              = var.CURRENT_ACCOUNT_ID
   AWS_REGION                      = var.AWS_REGION
   LAMBDA_URI                      =var.LAMBDA_UPDATE_SUBSCRIPTION_USAGE_PLAN_INVOKE_ARN
@@ -616,7 +644,10 @@ module "usagePlanId_delete" {
   INTEGRATION_RESPONSE_PARAMETERS = local.integration_response_parameters
   METHOD_RESPONSE_PARAMETERS      = local.method_response_parameters
   HTTP_METHOD                     = "DELETE"
-  AUTHORIZATION                   = var.AUTHORIZATION
+  AUTHORIZATION = "${var.AUTHORIZATION}"
+  AUTHORIZER_ID = "${var.AUTHORIZATION == "CUSTOM" ? "${aws_api_gateway_authorizer.lambda_authorizer[0].id}" : ""}"
+  
+  
   CURRENT_ACCOUNT_ID              = var.CURRENT_ACCOUNT_ID
   AWS_REGION                      = var.AWS_REGION
   LAMBDA_URI                      =var.LAMBDA_DELETE_SUBSCRIPTION_USAGE_PLAN_INVOKE_ARN
@@ -644,7 +675,10 @@ module "usage_get" {
   INTEGRATION_RESPONSE_PARAMETERS = local.integration_response_parameters
   METHOD_RESPONSE_PARAMETERS      = local.method_response_parameters
   HTTP_METHOD                     = "GET"
-  AUTHORIZATION                   = var.AUTHORIZATION
+  AUTHORIZATION = "${var.AUTHORIZATION}"
+  AUTHORIZER_ID = "${var.AUTHORIZATION == "CUSTOM" ? "${aws_api_gateway_authorizer.lambda_authorizer[0].id}" : ""}"
+  
+  
   CURRENT_ACCOUNT_ID              = var.CURRENT_ACCOUNT_ID
   AWS_REGION                      = var.AWS_REGION
   LAMBDA_URI                      = var.LAMBDA_GET_SUBSCRIPTION_USAGE_PLAN_INVOKE_ARN
@@ -702,7 +736,10 @@ module "sdk_get" {
   INTEGRATION_RESPONSE_PARAMETERS = local.integration_response_parameters
   METHOD_RESPONSE_PARAMETERS      = local.method_response_parameters
   HTTP_METHOD                     = "GET"
-  AUTHORIZATION                   = var.AUTHORIZATION
+  AUTHORIZATION = "${var.AUTHORIZATION}"
+  AUTHORIZER_ID = "${var.AUTHORIZATION == "CUSTOM" ? "${aws_api_gateway_authorizer.lambda_authorizer[0].id}" : ""}"
+  
+  
   CURRENT_ACCOUNT_ID              = var.CURRENT_ACCOUNT_ID
   AWS_REGION                      = var.AWS_REGION
   LAMBDA_URI                      = var.LAMBDA_GET_SDK_INVOKE_ARN
@@ -715,7 +752,10 @@ module "export_get" {
   INTEGRATION_RESPONSE_PARAMETERS = local.integration_response_parameters
   METHOD_RESPONSE_PARAMETERS      = local.method_response_parameters
   HTTP_METHOD                     = "GET"
-  AUTHORIZATION                   = var.AUTHORIZATION
+  AUTHORIZATION = "${var.AUTHORIZATION}"
+  AUTHORIZER_ID = "${var.AUTHORIZATION == "CUSTOM" ? "${aws_api_gateway_authorizer.lambda_authorizer[0].id}" : ""}"
+  
+  
   CURRENT_ACCOUNT_ID              = var.CURRENT_ACCOUNT_ID
   AWS_REGION                      = var.AWS_REGION
   LAMBDA_URI                      = var.LAMBDA_EXPORT_API_INVOKE_ARN
@@ -754,7 +794,10 @@ module "visibility_delete" {
   RESOURCE_ID                     = aws_api_gateway_resource.admin_catalog_visibility_id_resource.id
   INTEGRATION_RESPONSE_PARAMETERS = local.integration_response_parameters
   METHOD_RESPONSE_PARAMETERS      = local.method_response_parameters
-  AUTHORIZATION                   = var.AUTHORIZATION
+  AUTHORIZATION = "${var.AUTHORIZATION}"
+  AUTHORIZER_ID = "${var.AUTHORIZATION == "CUSTOM" ? "${aws_api_gateway_authorizer.lambda_authorizer[0].id}" : ""}"
+  
+  
   HTTP_METHOD                     = "DELETE"
   LAMBDA_INVOKE_ARN               = var.BACKEND_LAMBDA_INVOKE_ARN
   FUNCTION_NAME                   = var.BACKEND_LAMBDA_NAME
@@ -788,7 +831,10 @@ module "sdkGeneration_put" {
   RESOURCE_ID                     = aws_api_gateway_resource.admin_catalog_visibility_id_sdkGeneration_resource.id
   INTEGRATION_RESPONSE_PARAMETERS = local.integration_response_parameters
   METHOD_RESPONSE_PARAMETERS      = local.method_response_parameters
-  AUTHORIZATION                   = var.AUTHORIZATION
+  AUTHORIZATION = "${var.AUTHORIZATION}"
+  AUTHORIZER_ID = "${var.AUTHORIZATION == "CUSTOM" ? "${aws_api_gateway_authorizer.lambda_authorizer[0].id}" : ""}"
+  
+  
   HTTP_METHOD                     = "PUT"
   LAMBDA_INVOKE_ARN               = var.BACKEND_LAMBDA_INVOKE_ARN
   FUNCTION_NAME                   = var.BACKEND_LAMBDA_NAME
@@ -810,7 +856,10 @@ module "sdkGeneration_delete" {
   RESOURCE_ID                     = aws_api_gateway_resource.admin_catalog_visibility_id_sdkGeneration_resource.id
   INTEGRATION_RESPONSE_PARAMETERS = local.integration_response_parameters
   METHOD_RESPONSE_PARAMETERS      = local.method_response_parameters
-  AUTHORIZATION                   = var.AUTHORIZATION
+  AUTHORIZATION = "${var.AUTHORIZATION}"
+  AUTHORIZER_ID = "${var.AUTHORIZATION == "CUSTOM" ? "${aws_api_gateway_authorizer.lambda_authorizer[0].id}" : ""}"
+  
+  
   HTTP_METHOD                     = "DELETE"
   LAMBDA_INVOKE_ARN               = var.BACKEND_LAMBDA_INVOKE_ARN
   FUNCTION_NAME                   = var.BACKEND_LAMBDA_NAME
@@ -845,7 +894,10 @@ module "account_get" {
   RESOURCE_ID                     = aws_api_gateway_resource.admin_account_resource.id
   INTEGRATION_RESPONSE_PARAMETERS = local.integration_response_parameters
   METHOD_RESPONSE_PARAMETERS      = local.method_response_parameters
-  AUTHORIZATION                   = var.AUTHORIZATION
+  AUTHORIZATION = "${var.AUTHORIZATION}"
+  AUTHORIZER_ID = "${var.AUTHORIZATION == "CUSTOM" ? "${aws_api_gateway_authorizer.lambda_authorizer[0].id}" : ""}"
+  
+  
   HTTP_METHOD                     = "GET"
   LAMBDA_INVOKE_ARN               = var.BACKEND_LAMBDA_INVOKE_ARN
   FUNCTION_NAME                   = var.BACKEND_LAMBDA_NAME
@@ -865,7 +917,10 @@ module "account_post" {
   RESOURCE_ID                     = aws_api_gateway_resource.admin_account_resource.id
   INTEGRATION_RESPONSE_PARAMETERS = local.integration_response_parameters
   METHOD_RESPONSE_PARAMETERS      = local.method_response_parameters
-  AUTHORIZATION                   = var.AUTHORIZATION
+  AUTHORIZATION = "${var.AUTHORIZATION}"
+  AUTHORIZER_ID = "${var.AUTHORIZATION == "CUSTOM" ? "${aws_api_gateway_authorizer.lambda_authorizer[0].id}" : ""}"
+  
+  
   HTTP_METHOD                     = "POST"
   LAMBDA_INVOKE_ARN               = var.BACKEND_LAMBDA_INVOKE_ARN
   FUNCTION_NAME                   = var.BACKEND_LAMBDA_NAME
@@ -885,7 +940,10 @@ module "account_userid_get" {
   RESOURCE_ID                     = aws_api_gateway_resource.admin_account_userid_resource.id
   INTEGRATION_RESPONSE_PARAMETERS = local.integration_response_parameters
   METHOD_RESPONSE_PARAMETERS      = local.method_response_parameters
-  AUTHORIZATION                   = var.AUTHORIZATION
+  AUTHORIZATION = "${var.AUTHORIZATION}"
+  AUTHORIZER_ID = "${var.AUTHORIZATION == "CUSTOM" ? "${aws_api_gateway_authorizer.lambda_authorizer[0].id}" : ""}"
+  
+  
   HTTP_METHOD                     = "GET"
   LAMBDA_INVOKE_ARN               = var.BACKEND_LAMBDA_INVOKE_ARN
   FUNCTION_NAME                   = var.BACKEND_LAMBDA_NAME
@@ -919,7 +977,10 @@ module "account_userid_promote_to_admin" {
   RESOURCE_ID                     = aws_api_gateway_resource.promote_to_admin_resource.id
   INTEGRATION_RESPONSE_PARAMETERS = local.integration_response_parameters
   METHOD_RESPONSE_PARAMETERS      = local.method_response_parameters
-  AUTHORIZATION                   = var.AUTHORIZATION
+  AUTHORIZATION = "${var.AUTHORIZATION}"
+  AUTHORIZER_ID = "${var.AUTHORIZATION == "CUSTOM" ? "${aws_api_gateway_authorizer.lambda_authorizer[0].id}" : ""}"
+  
+  
   HTTP_METHOD                     = "PUT"
   LAMBDA_INVOKE_ARN               = var.BACKEND_LAMBDA_INVOKE_ARN
   FUNCTION_NAME                   = var.BACKEND_LAMBDA_NAME
@@ -954,7 +1015,9 @@ module "account_userid_delete" {
   RESOURCE_ID                     = aws_api_gateway_resource.admin_account_userid_resource.id
   INTEGRATION_RESPONSE_PARAMETERS = local.integration_response_parameters
   METHOD_RESPONSE_PARAMETERS      = local.method_response_parameters
-  AUTHORIZATION                   = var.AUTHORIZATION
+  AUTHORIZATION = "${var.AUTHORIZATION}"
+  AUTHORIZER_ID = "${var.AUTHORIZATION == "CUSTOM" ? "${aws_api_gateway_authorizer.lambda_authorizer[0].id}" : ""}"
+  
   HTTP_METHOD                     = "DELETE"
   LAMBDA_INVOKE_ARN               = var.BACKEND_LAMBDA_INVOKE_ARN
   FUNCTION_NAME                   = var.BACKEND_LAMBDA_NAME
@@ -977,7 +1040,10 @@ module "account_callbackauth" {
   RESOURCE_ID                     = aws_api_gateway_resource.admin_account_callback_auth_resource.id
   INTEGRATION_RESPONSE_PARAMETERS = local.integration_response_parameters
   METHOD_RESPONSE_PARAMETERS      = local.method_response_parameters
-  AUTHORIZATION                   = var.AUTHORIZATION
+  AUTHORIZATION = "${var.AUTHORIZATION}"
+  AUTHORIZER_ID = "${var.AUTHORIZATION == "CUSTOM" ? "${aws_api_gateway_authorizer.lambda_authorizer[0].id}" : ""}"
+  
+  
   HTTP_METHOD                     = "POST"
   LAMBDA_INVOKE_ARN               = var.BACKEND_LAMBDA_INVOKE_ARN
   FUNCTION_NAME                   = var.BACKEND_LAMBDA_NAME
@@ -1014,7 +1080,10 @@ module "resendInvite_post" {
   RESOURCE_ID                     = aws_api_gateway_resource.admin_account_resend_invite_resource.id
   INTEGRATION_RESPONSE_PARAMETERS = local.integration_response_parameters
   METHOD_RESPONSE_PARAMETERS      = local.method_response_parameters
-  AUTHORIZATION                   = var.AUTHORIZATION
+  AUTHORIZATION = "${var.AUTHORIZATION}"
+  AUTHORIZER_ID = "${var.AUTHORIZATION == "CUSTOM" ? "${aws_api_gateway_authorizer.lambda_authorizer[0].id}" : ""}"
+  
+  
   HTTP_METHOD                     = "POST"
   LAMBDA_INVOKE_ARN               = var.BACKEND_LAMBDA_INVOKE_ARN
   FUNCTION_NAME                   = var.BACKEND_LAMBDA_NAME
@@ -1049,7 +1118,10 @@ module "userProfile_get" {
   RESOURCE_ID                     = aws_api_gateway_resource.admin_account_user_profile_resource.id
   INTEGRATION_RESPONSE_PARAMETERS = local.integration_response_parameters
   METHOD_RESPONSE_PARAMETERS      = local.method_response_parameters
-  AUTHORIZATION                   = var.AUTHORIZATION
+  AUTHORIZATION = "${var.AUTHORIZATION}"
+  AUTHORIZER_ID = "${var.AUTHORIZATION == "CUSTOM" ? "${aws_api_gateway_authorizer.lambda_authorizer[0].id}" : ""}"
+  
+  
   HTTP_METHOD                     = "GET"
   LAMBDA_INVOKE_ARN               = var.BACKEND_LAMBDA_INVOKE_ARN
   FUNCTION_NAME                   = var.BACKEND_LAMBDA_NAME
@@ -1076,6 +1148,7 @@ module "userProfile_resource_OPTION" {
   AWS_REGION                      = var.AWS_REGION
 }
 
+
 module "profileImage_resource_OPTION" {
   source                          = "./methods"
   METHOD_VALUE                    = ""
@@ -1096,7 +1169,10 @@ module "profileImage_get" {
   RESOURCE_ID                     = aws_api_gateway_resource.admin_account_profile_image_user_id_resource.id
   INTEGRATION_RESPONSE_PARAMETERS = local.integration_response_parameters
   METHOD_RESPONSE_PARAMETERS      = local.method_response_parameters
-  AUTHORIZATION                   = var.AUTHORIZATION
+  AUTHORIZATION = "${var.AUTHORIZATION}"
+  AUTHORIZER_ID = "${var.AUTHORIZATION == "CUSTOM" ? "${aws_api_gateway_authorizer.lambda_authorizer[0].id}" : ""}"
+  
+  
   HTTP_METHOD                     = "GET"
   LAMBDA_INVOKE_ARN               = var.BACKEND_LAMBDA_INVOKE_ARN
   FUNCTION_NAME                   = var.BACKEND_LAMBDA_NAME
@@ -1116,7 +1192,10 @@ module "profileImage_put" {
   RESOURCE_ID                     = aws_api_gateway_resource.admin_account_profile_image_user_id_resource.id
   INTEGRATION_RESPONSE_PARAMETERS = local.integration_response_parameters
   METHOD_RESPONSE_PARAMETERS      = local.method_response_parameters
-  AUTHORIZATION                   = var.AUTHORIZATION
+  AUTHORIZATION = "${var.AUTHORIZATION}"
+  AUTHORIZER_ID = "${var.AUTHORIZATION == "CUSTOM" ? "${aws_api_gateway_authorizer.lambda_authorizer[0].id}" : ""}"
+  
+  
   HTTP_METHOD                     = "PUT"
   LAMBDA_INVOKE_ARN               = var.BACKEND_LAMBDA_INVOKE_ARN
   FUNCTION_NAME                   = var.BACKEND_LAMBDA_NAME
@@ -1268,6 +1347,7 @@ resource "aws_api_gateway_authorizer" "lambda_authorizer" {
   rest_api_id            = aws_api_gateway_rest_api.api-gateway.id
   authorizer_uri         = var.API_KEY_AUTHORIZATION_INVOKE_ARN
   authorizer_credentials = var.API_KEY_AUTHORIZATION_ROLE_ARN
+  count            = "${var.AUTHORIZATION == "CUSTOM" ? 1 : 0}"
 }
 
 resource "aws_lambda_permission" "siginin_post_lambda_permission" {
@@ -1466,5 +1546,4 @@ resource "aws_lambda_permission" "get_all_account_lambda_permission" {
   principal     = "apigateway.amazonaws.com"
   source_arn    = "${aws_api_gateway_rest_api.api-gateway.execution_arn}/*/*/*"
 }
-
 

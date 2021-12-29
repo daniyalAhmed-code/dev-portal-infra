@@ -55,6 +55,7 @@ resource "aws_api_gateway_method" "lambda_method" {
   resource_id   = "${var.RESOURCE_ID}"
   http_method   = "${var.HTTP_METHOD}"
   authorization = "${var.AUTHORIZATION}"
+  authorizer_id = "${var.AUTHORIZER_ID}"
   count            = "${var.HTTP_METHOD != "OPTIONS" ? 1 : 0}"
   
 }
