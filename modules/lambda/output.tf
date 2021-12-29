@@ -78,3 +78,10 @@ output "API_KEY_AUTHORIZATION_LAMBDA_NAME" {
 output "COGNITO_USERPOOL_CLIENT_SETTINGS_NAME" {
   value = aws_lambda_function.lambda_cognito_userpool_client_settings_function.function_name
 }
+
+output "LAMBDA_CREATE_MNO_THIRD_PARTY_RESOURCE_INVOKE_ARN"{
+  value = aws_lambda_function.lambda_create_mno_third_party_resources_function.invoke_arn
+}
+output "CREATE_MNO_THIRD_PARTY_RESOURCE_LAMBDA_NAME"{
+  value = aws_lambda_function.lambda_create_mno_third_party_resources_function.function_name
+}

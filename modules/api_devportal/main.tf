@@ -249,6 +249,14 @@ resource "aws_api_gateway_resource" "admin_resource" {
   path_part   = "admin"
 }
 
+resource "aws_api_gateway_resource" "admin_account_mno_resource" {
+  rest_api_id = aws_api_gateway_rest_api.api-gateway.id
+  parent_id   = aws_api_gateway_resource.admin_resource.id
+  path_part   = "mno"
+}
+
+
+
 resource "aws_api_gateway_resource" "admin_catalog_resource" {
   rest_api_id = aws_api_gateway_rest_api.api-gateway.id
   parent_id   = aws_api_gateway_resource.admin_resource.id
@@ -334,6 +342,42 @@ module "visibility_post" {
 #   }
 # }
 
+module "MnoResource_post" {
+  source                          = "./methods"
+  METHOD_VALUE                    = ""
+  API_GATEWAY_ID                  = aws_api_gateway_rest_api.api-gateway.id
+  RESOURCE_ID                     = aws_api_gateway_resource.admin_account_mno_resource.id
+  INTEGRATION_RESPONSE_PARAMETERS = local.integration_response_parameters
+  METHOD_RESPONSE_PARAMETERS      = local.method_response_parameters
+  AUTHORIZATION                   = var.AUTHORIZATION
+  
+  
+  HTTP_METHOD                     = "POST"
+  LAMBDA_INVOKE_ARN               = var.BACKEND_LAMBDA_INVOKE_ARN
+  FUNCTION_NAME                   = var.BACKEND_LAMBDA_NAME
+  CURRENT_ACCOUNT_ID              = var.CURRENT_ACCOUNT_ID
+  AWS_REGION                      = var.AWS_REGION
+  # LAMBDA_URI                      =var.LAMBDA_CREATE_MNO_THIRD_PARTY_RESOURCE_INVOKE_ARN
+
+  REQUEST_TEMPLATES = {
+    "application/json" = <<EOF
+    EOF
+  }
+}
+
+module "Mno_resource_OPTION" {
+  source                          = "./methods"
+  METHOD_VALUE                    = ""
+  API_GATEWAY_ID                  = aws_api_gateway_rest_api.api-gateway.id
+  RESOURCE_ID                     = aws_api_gateway_resource.admin_account_mno_resource.id
+  INTEGRATION_RESPONSE_PARAMETERS = local.integration_response_parameters
+  METHOD_RESPONSE_PARAMETERS      = local.method_response_parameters
+  HTTP_METHOD                     = "OPTIONS"
+  AUTHORIZATION                   = "NONE"
+  CURRENT_ACCOUNT_ID              = var.CURRENT_ACCOUNT_ID
+  AWS_REGION                      = var.AWS_REGION
+}
+
 
 
 
@@ -388,7 +432,7 @@ resource "aws_api_gateway_deployment" "api-gateway-deployment" {
     "module.feedback_resource_OPTION.API_GATEWAY_METHOD",
     "module.catalog_resource_OPTION.API_GATEWAY_METHOD",
     "module.visibility_resource_OPTION.API_GATEWAY_METHOD",
-
+    "module.Mno_resource_OPTION.API_GATEWAY_METHOD",
     "module.proxy_resource_OPTION.API_GATEWAY_METHOD",
 
     "module.register_resource_OPTION.API_GATEWAY_METHOD",
