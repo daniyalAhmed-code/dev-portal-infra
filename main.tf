@@ -10,6 +10,7 @@ module "policy" {
     aws.src    = aws
     aws.global = aws.global_region
   }
+  API_ROLE_PERMISSION_TABLE_ARN                        = module.API_ROLE_PERMISSION_TABLE_ARN
   CLOUDFRONT_SECURITY_LAMBDA_QUALIFIED_ARN             = module.lambda.CLOUDFRONT_SECURITY_LAMBDA_QUALIFIED_ARN
   COGNITO_USER_POOL                                    = module.cognito.COGNITO_USERPOOL_ARN
   LAMBDA_CATALOG_UPDATER_ROLE_NAME                     = module.role.LAMBDA_CATALOG_UPDATER_ROLE_NAME
@@ -83,6 +84,8 @@ module "lambda" {
   NODE_ENV                                            = var.NODE_ENV
   WEBSITE_BUCKET_NAME                                 = local.DEV_PORTAL_SITE_S3_BUCKET
   CUSTOMER_TABLE_NAME                                 = local.DEV_PORTAL_CUSTOMERS_TABLE_NAME
+  API_ROLE_PERMISSION_TABLE_NAME                      = local.API_ROLE_PERMISSION_TABLE_NAME
+  API_ROLE_PERMISSION_TABLE_ARN                       = local.API_ROLE_PERMISSION_TABLE_ARN
   PRE_LOGIN_ACCOUNT_TABLE_NAME                        = local.DEV_PORTAL_PRE_LOGIN_ACCOUNTS_TABLE_NAME
   FEEDBACK_TABLE_NAME                                 = local.DEV_PORTAL_FEEDBACK_TABLE_NAME
   FEEDBACK_SNS_TOPIC_ARN                              = local.ENABLE_FEEDBACK_SUBMISSION

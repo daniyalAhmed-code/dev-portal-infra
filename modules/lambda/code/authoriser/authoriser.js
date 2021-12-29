@@ -93,7 +93,7 @@ const processAuthRequest = async(payload, awsAccountId, apiOptions) => {
         if (payload['cognito:groups']) {
             let user_groups = payload['cognito:groups'];
             console.log(user_groups)
-            let tableName = `vap-dani-s-test-role-permission`;
+            let tableName = `${process.env.ApiRolePermissionTable}`;
             // GET the cuid from payload
             // if cuid == 'admin' tableName = `${process.env.STAGE}-admin-role-membership`
             // Get all APIs a user can execute
@@ -118,7 +118,6 @@ const processAuthRequest = async(payload, awsAccountId, apiOptions) => {
             console.log("in else deny")
             return deny(awsAccountId, apiOptions);
         }
-        console.log("outside if else")
         // Get all the config
         let context = {};
         let cognitoIdentityId = ""
@@ -139,8 +138,6 @@ const processAuthRequest = async(payload, awsAccountId, apiOptions) => {
 
         let customerResponse = await dynamodb.scan(customerParams).promise()
         if (customerResponse.Count == 0){
-            console.log("in if block")
-            console.log(payload['cognito:username'])
             let customerPreloginParams = {
             ProjectionExpression: "UserId",
             FilterExpression: "#username = :a",
@@ -150,7 +147,7 @@ const processAuthRequest = async(payload, awsAccountId, apiOptions) => {
             ExpressionAttributeValues: {
                 ":a": payload['cognito:username']
             },
-            TableName: `${process.env.PreLoginTableName}`
+            TableName: `${process.env.PreLoginAccountsTableName}`
             };
             customerResponse = await dynamodb.scan(customerPreloginParams).promise()
             console.log(customerResponse)
@@ -160,8 +157,6 @@ const processAuthRequest = async(payload, awsAccountId, apiOptions) => {
         {
             cognitoIdentityId = customerResponse.Items[0].Id
         }
-        console.log("outside lambda if")
-        console.log(customerResponse)
         // let pool = tokenIssuer.substring(tokenIssuer.lastIndexOf('/') + 1);
         try {
             context.cognitoIdentityId = cognitoIdentityId

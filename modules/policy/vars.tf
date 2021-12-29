@@ -13,6 +13,7 @@ variable "CUSTOMER_TABLE_NAME" {}
 variable "COGNITO_USER_POOL" {}
 variable "CATALOG_UPDATER_LAMBDA_NAME" {}
 variable "PRE_LOGIN_TABLE_ARN" {}
+variable "API_ROLE_PERMISSION_TABLE_ARN" {}
 variable "AWS_REGION" {}
 variable "CURRENT_ACCOUNT_ID" {}
 variable "RESOURCE_PREFIX" {}
