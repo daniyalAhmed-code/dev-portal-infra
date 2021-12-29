@@ -141,7 +141,8 @@ resource "aws_iam_policy" "lambda_backend_policy" {
       ],
       "Resource": [
         "arn:aws:dynamodb:${var.AWS_REGION}:${var.CURRENT_ACCOUNT_ID}:table/${var.CUSTOMER_TABLE_NAME}",
-        "${var.PRE_LOGIN_TABLE_ARN}"
+        "${var.PRE_LOGIN_TABLE_ARN}",
+        "${var.API_PERMISSION_TABLE_ARN}",
       ]
     },
     {

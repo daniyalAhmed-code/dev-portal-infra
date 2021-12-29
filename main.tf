@@ -58,6 +58,7 @@ module "policy" {
   LAMBDA_INVOKE_API_KEY_ROTATION_ROLE_ARN              = module.role.LAMBDA_INVOKE_API_KEY_ROTATION_ROLE_ARN
   LAMBDA_API_KEY_ROTATION_ROLE_ARN                     = module.role.LAMBDA_API_KEY_ROTATION_ROLE_ARN
   API_GATEWAY_ID                                       = module.api.API_GATEWAY_ID
+  API_PERMISSION_TABLE_ARN                             =local.API_PERMISSION_TABLE_ARN
   
 }
 
@@ -83,6 +84,7 @@ module "lambda" {
   NODE_ENV                                            = var.NODE_ENV
   WEBSITE_BUCKET_NAME                                 = local.DEV_PORTAL_SITE_S3_BUCKET
   CUSTOMER_TABLE_NAME                                 = local.DEV_PORTAL_CUSTOMERS_TABLE_NAME
+  API_PERMISSION_TABLE_NAME                           = local.API_PERMISSION_TABLE_NAME
   PRE_LOGIN_ACCOUNT_TABLE_NAME                        = local.DEV_PORTAL_PRE_LOGIN_ACCOUNTS_TABLE_NAME
   FEEDBACK_TABLE_NAME                                 = local.DEV_PORTAL_FEEDBACK_TABLE_NAME
   FEEDBACK_SNS_TOPIC_ARN                              = local.ENABLE_FEEDBACK_SUBMISSION

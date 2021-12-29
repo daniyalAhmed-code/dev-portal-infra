@@ -78,3 +78,34 @@ output "API_KEY_AUTHORIZATION_LAMBDA_NAME" {
 output "COGNITO_USERPOOL_CLIENT_SETTINGS_NAME" {
   value = aws_lambda_function.lambda_cognito_userpool_client_settings_function.function_name
 }
+
+
+output "LAMBDA_CREATE_PERMISION_FOR_API_INVOKE_ARN"{
+  value = aws_lambda_function.lambda_create_permissions_for_api_function.invoke_arn
+}
+output "CREATE_PERMISION_FOR_API_LAMBDA_NAME"{
+  value = aws_lambda_function.lambda_create_permissions_for_api_function.function_name
+}
+
+
+
+output "LAMBDA_GET_ALLOWED_APIS_FOR_RESOURCE_INVOKE_ARN"{
+  value = aws_lambda_function.lambda_get_allowed_apis_for_resource_function.invoke_arn
+}
+output "GET_ALLOWED_APIS_FOR_RESOURCE_LAMBDA_NAME"{
+  value = aws_lambda_function.lambda_get_allowed_apis_for_resource_function.function_name
+}
+
+output "LAMBDA_DELETE_ALLOWED_APIS_FOR_RESOURCE_INVOKE_ARN"{
+  value = aws_lambda_function.lambda_delete_allowed_api_for_resource_function.invoke_arn
+}
+output "DELETE_ALLOWED_APIS_FOR_RESOURCE_LAMBDA_NAME"{
+  value = aws_lambda_function.lambda_delete_allowed_api_for_resource_function.function_name
+}
+
+output "LAMBDA_UPDATE_ALLOWED_APIS_FOR_RESOURCE_INVOKE_ARN"{
+  value = aws_lambda_function.lambda_update_allowed_api_for_resource_function.invoke_arn
+}
+output "UPDATE_ALLOWED_APIS_FOR_RESOURCE_LAMBDA_NAME"{
+  value = aws_lambda_function.lambda_update_allowed_api_for_resource_function.function_name
+}

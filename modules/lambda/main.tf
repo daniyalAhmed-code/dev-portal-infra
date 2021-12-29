@@ -319,3 +319,74 @@ resource "aws_lambda_permission" "lambda_authorizer_all_api_gateway_perm" {
   principal     = "apigateway.amazonaws.com"
   source_arn    = "arn:aws:execute-api:${var.AWS_REGION}:${var.AWS_ACCOUNT_ID}:*"
 }
+
+resource "aws_lambda_function" "lambda_create_permissions_for_api_function" {
+  provider            = aws.src
+  filename         = "${path.module}/zip/create-permissions-for-api.zip"
+  function_name    = "${var.RESOURCE_PREFIX}-create-permissions-for-api"
+  role             = "${var.LAMBDA_BACKEND_ROLE_ARN}"
+  handler          = "index.handler"
+  source_code_hash = "${data.archive_file.lambda_backend_lambda_function.output_base64sha256}"
+  runtime          = "nodejs12.x"
+  timeout          = "20"
+  layers           = ["${aws_lambda_layer_version.lambda-common-layer.arn}"]
+  environment {
+    variables = {
+      "ApiPermissionTableName"        = "${var.API_PERMISSION_TABLE_NAME}"
+      "UserPoolId"                = "${var.USERPOOL_ID}"
+    }
+  }
+}
+
+resource "aws_lambda_function" "lambda_get_allowed_apis_for_resource_function" {
+  provider            = aws.src
+  filename         = "${path.module}/zip/get-allowed-apis-for-resource.zip"
+  function_name    = "${var.RESOURCE_PREFIX}-get-allowed-apis-for-resource"
+  role             = "${var.LAMBDA_BACKEND_ROLE_ARN}"
+  handler          = "index.handler"
+  source_code_hash = "${data.archive_file.lambda_backend_lambda_function.output_base64sha256}"
+  runtime          = "nodejs12.x"
+  timeout          = "20"
+  layers           = ["${aws_lambda_layer_version.lambda-common-layer.arn}"]
+  environment {
+    variables = {
+      "ApiPermissionTableName"        = "${var.API_PERMISSION_TABLE_NAME}"
+      "UserPoolId"                = "${var.USERPOOL_ID}"
+    }
+  }
+}
+resource "aws_lambda_function" "lambda_delete_allowed_api_for_resource_function" {
+  provider            = aws.src
+  filename         = "${path.module}/zip/delete-allowed-apis-for-resource.zip"
+  function_name    = "${var.RESOURCE_PREFIX}-delete-allowed-apis-for-resource"
+  role             = "${var.LAMBDA_BACKEND_ROLE_ARN}"
+  handler          = "index.handler"
+  source_code_hash = "${data.archive_file.lambda_backend_lambda_function.output_base64sha256}"
+  runtime          = "nodejs12.x"
+  timeout          = "20"
+  layers           = ["${aws_lambda_layer_version.lambda-common-layer.arn}"]
+  environment {
+    variables = {
+      "ApiPermissionTableName"        = "${var.API_PERMISSION_TABLE_NAME}"
+      "UserPoolId"                = "${var.USERPOOL_ID}"
+    }
+  }
+}
+
+resource "aws_lambda_function" "lambda_update_allowed_api_for_resource_function" {
+  provider            = aws.src
+  filename         = "${path.module}/zip/update-allowed-apis-for-resource.zip"
+  function_name    = "${var.RESOURCE_PREFIX}-update-allowed-apis-for-resource"
+  role             = "${var.LAMBDA_BACKEND_ROLE_ARN}"
+  handler          = "index.handler"
+  source_code_hash = "${data.archive_file.lambda_backend_lambda_function.output_base64sha256}"
+  runtime          = "nodejs12.x"
+  timeout          = "20"
+  layers           = ["${aws_lambda_layer_version.lambda-common-layer.arn}"]
+  environment {
+    variables = {
+      "ApiPermissionTableName"        = "${var.API_PERMISSION_TABLE_NAME}"
+      "UserPoolId"                = "${var.USERPOOL_ID}"
+    }
+  }
+}
