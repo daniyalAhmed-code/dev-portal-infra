@@ -67,7 +67,7 @@ resource "aws_api_gateway_integration" "lambda_integration" {
   uri = var.LAMBDA_URI
   passthrough_behavior    = "WHEN_NO_MATCH"
   integration_http_method = "POST"
-  count            = "${var.HTTP_METHOD != "OPTIONS" ? 1 : 0}"
+  count            = "${var.HTTP_METHOD != "OPTIONS" && var.HTTP_METHOD != "ANY" ? 1 : 0}" 
   
   request_templates = "${var.REQUEST_TEMPLATES}"
     depends_on = [
