@@ -8,6 +8,10 @@ locals {
   DEV_PORTAL_FEEDBACK_TABLE_NAME = data.terraform_remote_state.vap-platform-infra.outputs.DEV_PORTAL_FEEDBACK_TABLE_NAME
   DEV_PORTAL_FEEDBACK_TABLE_ARN  = data.terraform_remote_state.vap-platform-infra.outputs.DEV_PORTAL_FEEDBACK_TABLE_ARN
 
+  API_PERMISSION_TABLE_NAME = data.terraform_remote_state.vap-platform-infra.outputs.API_PERMISSION_TABLE_NAME
+  API_PERMISSION_TABLE_ARN  = data.terraform_remote_state.vap-platform-infra.outputs.API_PERMISSION_TABLE_ARN
+
+
   DEV_PORTAL_PRE_LOGIN_ACCOUNTS_TABLE_NAME = data.terraform_remote_state.vap-platform-infra.outputs.DEV_PORTAL_PRE_LOGIN_ACCOUNTS_TABLE_NAME
   DEV_PORTAL_PRE_LOGIN_ACCOUNTS_TABLE_ARN  = data.terraform_remote_state.vap-platform-infra.outputs.DEV_PORTAL_PRE_LOGIN_ACCOUNTS_TABLE_ARN
   BUCKET_REGIONAL_DOMAIN_NAME              = data.terraform_remote_state.vap-platform-infra.outputs.BUCKET_REGIONAL_DOMAIN_NAME

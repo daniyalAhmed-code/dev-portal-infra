@@ -70,3 +70,27 @@ data "archive_file" "lambda_api_key_rotation_function" {
   source_dir  = "${path.module}/code/api-key-rotation"
   output_path = "${path.module}/zip/api-key-rotation.zip"
 }
+
+data "archive_file" "lambda_create_permissions_for_api_function" {
+  type        = "zip"
+  source_dir  = "${path.module}/code/create-permissions-for-api"
+  output_path = "${path.module}/zip/create-permissions-for-api.zip"
+}
+
+data "archive_file" "lambda_get_allowed_apis_for_resource_function" {
+  type        = "zip"
+  source_dir  = "${path.module}/code/get-allowed-apis-for-resource"
+  output_path = "${path.module}/zip/get-allowed-apis-for-resource.zip"
+}
+
+data "archive_file" "lambda_delete_allowed_api_for_resource_function" {
+  type        = "zip"
+  source_dir  = "${path.module}/code/delete-allowed-apis-for-resource"
+  output_path = "${path.module}/zip/delete-allowed-apis-for-resource.zip"
+}
+
+data "archive_file" "lambda_update_permissions_for_api_function" {
+  type        = "zip"
+  source_dir  = "${path.module}/code/update-permissions-for-api"
+  output_path = "${path.module}/zip/update-permissions-for-api.zip"
+}
