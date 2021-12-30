@@ -55,6 +55,7 @@ resource "aws_api_gateway_method" "lambda_method" {
   resource_id   = "${var.RESOURCE_ID}"
   http_method   = "${var.HTTP_METHOD}"
   authorization = "${var.AUTHORIZATION}"
+  authorizer_id = "${var.AUTHORIZER_ID}"
   count            = "${var.HTTP_METHOD != "OPTIONS" ? 1 : 0}"
   
 }
@@ -63,10 +64,10 @@ resource "aws_api_gateway_integration" "lambda_integration" {
   resource_id   = "${var.RESOURCE_ID}"
   http_method             = "${var.HTTP_METHOD}"
   type                    = "AWS_PROXY"
-  uri = "arn:aws:apigateway:${var.AWS_REGION}:lambda:path/2015-03-31/functions/arn:aws:lambda:${var.AWS_REGION}:${var.CURRENT_ACCOUNT_ID}:function:$${stageVariables.DevPortalFunctionName}/invocations"
+  uri = var.LAMBDA_URI
   passthrough_behavior    = "WHEN_NO_MATCH"
   integration_http_method = "POST"
-  count            = "${var.HTTP_METHOD != "OPTIONS" ? 1 : 0}"
+  count            = "${var.HTTP_METHOD != "OPTIONS" && var.HTTP_METHOD != "ANY" ? 1 : 0}" 
   
   request_templates = "${var.REQUEST_TEMPLATES}"
     depends_on = [
