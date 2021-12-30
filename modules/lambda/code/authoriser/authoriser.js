@@ -2,17 +2,22 @@
 
 const AWS = require('aws-sdk');
 const AuthPolicy = require('aws-auth-policy');
-
 const log4js = require('log4js');
 const logger = log4js.getLogger();
 logger.level = process.env.LOG_LEVEL;
+const jwt = require('jsonwebtoken');
+const request = require('request');
+const jwkToPem = require('jwk-to-pem');
+let PEMS = null;
 const dynamodb = new AWS.DynamoDB.DocumentClient();
-const apigateway = new AWS.APIGateway();
-const cognito = new AWS.CognitoIdentityServiceProvider();
-const {
-    getEnv
-} = require('dev-portal-common/get-env');
 
+const toPem = (keyDictionary) => {
+    return jwkToPem(Object.assign({}, {
+        kty: keyDictionary.kty,
+        n: keyDictionary.n,
+        e: keyDictionary.e
+    }));
+};
 
 const deny = (awsAccountId, apiOptions) => {
     console.log('Inside deny', awsAccountId, apiOptions);
@@ -22,11 +27,184 @@ const deny = (awsAccountId, apiOptions) => {
     return iamPolicy;
 };
 
+const getJWKS = async(jwtKeySetURI) => {
+    console.time(`AUTHORIZER:getJWKS`);
+    return new Promise((resolve, reject) => {
+        request({
+            url: jwtKeySetURI,
+            json: true
+        }, (error, response, body) => {
+            console.timeEnd(`AUTHORIZER:getJWKS`);
+            if (!error && response.statusCode === 200) {
+                let pems = {};
+                let keys = body['keys'];
+                for (let keyIndex = 0; keyIndex < keys.length; keyIndex++) {
+                    let kid = keys[keyIndex].kid;
+                    pems[kid] = toPem(keys[keyIndex]);
+                }
+                resolve(pems);
+            }
+            else {
+                logger.info("Failed to retrieve the keys from the well known user-pool URI, ");
+                logger.info('Error-Code: ', response.statusCode);
+                logger.info(error);
+                //resolve(null);
+                reject(error);
+            }
+        });
+    });
+};
+
+const verifyJWT = async(token, pem, tokenIssuer) => {
+    console.time(`AUTHORIZER:verifyJWT`);
+    return new Promise(resolve => {
+        jwt.verify(token, pem, {
+            issuer: tokenIssuer
+        }, function(err, payload) {
+            console.timeEnd(`AUTHORIZER:verifyJWT`);
+            if (err) {
+                logger.info("Error while trying to verify the Token, returning deny-all policy", err.message);
+                resolve(null);
+            }
+            resolve(payload);
+        });
+    });
+};
+
+const processAuthRequest = async(payload, awsAccountId, apiOptions) => {
+    console.log(payload)
+    let ApiId = apiOptions.restApiId
+    logger.info('payload', payload);
+    if (!payload) {
+        console.log("in not payload")
+        return deny(awsAccountId, apiOptions);
+    }
+    else {
+        //Valid token. Generate the API Gateway policy for the user
+        //Always generate the policy on value of 'sub' claim and not for
+        // 'username' because username is reassignable
+        //sub is UUID for a user which is never reassigned to another user.
+        const pId = payload.sub;
+        let policy = new AuthPolicy(pId, awsAccountId, apiOptions);
+
+        // Check the Cognito group entry for permissions.
+        // precedence
+        console.log(payload['cognito:groups'])
+        let UserPoolId = payload.iss.split('/')[3]
+        if (payload['cognito:groups']) {
+            let user_groups = payload['cognito:groups'];
+            console.log(user_groups)
+            console.log("HELLO")
+            let tableName = `${process.env.ApiRolePermissionTable}`;
+            let apiPermissionTableName = `${process.env.ApiPermissionTable}`
+            // GET the cuid from payload
+            // if cuid == 'admin' tableName = `${process.env.STAGE}-admin-role-membership`
+            // Get all APIs a user can execute
+            let apisResponse = await dynamodb.scan({ TableName: tableName }).promise();
+            let apiPermissionRespone = await dynamodb.scan({ TableName: apiPermissionTableName }).promise();
+            console.log("api response below")
+            console.log('apisResponse---', apisResponse);
+            // Get list of all
+            for (let ar of apisResponse.Items) {
+                console.log("in for loops")
+                console.log(ar.ResourceName)
+                if (ar.hasOwnProperty('ResourceName')){
+                if (user_groups.includes(ar.role) && ar.ResourceName == apiPermissionRespone.Items[0].ResourceName ) {
+                    console.log("in user-group")
+                    console.log(apiPermissionRespone)
+                    for (let api of ar.apis) {
+                        if (ApiId == apiPermissionRespone.Items[0].apis[0].id )
+                        {
+                            console.log("in api")
+                            policy.allowMethod(AuthPolicy.HttpVerb[api.method], api.api);
+                        }
+                        else{
+                            console.log("in deny")
+                            return deny(awsAccountId, apiOptions);
+                        }
+                    }
+                }
+            }
+            else {
+                if (user_groups.includes(ar.role)) {
+                    console.log("in user-group")
+                    for (let api of ar.apis) {
+                            policy.allowMethod(AuthPolicy.HttpVerb[api.method], api.api);
+                        }
+                    }
+                }
+        }
+        }
+        else {
+            console.log("in else deny")
+            return deny(awsAccountId, apiOptions);
+        }
+        // Get all the config
+        let context = {};
+        let cognitoIdentityId = ""
+        let iamPolicy = policy.build();
+        console.log(iamPolicy.policyDocument.Statement)
+        let customerTable = `${process.env.CustomersTableName}`
+        let customerParams = {
+            ProjectionExpression: "Id",
+            FilterExpression: "#username = :a",
+            ExpressionAttributeNames: {
+                "#username": "Username",
+            },
+            ExpressionAttributeValues: {
+                ":a": payload['cognito:username']
+           },
+            TableName: customerTable
+           };
+
+        let customerResponse = await dynamodb.scan(customerParams).promise()
+        if (customerResponse.Count == 0){
+            let customerPreloginParams = {
+            ProjectionExpression: "UserId",
+            FilterExpression: "#username = :a",
+            ExpressionAttributeNames: {
+                "#username": "UserId",
+            },
+            ExpressionAttributeValues: {
+                ":a": payload['cognito:username']
+            },
+            TableName: `${process.env.PreLoginAccountsTableName}`
+            };
+            customerResponse = await dynamodb.scan(customerPreloginParams).promise()
+            console.log(customerResponse)
+            cognitoIdentityId = customerResponse.Items[0].UserId
+        }
+        else
+        {
+            cognitoIdentityId = customerResponse.Items[0].Id
+        }
+        // let pool = tokenIssuer.substring(tokenIssuer.lastIndexOf('/') + 1);
+        try {
+            context.cognitoIdentityId = cognitoIdentityId
+            context.Usersub = payload['cognito:username']
+            context.UserId = payload['cognito:username']
+            context.UserPoolId = UserPoolId
+           
+        }
+        catch (e) {
+            logger.error(e);
+        }
+        console.log(context)
+
+        iamPolicy.context = context;
+        console.log(iamPolicy);
+        return iamPolicy;
+    }
+};
+
 
 exports.handler = async (event, context, callback) => {
     console.log('Inside event', event);
+    console.log('Inside context', context);
+    
     let apiKey;
-
+    let cognitoGroupName = []
+    let decoded
     const tmp = event.methodArn.split(':');
     const apiGatewayArnTmp = tmp[5].split('/');
     const awsAccountId = tmp[4];
@@ -35,80 +213,24 @@ exports.handler = async (event, context, callback) => {
         restApiId: apiGatewayArnTmp[0],
         stage: apiGatewayArnTmp[1]
     };
-
-    console.log(apiOptions);
-    
-    let apiId = event.requestContext.identity.apiKeyId;
-    let userPoolId = getEnv("UserPoolId");
-    let api_date;
-
-    let current_date = new Date();
     try {
-        apiKey = await apigateway.getApiKey({
-            apiKey: apiId
-        }).promise();
-    } catch (err) {
-        console.log(err);
-        return deny(awsAccountId, apiOptions);
-    }
-
-    let userId = apiKey.name.split("/")[0];
-    let tableName = `${process.env.CustomersTableName}`;
-    let apisResponse = await dynamodb.query({
-        TableName: tableName,
-        KeyConditionExpression: "Id = :id",
-        ExpressionAttributeValues: {
-            ":id": userId
+        const token = event.authorizationToken
+        decoded = jwt.decode(token, {
+            complete: true
+        });
+        
+        console.log(decoded)
+        if (!decoded) {
+            logger.info('denied due to decoded error');
+            console.log("denied due to decoded error")
+            return deny(awsAccountId, apiOptions);
         }
-    }).promise();
-    
-    console.log(apisResponse);
-    
-    if (apisResponse.Count <= 0)
-        return deny(awsAccountId, apiOptions);
-
-    let username = apisResponse.Items[0].Username;
-    let cognitoResponse = await cognito.adminGetUser({
-        UserPoolId: userPoolId,
-        Username: username
-    });
-    
-    
-    console.log(cognitoResponse);
-    
-    if (!apisResponse.Items[0].hasOwnProperty("ApiKeyDuration")) {
-        console.log("ApiKeyDuration not present");
-        return generate_api_gateway_response(awsAccountId, apiOptions, username, userId);
+        
     }
-    
-    console.log("ApiKeyDuration present");
-    
-    if ('lastUpdatedDate' in apiKey) {
-        api_date = apiKey.lastUpdatedDate;
-    } else {
-        api_date = apiKey.createdDate;
+    catch (err) {
+        logger.error(err);
     }
-    
-    let ApiDate = new Date(api_date);
-    ApiDate.setDate(ApiDate.getDate() + apisResponse.Items[0].ApiKeyDuration);
-    
-    if (ApiDate > current_date) {
-        return generate_api_gateway_response(awsAccountId, apiOptions, username, userId);
-    }
-    else
-        return deny(awsAccountId, apiOptions);
-};
-
-
-function generate_api_gateway_response(awsAccountId, apiOptions, username, userId) {
-    var authPolicy = new AuthPolicy(`${awsAccountId}`, awsAccountId, apiOptions);
-    authPolicy.allowMethod(AuthPolicy.HttpVerb.ALL, "/*");
-    
-    var generated = authPolicy.build();
-    generated["context"] = {
-        "cognito_username": username,
-        "user_id": userId
-    };
-    
-    return generated;
+    // console.log("main deny")
+    return await processAuthRequest(decoded.payload, awsAccountId, apiOptions);
+    // return deny(awsAccountId, apiOptions);
 }

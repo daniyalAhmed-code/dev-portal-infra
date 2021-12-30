@@ -217,8 +217,10 @@ resource "aws_lambda_function" "lambda_api_key_authoriser_function" {
   environment {
     variables = {
       "UserPoolId"         = "${var.USERPOOL_ID}"
+      "ApiRolePermissionTable" = "${var.API_ROLE_PERMISSION_TABLE_NAME}"
       "CustomersTableName" = "${var.CUSTOMER_TABLE_NAME}"
-
+      "PreLoginAccountsTableName" = "${var.PRE_LOGIN_ACCOUNT_TABLE_NAME}"
+      "ApiPermissionTable" = "${var.API_PERMISSION_TABLE_NAME}"
     }
   }
 }
