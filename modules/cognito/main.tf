@@ -186,23 +186,15 @@ resource "aws_cognito_user_pool" "third_party_cognito_user_pool" {
       sms_message   = "<p><b>Username:</b> {username} <br><b>Temporary Password</b> {####}</p>"
     }
   }
-  
-  mfa_configuration = "OPTIONAL"
-  sms_configuration {
-    external_id    = "${var.RESOURCE_PREFIX}-SMS-ROLE"
-    sns_caller_arn = var.COGNITO_SMS_CALLER_ROLE_ARN
-  }
+
+
   
   email_verification_subject = "Developer Portal - Invitation"
   email_verification_message = "'<h2>Developer Portal</h2><p>Your verification code is <b>{####}</b></p>'"
   auto_verified_attributes   = ["email"]
   username_attributes        = ["email"]
 
-  lambda_config {
-    pre_sign_up         = "arn:aws:lambda:${var.AWS_REGION}:${var.AWS_ACCOUNT_ID}:function:${var.RESOURCE_PREFIX}-CognitoPreSignupTriggerFn"
-    post_confirmation   = "arn:aws:lambda:${var.AWS_REGION}:${var.AWS_ACCOUNT_ID}:function:${var.RESOURCE_PREFIX}-CognitoPostConfirmationTriggerFn"
-    post_authentication = "arn:aws:lambda:${var.AWS_REGION}:${var.AWS_ACCOUNT_ID}:function:${var.RESOURCE_PREFIX}-CognitoPostAuthenticationTriggerFn"
-  }
+
   password_policy {
     minimum_length    = 12
     require_lowercase = true
@@ -357,22 +349,14 @@ resource "aws_cognito_user_pool" "mno_cognito_user_pool" {
     }
   }
   
-  mfa_configuration = "OPTIONAL"
-  sms_configuration {
-    external_id    = "${var.RESOURCE_PREFIX}-SMS-ROLE"
-    sns_caller_arn = var.COGNITO_SMS_CALLER_ROLE_ARN
-  }
+
   
   email_verification_subject = "Developer Portal - Invitation"
   email_verification_message = "'<h2>Developer Portal</h2><p>Your verification code is <b>{####}</b></p>'"
   auto_verified_attributes   = ["email"]
   username_attributes        = ["email"]
 
-  lambda_config {
-    pre_sign_up         = "arn:aws:lambda:${var.AWS_REGION}:${var.AWS_ACCOUNT_ID}:function:${var.RESOURCE_PREFIX}-CognitoPreSignupTriggerFn"
-    post_confirmation   = "arn:aws:lambda:${var.AWS_REGION}:${var.AWS_ACCOUNT_ID}:function:${var.RESOURCE_PREFIX}-CognitoPostConfirmationTriggerFn"
-    post_authentication = "arn:aws:lambda:${var.AWS_REGION}:${var.AWS_ACCOUNT_ID}:function:${var.RESOURCE_PREFIX}-CognitoPostAuthenticationTriggerFn"
-  }
+
   password_policy {
     minimum_length    = 12
     require_lowercase = true
