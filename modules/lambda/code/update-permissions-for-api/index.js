@@ -19,11 +19,18 @@ exports.handler = async (req, res) => {
     if(typeof req.pathParameters == "string")
         req['pathParameters'] = JSON.parse(req.pathParameters)
     let ResourceId = req.pathParameters.ResourceId
+    let UsagePlanPermission = await customersController.getAllowedApisForResource(
+        ResourceId,
+        )
+    
+    if (UsagePlanPermission == null)
+        return rh.callbackRespondWithError(404,"No allowed apis for this resource")
+    
     const {
         ApiId
     } = req.body
     let body = await schema.validate(req.body);
 
-    const UsagePlanPermission = await customersController.updateAllowedApisForResource(ResourceId,ApiId)
-    return rh.callbackRespondWithJsonBody(200,UsagePlanPermission)
+    let updateAllowedApis = await customersController.updateAllowedApisForResource(ResourceId,ApiId)
+    return rh.callbackRespondWithJsonBody(200,updateAllowedApis)
 }   

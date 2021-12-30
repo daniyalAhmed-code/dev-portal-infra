@@ -12,7 +12,13 @@ exports.handler = async (req, res) => {
     if(typeof req.pathParameters == "string")
         req['pathParameters'] = JSON.parse(req.pathParameters)
     let ResourceId = req.pathParameters.ResourceId
-   
-    const UsagePlanPermission = await customersController.deleteAllowedApisForResource(ResourceId)
-    return rh.callbackRespondWithJsonBody(200,UsagePlanPermission)
+    let UsagePlanPermission = await customersController.getAllowedApisForResource(
+        ResourceId,
+        )
+    
+    if (UsagePlanPermission == null)
+        return rh.callbackRespondWithError(404,"No allowed apis for this resource")
+    
+    let DeleteAllowedApis = await customersController.deleteAllowedApisForResource(ResourceId)
+    return rh.callbackRespondWithJsonBody(200,DeleteAllowedApis)
 }   

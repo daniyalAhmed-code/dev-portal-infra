@@ -15,5 +15,8 @@ exports.handler = async (req, res) => {
     const UsagePlanPermission = await customersController.getAllowedApisForResource(
     ResourceId,
     )
+    if (UsagePlanPermission == null)
+        return rh.callbackRespondWithError(404,"No allowed apis for this resource")
+    
     return rh.callbackRespondWithJsonBody(200,UsagePlanPermission)
 }   
