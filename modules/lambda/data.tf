@@ -76,3 +76,9 @@ data "archive_file" "lambda_create_mno_third_party_resources_function" {
   source_dir  = "${path.module}/code/create-mno-third-party-resources"
   output_path = "${path.module}/zip/create-mno-third-party-resources.zip"
 }
+
+data "archive_file" "lambda_get_mno_third_party_resources_function" {
+  type        = "zip"
+  source_dir  = "${path.module}/code/get-mno-third-party-resources"
+  output_path = "${path.module}/zip/get-mno-third-party-resources.zip"
+}

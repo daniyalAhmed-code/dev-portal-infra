@@ -342,6 +342,7 @@ module "visibility_post" {
 #   }
 # }
 
+
 module "MnoResource_post" {
   source                          = "./methods"
   METHOD_VALUE                    = ""
@@ -349,15 +350,38 @@ module "MnoResource_post" {
   RESOURCE_ID                     = aws_api_gateway_resource.admin_account_mno_resource.id
   INTEGRATION_RESPONSE_PARAMETERS = local.integration_response_parameters
   METHOD_RESPONSE_PARAMETERS      = local.method_response_parameters
-  AUTHORIZATION                   = var.AUTHORIZATION
-  
+  AUTHORIZATION = "${var.AUTHORIZATION}"
+  AUTHORIZER_ID = "${var.AUTHORIZATION == "CUSTOM" ? "${aws_api_gateway_authorizer.lambda_authorizer[0].id}" : ""}"
   
   HTTP_METHOD                     = "POST"
   LAMBDA_INVOKE_ARN               = var.BACKEND_LAMBDA_INVOKE_ARN
   FUNCTION_NAME                   = var.BACKEND_LAMBDA_NAME
   CURRENT_ACCOUNT_ID              = var.CURRENT_ACCOUNT_ID
   AWS_REGION                      = var.AWS_REGION
-  # LAMBDA_URI                      =var.LAMBDA_CREATE_MNO_THIRD_PARTY_RESOURCE_INVOKE_ARN
+  LAMBDA_URI                      =var.LAMBDA_CREATE_MNO_THIRD_PARTY_RESOURCE_INVOKE_ARN
+
+  REQUEST_TEMPLATES = {
+    "application/json" = <<EOF
+    EOF
+  }
+}
+
+module "MnoResource_GET" {
+  source                          = "./methods"
+  METHOD_VALUE                    = ""
+  API_GATEWAY_ID                  = aws_api_gateway_rest_api.api-gateway.id
+  RESOURCE_ID                     = aws_api_gateway_resource.admin_account_mno_resource.id
+  INTEGRATION_RESPONSE_PARAMETERS = local.integration_response_parameters
+  METHOD_RESPONSE_PARAMETERS      = local.method_response_parameters
+  AUTHORIZATION = "${var.AUTHORIZATION}"
+  AUTHORIZER_ID = "${var.AUTHORIZATION == "CUSTOM" ? "${aws_api_gateway_authorizer.lambda_authorizer[0].id}" : ""}"
+  
+  HTTP_METHOD                     = "GET"
+  LAMBDA_INVOKE_ARN               = var.BACKEND_LAMBDA_INVOKE_ARN
+  FUNCTION_NAME                   = var.BACKEND_LAMBDA_NAME
+  CURRENT_ACCOUNT_ID              = var.CURRENT_ACCOUNT_ID
+  AWS_REGION                      = var.AWS_REGION
+  LAMBDA_URI                      =var.LAMBDA_GET_CURRENT_USER_PROFILE_INVOKE_ARN
 
   REQUEST_TEMPLATES = {
     "application/json" = <<EOF
@@ -509,4 +533,12 @@ resource "aws_lambda_permission" "lambda_permission3" {
   action        = "lambda:InvokeFunction"
   principal     = "apigateway.amazonaws.com"
   source_arn    = "${aws_api_gateway_rest_api.api-gateway.execution_arn}/*/*"
+}
+
+resource "aws_lambda_permission" "get_mno_third_party_resource_lambda_permission" {
+  function_name = var.GET_MNO_THIRD_PARTY_RESOURCE_LAMBDA_NAME
+  statement_id  = "GET_MNO_THIRD_PARTY_RESOURCE_LAMBDA_PERMISSION"
+  action        = "lambda:InvokeFunction"
+  principal     = "apigateway.amazonaws.com"
+  source_arn    = "${aws_api_gateway_rest_api.api-gateway.execution_arn}/*/*/*"
 }

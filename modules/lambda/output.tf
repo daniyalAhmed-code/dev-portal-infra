@@ -85,3 +85,9 @@ output "LAMBDA_CREATE_MNO_THIRD_PARTY_RESOURCE_INVOKE_ARN"{
 output "CREATE_MNO_THIRD_PARTY_RESOURCE_LAMBDA_NAME"{
   value = aws_lambda_function.lambda_create_mno_third_party_resources_function.function_name
 }
+output "LAMBDA_GET_MNO_THIRD_PARTY_RESOURCE_INVOKE_ARN"{
+  value = aws_lambda_function.lambda_get_mno_third_party_resources_function.invoke_arn
+}
+output "GET_MNO_THIRD_PARTY_RESOURCE_LAMBDA_NAME"{
+  value = aws_lambda_function.lambda_get_mno_third_party_resources_function.function_name
+}
