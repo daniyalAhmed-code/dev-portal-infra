@@ -59,6 +59,8 @@ module "policy" {
   LAMBDA_INVOKE_API_KEY_ROTATION_ROLE_ARN              = module.role.LAMBDA_INVOKE_API_KEY_ROTATION_ROLE_ARN
   LAMBDA_API_KEY_ROTATION_ROLE_ARN                     = module.role.LAMBDA_API_KEY_ROTATION_ROLE_ARN
   API_GATEWAY_ID                                       = module.api.API_GATEWAY_ID
+  API_PERMISSION_TABLE_ARN                             = local.API_PERMISSION_TABLE_ARN
+
   
 }
 
@@ -106,6 +108,7 @@ module "lambda" {
   APIGATEWAY_CUSTOM_DOMAIN_NAME                       = var.APIGATEWAY_CUSTOM_DOMAIN_NAME
   LAMBDA_INVOKE_API_KEY_ROTATION_ROLE_ARN             = module.role.LAMBDA_INVOKE_API_KEY_ROTATION_ROLE_ARN
   LAMBDA_API_KEY_ROTATION_ROLE_ARN                    = module.role.LAMBDA_API_KEY_ROTATION_ROLE_ARN
+  API_PERMISSION_TABLE_NAME                           =local.API_PERMISSION_TABLE_NAME
 }
 
 

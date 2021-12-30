@@ -22,6 +22,7 @@ variable "DEVELOPMENT_MODE" {}
 variable "CUSTOMER_TABLE_NAME" {}
 variable "PRE_LOGIN_ACCOUNT_TABLE_NAME" {}
 variable "API_ROLE_PERMISSION_TABLE_NAME" {}
+variable "API_PERMISSION_TABLE_NAME" {}
 variable "ACCOUNT_REGISTRATION_MODE" {}
 variable "RESOURCE_PREFIX" {}
 variable "IS_ADMIN" {}

@@ -73,6 +73,7 @@ const verifyJWT = async(token, pem, tokenIssuer) => {
 
 const processAuthRequest = async(payload, awsAccountId, apiOptions) => {
     console.log(payload)
+    let ApiId = apiOptions.restApiId
     logger.info('payload', payload);
     if (!payload) {
         console.log("in not payload")
@@ -93,26 +94,46 @@ const processAuthRequest = async(payload, awsAccountId, apiOptions) => {
         if (payload['cognito:groups']) {
             let user_groups = payload['cognito:groups'];
             console.log(user_groups)
+            console.log("HELLO")
             let tableName = `${process.env.ApiRolePermissionTable}`;
+            let apiPermissionTableName = `${process.env.ApiPermissionTable}`
             // GET the cuid from payload
             // if cuid == 'admin' tableName = `${process.env.STAGE}-admin-role-membership`
             // Get all APIs a user can execute
-            console.log(tableName)
             let apisResponse = await dynamodb.scan({ TableName: tableName }).promise();
+            let apiPermissionRespone = await dynamodb.scan({ TableName: apiPermissionTableName }).promise();
             console.log("api response below")
             console.log('apisResponse---', apisResponse);
             // Get list of all
             for (let ar of apisResponse.Items) {
                 console.log("in for loops")
-                if (user_groups.includes(ar.role)) {
+                console.log(ar.ResourceName)
+                if (ar.hasOwnProperty('ResourceName')){
+                if (user_groups.includes(ar.role) && ar.ResourceName == apiPermissionRespone.Items[0].ResourceName ) {
                     console.log("in user-group")
+                    console.log(apiPermissionRespone)
                     for (let api of ar.apis) {
-                        console.log("in api")
-                        policy.allowMethod(AuthPolicy.HttpVerb[api.method], api.api);
+                        if (ApiId == apiPermissionRespone.Items[0].apis[0].id )
+                        {
+                            console.log("in api")
+                            policy.allowMethod(AuthPolicy.HttpVerb[api.method], api.api);
+                        }
+                        else{
+                            console.log("in deny")
+                            return deny(awsAccountId, apiOptions);
+                        }
                     }
                 }
             }
-
+            else {
+                if (user_groups.includes(ar.role)) {
+                    console.log("in user-group")
+                    for (let api of ar.apis) {
+                            policy.allowMethod(AuthPolicy.HttpVerb[api.method], api.api);
+                        }
+                    }
+                }
+        }
         }
         else {
             console.log("in else deny")
@@ -197,6 +218,7 @@ exports.handler = async (event, context, callback) => {
         decoded = jwt.decode(token, {
             complete: true
         });
+        
         console.log(decoded)
         if (!decoded) {
             logger.info('denied due to decoded error');
