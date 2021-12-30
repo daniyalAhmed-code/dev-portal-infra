@@ -10,8 +10,8 @@ exports.handler = async (req, res) => {
 
     const schema = Joi.object().keys({
     ResourceType: Joi.string().valid("Mno","ThirdParty"),
-    ResourceName : Joi.string().required(),
-    ApiId: Joi.array().items(Joi.object().keys({Id:Joi.string().required()}))
+    ResourceId : Joi.string().required(),
+    ApiId: Joi.array().items(Joi.string().required())
     });
 
 
@@ -22,14 +22,14 @@ exports.handler = async (req, res) => {
 
     const {
     ResourceType,    
-    ResourceName,
+    ResourceId,
     ApiId
     } = req.body
     let body = await schema.validate(req.body);
 
     const UsagePlanPermission = await customersController.createPermissionToAccessApis(
     ResourceType,    
-    ResourceName,
+    ResourceId,
     ApiId)
     return rh.callbackRespondWithJsonBody(200,UsagePlanPermission)
 }   
