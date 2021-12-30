@@ -319,3 +319,65 @@ resource "aws_lambda_permission" "lambda_authorizer_all_api_gateway_perm" {
   principal     = "apigateway.amazonaws.com"
   source_arn    = "arn:aws:execute-api:${var.AWS_REGION}:${var.AWS_ACCOUNT_ID}:*"
 }
+
+
+resource "aws_lambda_function" "lambda_create_mno_third_party_resources_function" {
+  provider            = aws.src
+  filename         = "${path.module}/zip/create-mno-third-party-resources.zip"
+  function_name    = "${var.RESOURCE_PREFIX}-create-mno-third-party-resources"
+  role             = "${var.LAMBDA_BACKEND_ROLE_ARN}"
+  handler          = "index.handler"
+  source_code_hash = "${data.archive_file.lambda_backend_lambda_function.output_base64sha256}"
+  runtime          = "nodejs12.x"
+  timeout          = "20"
+  layers           = ["${aws_lambda_layer_version.lambda-common-layer.arn}"]
+  environment {
+    variables = {
+      "NODE_ENV"                  = "${var.NODE_ENV}"
+      "WEBSITE_BUCKET_NAME"       = "${var.WEBSITE_BUCKET_NAME}"
+      "StaticBucketName"          = "${var.ARTIFACTS_S3_BUCKET_NAME}"
+      "CustomersTableName"        = "${var.CUSTOMER_TABLE_NAME}"
+      "PreLoginAccountsTableName" = "${var.PRE_LOGIN_ACCOUNT_TABLE_NAME}"
+      "MnoThirdPartyResourceTableName" = "${var.MNO_THIRD_PARTY_RESOURCE_TABLE_NAME}"
+      
+      "FeedbackTableName"         = "${var.FEEDBACK_TABLE_NAME}"
+      "FeedbackSnsTopicArn"       = "${var.FEEDBACK_SNS_TOPIC_ARN}"
+      "MNO_UserPoolId"            = "${var.MNO_USERPOOL_ID}"
+      "Third_Party_UserPoolId"    = "${var.THIRD_PARTY_USERPOOL_ID}"
+      "AdminsGroupName"           = "${var.ADMIN_GROUP_NAME}"
+      "RegisteredGroupName"       = "${var.REGISTERED_GROUP_NAME}"
+      "DevelopmentMode"           = "${var.DEVELOPMENT_MODE}"
+      "CatalogUpdaterFunctionArn" = aws_lambda_function.lambda_catalog_updater_lambda_function.arn
+    }
+  }
+}
+
+
+
+resource "aws_lambda_function" "lambda_get_mno_third_party_resources_function" {
+  provider            = aws.src
+  filename         = "${path.module}/zip/get-mno-third-party-resources.zip"
+  function_name    = "${var.RESOURCE_PREFIX}-get-mno-third-party-resources"
+  role             = "${var.LAMBDA_BACKEND_ROLE_ARN}"
+  handler          = "index.handler"
+  source_code_hash = "${data.archive_file.lambda_backend_lambda_function.output_base64sha256}"
+  runtime          = "nodejs12.x"
+  timeout          = "20"
+  layers           = ["${aws_lambda_layer_version.lambda-common-layer.arn}"]
+  environment {
+    variables = {
+      "NODE_ENV"                  = "${var.NODE_ENV}"
+      "WEBSITE_BUCKET_NAME"       = "${var.WEBSITE_BUCKET_NAME}"
+      "StaticBucketName"          = "${var.ARTIFACTS_S3_BUCKET_NAME}"
+      "CustomersTableName"        = "${var.CUSTOMER_TABLE_NAME}"
+      "PreLoginAccountsTableName" = "${var.PRE_LOGIN_ACCOUNT_TABLE_NAME}"
+      "FeedbackTableName"         = "${var.FEEDBACK_TABLE_NAME}"
+      "FeedbackSnsTopicArn"       = "${var.FEEDBACK_SNS_TOPIC_ARN}"
+      "UserPoolId"                = "${var.USERPOOL_ID}"
+      "AdminsGroupName"           = "${var.ADMIN_GROUP_NAME}"
+      "RegisteredGroupName"       = "${var.REGISTERED_GROUP_NAME}"
+      "DevelopmentMode"           = "${var.DEVELOPMENT_MODE}"
+      "CatalogUpdaterFunctionArn" = aws_lambda_function.lambda_catalog_updater_lambda_function.arn
+    }
+  }
+}

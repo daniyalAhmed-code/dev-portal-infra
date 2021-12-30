@@ -13,8 +13,14 @@ locals {
   BUCKET_REGIONAL_DOMAIN_NAME              = data.terraform_remote_state.vap-platform-infra.outputs.BUCKET_REGIONAL_DOMAIN_NAME
   TOPIC_NAME                               = data.terraform_remote_state.vap-platform-infra.outputs.TOPIC_NAME
   COGNITO_USER_POOL                        = "${local.RESOURCE_PREFIX}-user-pool"
-  COGNITO_USER_POOL_CLIENT                 = "${local.RESOURCE_PREFIX}-user-pool-client"
+  THIRD_PARTY_COGNITO_USER_POOL            = "${local.RESOURCE_PREFIX}-third-party-user-pool"
+  MNO_COGNITO_USER_POOL                    = "${local.RESOURCE_PREFIX}-mno-user-pool"
+  MNO_THIRD_PARTY_RESOURCE_TABLE_NAME  = data.terraform_remote_state.vap-platform-infra.outputs.MNO_THIRD_PARTY_RESOURCE_TABLE_NAME
+  MNO_THIRD_PARTY_RESOURCE_TABLE_ARN  = data.terraform_remote_state.vap-platform-infra.outputs.MNO_THIRD_PARTY_RESOURCE_TABLE_ARN
 
+  COGNITO_USER_POOL_CLIENT                 = "${local.RESOURCE_PREFIX}-user-pool-client"
+  MNO_COGNITO_USER_POOL_CLIENT                 = "${local.RESOURCE_PREFIX}-mno-user-pool-client"
+  THIRD_PARTY_COGNITO_USER_POOL_CLIENT                 = "${local.RESOURCE_PREFIX}-third-party-user-pool-client"
   ENABLE_FEEDBACK_SUBMISSION = var.ENABLE_FEEDBACK_SUBMISSION == "admin@email.com" ? local.TOPIC_NAME : ""
   IS_ADMIN                   = var.ENABLE_FEEDBACK_SUBMISSION == "admin@email.com" ? true : false
 

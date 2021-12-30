@@ -15,6 +15,8 @@ variable "ADMIN_GROUP_NAME" {}
 variable "REGISTERED_GROUP_NAME" {}
 variable "WEBSITE_BUCKET_NAME" {}
 variable "USERPOOL_ID" {}
+variable "MNO_USERPOOL_ID" {}
+variable "THIRD_PARTY_USERPOOL_ID" {}
 variable "FEEDBACK_SNS_TOPIC_ARN" {}
 variable "FEEDBACK_TABLE_NAME" {}
 variable "NODE_ENV" {}

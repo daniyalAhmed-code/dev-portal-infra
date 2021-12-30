@@ -12,6 +12,9 @@ module "policy" {
   }
   CLOUDFRONT_SECURITY_LAMBDA_QUALIFIED_ARN             = module.lambda.CLOUDFRONT_SECURITY_LAMBDA_QUALIFIED_ARN
   COGNITO_USER_POOL                                    = module.cognito.COGNITO_USERPOOL_ARN
+  MNO_COGNITO_USER_POOL                                = module.cognito.MNO_COGNITO_USERPOOL_ARN
+  THIRD_PARTY_COGNITO_USER_POOL                        = module.cognito.THIRD_PARTY_COGNITO_USERPOOL_ARN
+
   LAMBDA_CATALOG_UPDATER_ROLE_NAME                     = module.role.LAMBDA_CATALOG_UPDATER_ROLE_NAME
   LAMBDA_BACKEND_ROLE_NAME                             = module.role.LAMBDA_BACKEND_ROLE_NAME
   LAMBDA_ASSET_UPLOADER_ROLE_NAME                      = module.role.LAMBDA_ASSET_UPLOADER_ROLE_NAME
@@ -67,6 +70,7 @@ module "lambda" {
     aws.src    = aws
     aws.global = aws.global_region
   }
+  MNO_THIRD_PARTY_RESOURCE_TABLE_NAME                 =local.MNO_THIRD_PARTY_RESOURCE_TABLE_NAME
   ARTIFACTS_S3_BUCKET_NAME                            = local.ARTIFICATS_S3_BUCKET
   LAMBDA_CATALOG_UPDATER_ROLE_ARN                     = module.role.LAMBDA_CATALOG_UPDATER_ROLE_ARN
   LAMBDA_BACKEND_ROLE_ARN                             = module.role.LAMBDA_BACKEND_ROLE_ARN
@@ -87,6 +91,8 @@ module "lambda" {
   FEEDBACK_TABLE_NAME                                 = local.DEV_PORTAL_FEEDBACK_TABLE_NAME
   FEEDBACK_SNS_TOPIC_ARN                              = local.ENABLE_FEEDBACK_SUBMISSION
   USERPOOL_ID                                         = module.cognito.COGNITO_USER_POOL
+  MNO_USERPOOL_ID                                     = module.cognito.MNO_COGNITO_USER_POOL
+  THIRD_PARTY_USERPOOL_ID                             = module.cognito.THIRD_PARTY_COGNITO_USER_POOL
   IS_ADMIN                                            = local.IS_ADMIN
   ADMIN_GROUP_NAME                                    = local.ADMIN_GROUP_NAME
   RESOURCE_PREFIX                                     = local.RESOURCE_PREFIX
@@ -120,6 +126,10 @@ module "api" {
   API_KEY_AUTHORIZATION_ROLE_ARN   = module.role.API_KEY_AUTHORIZATION_ROLE_ARN
   API_KEY_AUTHORIZATION_INVOKE_ARN = module.lambda.API_KEY_AUTHORIZATION_INVOKE_ARN
   APIGATEWAY_CUSTOM_DOMAIN_NAME    = var.APIGATEWAY_CUSTOM_DOMAIN_NAME
+  LAMBDA_CREATE_MNO_THIRD_PARTY_RESOURCE_INVOKE_ARN  = module.lambda.LAMBDA_CREATE_MNO_THIRD_PARTY_RESOURCE_INVOKE_ARN
+  CREATE_MNO_THIRD_PARTY_RESOURCE_LAMBDA_NAME  = module.lambda.CREATE_MNO_THIRD_PARTY_RESOURCE_LAMBDA_NAME
+  LAMBDA_GET_MNO_THIRD_PARTY_RESOURCE_INVOKE_ARN = module.lambda.LAMBDA_GET_MNO_THIRD_PARTY_RESOURCE_INVOKE_ARN
+  GET_MNO_THIRD_PARTY_RESOURCE_LAMBDA_NAME = module.lambda.GET_MNO_THIRD_PARTY_RESOURCE_LAMBDA_NAME
 
 }
 
@@ -152,16 +162,23 @@ module "route53" {
 
 module "cognito" {
   source                               = "./modules/cognito"
+
   COGNITO_USER_POOL                    = local.COGNITO_USER_POOL
+  THIRD_PARTY_COGNITO_USER_POOL        = local.THIRD_PARTY_COGNITO_USER_POOL
+  MNO_COGNITO_USER_POOL                = local.MNO_COGNITO_USER_POOL
   ALLOW_ADMIN_CREATE_USER_ONLY         = var.ALLOW_ADMIN_CREATE_USER_ONLY
   CUSTOM_DOMAIN_NAME                   = var.CUSTOM_DOMAIN_NAME
   AWS_REGION                           = local.AWS_REGION
   AWS_ACCOUNT_ID                       = local.CURRENT_ACCOUNT_ID
   RESOURCE_PREFIX                      = local.RESOURCE_PREFIX
   COGNITO_USER_POOL_CLIENT             = local.COGNITO_USER_POOL_CLIENT
+  MNO_COGNITO_USER_POOL_CLIENT         = local.MNO_COGNITO_USER_POOL_CLIENT
+  THIRD_PARTY_COGNITO_USER_POOL_CLIENT = local.THIRD_PARTY_COGNITO_USER_POOL_CLIENT
   COGNITO_ADMIN_GROUP_DESCRIPTION      = var.COGNITO_ADMIN_GROUP_DESCRIPTION
   COGNITO_REGISTERED_GROUP_DESCRIPTION = var.COGNITO_REGISTERED_GROUP_DESCRIPTION
   COGNITO_USER_POOL_DOMAIN             = var.COGNITO_USER_POOL_DOMAIN
+  THIRD_PARTY_COGNITO_USER_POOL_DOMAIN = var.THIRD_PARTY_COGNITO_USER_POOL_DOMAIN
+  MNO_COGNITO_USER_POOL_DOMAIN         = var.MNO_COGNITO_USER_POOL_DOMAIN
   DNS_NAME                             = module.cloudfront.CLOUDFRONT_DOMAIN
   REGISTERED_GROUP_NAME                = local.REGISTERED_GROUP_NAME
   ADMIN_GROUP_NAME                     = local.ADMIN_GROUP_NAME

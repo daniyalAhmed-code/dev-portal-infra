@@ -141,7 +141,8 @@ resource "aws_iam_policy" "lambda_backend_policy" {
       ],
       "Resource": [
         "arn:aws:dynamodb:${var.AWS_REGION}:${var.CURRENT_ACCOUNT_ID}:table/${var.CUSTOMER_TABLE_NAME}",
-        "${var.PRE_LOGIN_TABLE_ARN}"
+        "${var.PRE_LOGIN_TABLE_ARN}",
+        "${var.MNO_THIRD_PARTY_RESOURCE_TABLE_ARN}",
       ]
     },
     {
@@ -395,7 +396,7 @@ resource "aws_iam_policy" "lambda_cognito_post_authentication_trigger_policy" {
         "Action": [
           "cognito-idp:AdminAddUserToGroup"
         ],
-        "Resource": "${var.COGNITO_USER_POOL}"
+        "Resource": ["${var.COGNITO_USER_POOL}","${var.MNO_COGNITO_USER_POOL}","${var.THIRD_PARTY_COGNITO_USER_POOL}"]
         
     }
    ]
@@ -494,7 +495,11 @@ resource "aws_iam_policy" "manage_user_pool_domain" {
         "Action": [
           "cognito-idp:CreateUserPoolDomain"
         ],
-        "Resource": "arn:aws:cognito-idp:${var.AWS_REGION}:${var.CURRENT_ACCOUNT_ID}:userpool/${var.USERPOOL_ID}"
+        "Resource": [
+          "arn:aws:cognito-idp:${var.AWS_REGION}:${var.CURRENT_ACCOUNT_ID}:userpool/${var.USERPOOL_ID}",
+          "arn:aws:cognito-idp:${var.AWS_REGION}:${var.CURRENT_ACCOUNT_ID}:userpool/${var.MNO_USERPOOL_ID}",
+          "arn:aws:cognito-idp:${var.AWS_REGION}:${var.CURRENT_ACCOUNT_ID}:userpool/${var.THIRD_PARTY_USERPOOL_ID}"
+          ]
         
     },
     {
@@ -502,7 +507,11 @@ resource "aws_iam_policy" "manage_user_pool_domain" {
         "Action": [
           "cognito-idp:DeleteUserPoolDomain"
         ],
-        "Resource": "arn:aws:cognito-idp:${var.AWS_REGION}:${var.CURRENT_ACCOUNT_ID}:userpool/${var.USERPOOL_ID}"
+        "Resource": [
+          "arn:aws:cognito-idp:${var.AWS_REGION}:${var.CURRENT_ACCOUNT_ID}:userpool/${var.USERPOOL_ID}",
+          "arn:aws:cognito-idp:${var.AWS_REGION}:${var.CURRENT_ACCOUNT_ID}:userpool/${var.MNO_USERPOOL_ID}",
+          "arn:aws:cognito-idp:${var.AWS_REGION}:${var.CURRENT_ACCOUNT_ID}:userpool/${var.THIRD_PARTY_USERPOOL_ID}"
+          ]
         
     },
     {
@@ -510,7 +519,11 @@ resource "aws_iam_policy" "manage_user_pool_domain" {
         "Action": [
           "cognito-idp:DescribeUserPoolDomain"
         ],
-        "Resource": "arn:aws:cognito-idp:${var.AWS_REGION}:${var.CURRENT_ACCOUNT_ID}:userpool/${var.USERPOOL_ID}"
+        "Resource": [
+          "arn:aws:cognito-idp:${var.AWS_REGION}:${var.CURRENT_ACCOUNT_ID}:userpool/${var.USERPOOL_ID}",
+          "arn:aws:cognito-idp:${var.AWS_REGION}:${var.CURRENT_ACCOUNT_ID}:userpool/${var.MNO_USERPOOL_ID}",
+          "arn:aws:cognito-idp:${var.AWS_REGION}:${var.CURRENT_ACCOUNT_ID}:userpool/${var.THIRD_PARTY_USERPOOL_ID}"
+          ]
         
     }
    ]
