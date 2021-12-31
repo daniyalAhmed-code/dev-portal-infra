@@ -72,11 +72,10 @@ const verifyJWT = async(token, pem, tokenIssuer) => {
 };
 
 const processAuthRequest = async(payload, awsAccountId, apiOptions) => {
-    console.log(payload)
+    let allowedApis = []
     let ApiId = apiOptions.restApiId
     logger.info('payload', payload);
     if (!payload) {
-        console.log("in not payload")
         return deny(awsAccountId, apiOptions);
     }
     else {
@@ -89,12 +88,9 @@ const processAuthRequest = async(payload, awsAccountId, apiOptions) => {
 
         // Check the Cognito group entry for permissions.
         // precedence
-        console.log(payload['cognito:groups'])
         let UserPoolId = payload.iss.split('/')[3]
         if (payload['cognito:groups']) {
             let user_groups = payload['cognito:groups'];
-            console.log(user_groups)
-            console.log("HELLO")
             let tableName = `${process.env.ApiRolePermissionTable}`;
             let apiPermissionTableName = `${process.env.ApiPermissionTable}`
             // GET the cuid from payload
@@ -106,26 +102,28 @@ const processAuthRequest = async(payload, awsAccountId, apiOptions) => {
             console.log('apisResponse---', apisResponse);
             // Get list of all
             for (let ar of apisResponse.Items) {
-                console.log("in for loops")
-                if (ar.hasOwnProperty('ResourceName')){
-                if (user_groups.includes(ar.role) && ar.ResourceId == apiPermissionRespone.Items[0].ResourceId ) {
+                if (ar.hasOwnProperty('ResourceId')){
+                console.log("Has own property")
+                if (user_groups.includes(ar.role) && ar.ResourceId == apiPermissionRespone.Items[0].Id ) {
+                    console.log("in resource check")
                     console.log("in user-group")
                     console.log(apiPermissionRespone)
                     for (let api of ar.apis) {
-                        if (ApiId == apiPermissionRespone.Items[0].apis[0].id )
+                        console.log(apiPermissionRespone.Items[0].ApiId)
+                        if (apiPermissionRespone.Items[0].ApiId.includes(ApiId))
                         {
+                            allowedApis= apiPermissionRespone.Items[0].ApiId
                             console.log("in api")
                             policy.allowMethod(AuthPolicy.HttpVerb[api.method], api.api);
                         }
-                        else{
-                            console.log("in deny")
-                            return deny(awsAccountId, apiOptions);
-                        }
+                
                     }
+                
                 }
             }
             else {
                 if (user_groups.includes(ar.role)) {
+                    
                     console.log("in user-group")
                     for (let api of ar.apis) {
                             policy.allowMethod(AuthPolicy.HttpVerb[api.method], api.api);
@@ -144,6 +142,7 @@ const processAuthRequest = async(payload, awsAccountId, apiOptions) => {
         let iamPolicy = policy.build();
         console.log(iamPolicy.policyDocument.Statement)
         let customerTable = `${process.env.CustomersTableName}`
+        
         let customerParams = {
             ProjectionExpression: "Id",
             FilterExpression: "#username = :a",
@@ -155,7 +154,7 @@ const processAuthRequest = async(payload, awsAccountId, apiOptions) => {
            },
             TableName: customerTable
            };
-
+        console.log("Is here after customer table")
         let customerResponse = await dynamodb.scan(customerParams).promise()
         if (customerResponse.Count == 0){
             let customerPreloginParams = {
@@ -179,12 +178,14 @@ const processAuthRequest = async(payload, awsAccountId, apiOptions) => {
         }
         // let pool = tokenIssuer.substring(tokenIssuer.lastIndexOf('/') + 1);
         try {
+            
             context.cognitoIdentityId = cognitoIdentityId
             context.Usersub = payload['cognito:username']
             context.UserId = payload['cognito:username']
             context.UserPoolId = UserPoolId
-           
+            context.apis =allowedApis.toString()
         }
+        
         catch (e) {
             logger.error(e);
         }
@@ -217,8 +218,6 @@ exports.handler = async (event, context, callback) => {
         decoded = jwt.decode(token, {
             complete: true
         });
-        
-        console.log(decoded)
         if (!decoded) {
             logger.info('denied due to decoded error');
             console.log("denied due to decoded error")
