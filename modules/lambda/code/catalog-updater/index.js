@@ -194,7 +194,7 @@ async function handler (event, context) {
       .Body.toString()
   )
   console.log(`sdkGeneration: ${inspectStringify(sdkGeneration)}`)
-
+  let sdkGenerationKey = Object.keys(sdkGeneration)[0]
   const usagePlansPromise = getAllUsagePlans(exports.apiGateway)
   const builderPromise = usagePlansPromise.then(usagePlans => {
     console.log(`usagePlans: ${inspectStringify(usagePlans)}`)
@@ -207,8 +207,8 @@ async function handler (event, context) {
   while (true) {
     const listObjectsResult = await exports.s3.listObjectsV2(
       token != null
-        ? { Bucket: bucketName, Prefix: 'catalog/', ContinuationToken: token }
-        : { Bucket: bucketName, Prefix: 'catalog/' }
+        ? { Bucket: bucketName, Prefix: `catalog/${sdkGenerationKey}`, ContinuationToken: token }
+        : { Bucket: bucketName, Prefix: `catalog/${sdkGenerationKey}` }
     ).promise()
 
     for (const file of listObjectsResult.Contents) {
