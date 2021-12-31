@@ -107,9 +107,8 @@ const processAuthRequest = async(payload, awsAccountId, apiOptions) => {
             // Get list of all
             for (let ar of apisResponse.Items) {
                 console.log("in for loops")
-                console.log(ar.ResourceName)
                 if (ar.hasOwnProperty('ResourceName')){
-                if (user_groups.includes(ar.role) && ar.ResourceName == apiPermissionRespone.Items[0].ResourceName ) {
+                if (user_groups.includes(ar.role) && ar.ResourceId == apiPermissionRespone.Items[0].ResourceId ) {
                     console.log("in user-group")
                     console.log(apiPermissionRespone)
                     for (let api of ar.apis) {
