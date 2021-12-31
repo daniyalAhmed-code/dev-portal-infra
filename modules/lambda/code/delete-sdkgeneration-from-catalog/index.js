@@ -42,7 +42,6 @@ exports.idempotentSdkGenerationUpdate = async (parity, id, res) => {
 exports.handler = async (req, res) => {
   if(typeof req.pathParameters == "string")
     req['pathParameters'] = JSON.parse(req.pathParameters)
-  console.log(`DELETE /admin/catalog/${req.pathParameters.id}/sdkGeneration for Cognito ID: ${util.getCognitoIdentityId(req)}`)
 
   await exports.idempotentSdkGenerationUpdate(false, req.pathParameters.id, res)
   return rh.callbackRespondWithSimpleMessage(200,'Success')
