@@ -13,6 +13,9 @@ const MAX_REST_API_LIMIT = 500
 const rh   =  require('dev-portal-common/responsehandler')
 
 exports.handler = async (req, res) => {
+  let allowedApis = req.requestContext.authorizer.apis
+  if (typeof allowedApis == "string")
+    allowedApis = allowedApis.split(",")
 
   console.log(`GET /admin/catalog/visibility for Cognito ID: ${util.getCognitoIdentityId(req)}`)
   try {
@@ -38,12 +41,20 @@ exports.handler = async (req, res) => {
       promises.push(
         util.apigateway.getStages({ restApiId: api.id }).promise()
           .then((response) => response.item)
-          .then((stages) => stages.forEach(stage => visibility.apiGateway.push({
+          .then((stages) => stages.forEach(stage =>{ 
+            allowedApis.forEach( api_id =>{
+              if(api.id == api_id)
+              {
+            visibility.apiGateway.push({
             id: api.id,
             name: api.name,
             stage: stage.stageName,
             visibility: false
-          })))
+          })    
+              }
+            })
+          })
+          )
       )
     })
     await Promise.all(promises)
@@ -97,36 +108,36 @@ exports.handler = async (req, res) => {
     console.log(`visibility updated subscribable: ${inspect(visibility)}`)
 
     // mark every api in the generic catalog as visible
-    catalogObject.generic.forEach((catalogEntry) => {
-      console.log(`catalogEntry: ${nodeUtil.inspect(catalogEntry, null, 1)}`)
-      // Unlike in the catalog and elsewhere, the visibility's `apiGateway` contains *all* API
-      // Gateway-managed APIs, and only unmanaged APIs are in `visibility.generic`.
-      if (catalogEntry.apiId != null) {
-        const target = visibility.apiGateway.find((api) =>
-          api.id === catalogEntry.apiId && api.stage === catalogEntry.apiStage
-        )
-        if (target != null) {
-          target.visibility = true
+    // catalogObject.generic.forEach((catalogEntry) => {
+    //   console.log(`catalogEntry: ${nodeUtil.inspect(catalogEntry, null, 1)}`)
+    //   // Unlike in the catalog and elsewhere, the visibility's `apiGateway` contains *all* API
+    //   // Gateway-managed APIs, and only unmanaged APIs are in `visibility.generic`.
+    //   if (catalogEntry.apiId != null) {
+    //     const target = visibility.apiGateway.find((api) =>
+    //       api.id === catalogEntry.apiId && api.stage === catalogEntry.apiStage
+    //     )
+    //     if (target != null) {
+    //       target.visibility = true
 
-          if (catalogEntry.sdkGeneration !== undefined) {
-            target.sdkGeneration = catalogEntry.sdkGeneration
-          }
+    //       if (catalogEntry.sdkGeneration !== undefined) {
+    //         target.sdkGeneration = catalogEntry.sdkGeneration
+    //       }
 
-          return
-        }
-      }
+    //       return
+    //     }
+    //   }
 
-      if (!visibility.generic) {
-        visibility.generic = {}
-      }
+    //   if (!visibility.generic) {
+    //     visibility.generic = {}
+    //   }
 
-      visibility.generic[catalogEntry.id] = {
-        visibility: true,
-        name: (catalogEntry.swagger && catalogEntry.swagger.info && catalogEntry.swagger.info.title) || 'Untitled'
-      }
-    })
+    //   visibility.generic[catalogEntry.id] = {
+    //     visibility: true,
+    //     name: (catalogEntry.swagger && catalogEntry.swagger.info && catalogEntry.swagger.info.title) || 'Untitled'
+    //   }
+    // })
 
-    console.log(`visibility updated generic: ${inspect(visibility)}`)
+    // console.log(`visibility updated generic: ${inspect(visibility)}`)
     
     return rh.callbackRespondWithJsonBody(200,visibility)
 
